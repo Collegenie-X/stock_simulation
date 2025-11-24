@@ -24,14 +24,22 @@ export default function GameSetupPage() {
       duration,
       initialCash: seedMoney,
     })
-    router.push("/practice/stock/scenario-1")
+    
+    // 선택한 기간에 맞는 시나리오 선택
+    // scenario-1: 10일 (1개월 미만용)
+    // scenario-100days: 100일 (1개월 이상용)
+    const scenarioId = duration >= 1 ? "scenario-100days" : "scenario-1"
+    
+    console.log("🎮 게임 시작:", { duration, seedMoney, scenarioId })
+    
+    router.push(`/practice/stock/${scenarioId}`)
   }
 
   const durations = [
-    { value: 1, label: "1개월", desc: "빠르게 체험하기" },
-    { value: 3, label: "3개월", desc: "기본 코스" },
-    { value: 6, label: "6개월", desc: "중급자 코스" },
-    { value: 12, label: "1년", desc: "장기 투자 연습" },
+    { value: 1, label: "1개월", desc: "빠르게 체험하기", days: 30 },
+    { value: 3, label: "3개월", desc: "기본 코스", days: 90 },
+    { value: 6, label: "6개월", desc: "중급자 코스 (곧 출시)", days: 180 },
+    { value: 12, label: "1년", desc: "장기 투자 연습 (곧 출시)", days: 365 },
   ]
 
   const moneyOptions = [
@@ -65,15 +73,23 @@ export default function GameSetupPage() {
               <button
                 key={opt.value}
                 onClick={() => setDuration(opt.value)}
+                disabled={opt.value > 3}
                 className={cn(
                   "p-4 rounded-2xl border text-left transition-all",
                   duration === opt.value
                     ? "bg-blue-500/20 border-blue-500 text-blue-400"
-                    : "bg-[#222] border-transparent hover:bg-[#2a2a2a] text-gray-400",
+                    : opt.value > 3
+                      ? "bg-[#1a1a1a] border-transparent text-gray-600 cursor-not-allowed opacity-50"
+                      : "bg-[#222] border-transparent hover:bg-[#2a2a2a] text-gray-400",
                 )}
               >
                 <div className="font-bold text-lg mb-1">{opt.label}</div>
                 <div className="text-xs opacity-70">{opt.desc}</div>
+                {opt.value <= 3 && (
+                  <div className="text-[10px] text-gray-500 mt-1">
+                    {opt.days}일 시뮬레이션
+                  </div>
+                )}
               </button>
             ))}
           </div>

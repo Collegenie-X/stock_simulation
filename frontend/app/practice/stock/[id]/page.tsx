@@ -18,21 +18,31 @@ import {
   CandlestickChart,
 } from "lucide-react"
 import scenariosData from "@/data/game-scenarios.json"
+import scenarios100DaysData from "@/data/stock-100days-data.json"
 // import { StockChart } from "@/components/stock-chart" // Removed as it's defined below
 import { cn } from "@/lib/utils"
 // Added XAxis, YAxis, Tooltip
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, ReferenceDot, Label } from "recharts" // Added ReferenceDot, Label
 import { storage } from "@/lib/storage"
+import { AIRankingCard, AINotification } from "@/components/ai-ranking-card"
+import { HintModal } from "@/components/hint-modal"
+import { EnhancedReportModal } from "@/components/enhanced-report-modal"
+import { ItemsShopModal, OwnedItemsBadge } from "@/components/items-shop-modal"
+import aiCompetitorsData from "@/data/ai-competitors.json"
 
 // Mock data generator for history
 const generateHistory = (initialPrice: number, days: number) => {
   let currentPrice = initialPrice
   const history = []
+  const today = new Date()
   for (let i = days; i > 0; i--) {
     const change = (Math.random() - 0.5) * 0.05 // +/- 2.5%
     currentPrice = currentPrice * (1 + change)
+    const historyDate = new Date(today)
+    historyDate.setDate(today.getDate() - i)
+    const dateStr = `${historyDate.getFullYear()}-${String(historyDate.getMonth() + 1).padStart(2, '0')}-${String(historyDate.getDate()).padStart(2, '0')}`
     history.push({
-      date: `D-${i}`,
+      date: dateStr,
       price: Math.round(currentPrice),
       index: -i,
     })
@@ -40,30 +50,70 @@ const generateHistory = (initialPrice: number, days: number) => {
   return history
 }
 
-const MiniChart = ({ data, color, isUp }: { data: any[]; color: string; isUp: boolean }) => (
-  <div className="h-10 w-14 shrink-0 mr-3" style={{ minHeight: "40px", minWidth: "56px" }}>
-    <ResponsiveContainer width="100%" height="100%" minHeight={40} minWidth={56}>
-      <AreaChart data={data}>
-        <defs>
-          <linearGradient id={`colorGradient-${isUp ? "up" : "down"}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={color} stopOpacity={0.3} />
-            <stop offset="95%" stopColor={color} stopOpacity={0} />
-          </linearGradient>
-        </defs>
-        <Area
-          type="monotone"
-          dataKey="price"
-          stroke={color}
-          strokeWidth={2}
-          fill={`url(#gradient-${isUp ? "up" : "down"})`}
-          isAnimationActive={false}
-        />
-      </AreaChart>
-    </ResponsiveContainer>
-  </div>
-)
+const MiniChart = ({ 
+  data, 
+  color, 
+  isUp, 
+  weekNumber = 0 
+}: { 
+  data: any[]
+  color: string
+  isUp: boolean
+  weekNumber?: number 
+}) => {
+  // Y축 범위 계산 (가격 변화가 잘 보이도록)
+  const prices = data.map(d => d.price).filter(p => p > 0)
+  const minPrice = Math.min(...prices)
+  const maxPrice = Math.max(...prices)
+  const padding = (maxPrice - minPrice) * 0.2 || maxPrice * 0.05 // 최소 5% 여유
+  const yMin = Math.floor(minPrice - padding)
+  const yMax = Math.ceil(maxPrice + padding)
+  
+  const strokeWidth = 2
+  const gradientId = `colorGradient-${isUp ? "up" : "down"}-${Math.random().toString(36).substr(2, 9)}`
+  
+  return (
+    <div className="h-12 w-16 shrink-0 mr-3 relative" style={{ minHeight: "48px", minWidth: "64px" }}>
+      <ResponsiveContainer width="100%" height="100%" minHeight={48} minWidth={64}>
+        <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
+          <defs>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor={color} stopOpacity={0.2} />
+              <stop offset="95%" stopColor={color} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <XAxis dataKey="index" hide />
+          <YAxis hide domain={[yMin, yMax]} />
+          <Area
+            type="monotone"
+            dataKey="price"
+            stroke={color}
+            strokeWidth={strokeWidth}
+            fill={`url(#${gradientId})`}
+            isAnimationActive={false}
+            dot={false}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  )
+}
 
 const EXCHANGE_RATE = 1300
+const TURNS_PER_DAY = 6 // 1일 6턴 (5초 × 6 = 30초/일)
+const DAYS_PER_WEEK = 7
+const TURNS_PER_WEEK = TURNS_PER_DAY * DAYS_PER_WEEK // 42턴
+const DAY_PHASES = ["장 시작", "오전", "점심", "오후", "장 마감", "시간외"]
+const DAY_NAMES = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"]
+const PLAY_SPEED_OPTIONS = [5, 8, 10, 15, 20] as const
+type PlaySpeed = (typeof PLAY_SPEED_OPTIONS)[number]
+const PLAY_SPEED_LABELS: Record<PlaySpeed, string> = {
+  5: "초고속",
+  8: "고속",
+  10: "보통",
+  15: "여유",
+  20: "느림",
+}
 
 const renderStockItem = (
   stock: any,
@@ -75,8 +125,14 @@ const renderStockItem = (
   currencyMode: "KRW" | "USD",
   listDisplayMode: "price" | "valuation" = "price", // Added listDisplayMode parameter
 ) => {
-  const sPrice = stock.turns[currentTurn].price
-  const sPrevPrice = currentTurn > 0 ? stock.turns[currentTurn - 1].price : stock.initialPrice
+  const currentTurnData = stock.turns[currentTurn]
+  if (!currentTurnData) {
+    console.error("❌ 턴 데이터 없음:", { stockId: stock.id, currentTurn, totalTurns: stock.turns.length })
+    return null
+  }
+  
+  const sPrice = currentTurnData.price
+  const sPrevPrice = currentTurn > 0 ? stock.turns[currentTurn - 1]?.price || stock.initialPrice : stock.initialPrice
   const sChange = (((sPrice - sPrevPrice) / sPrevPrice) * 100).toFixed(1)
   const isUp = Number.parseFloat(sChange) >= 0
   const myQty = holdings[stock.id] || 0
@@ -116,18 +172,41 @@ const renderStockItem = (
     displayValue = displayValue / EXCHANGE_RATE
   }
 
-  const historyNeeded = 20
-  let chartData = []
+  // 5일치 데이터 (30턴), 2턴당 1개씩 샘플링하여 15개 포인트 표시
+  const historyNeeded = 30 // 5일 × 6턴
+  const sampleRate = 2 // 2턴당 1개
+  let rawData = []
 
   if (currentTurn < historyNeeded) {
     const startPrice = stock.initialPrice
     for (let i = historyNeeded - currentTurn; i > 0; i--) {
-      chartData.push({ price: startPrice * (1 + (Math.random() - 0.5) * 0.02) })
+      rawData.push({ price: startPrice, index: rawData.length })
     }
   }
 
-  const recentTurns = stock.turns.slice(Math.max(0, currentTurn - historyNeeded), currentTurn + 1)
-  chartData = [...chartData, ...recentTurns.map((t: any) => ({ price: t.price }))]
+  const startIndex = Math.max(0, currentTurn - historyNeeded)
+  const recentTurns = stock.turns.slice(startIndex, currentTurn + 1)
+  rawData = [...rawData, ...recentTurns.map((t: any, idx: number) => ({ 
+    price: t.price, 
+    index: rawData.length + idx 
+  }))]
+
+  // 2턴당 1개씩 샘플링 (미니차트 최적화)
+  const chartData = rawData.filter((_, idx) => idx % sampleRate === 0 || idx === rawData.length - 1)
+  
+  // 디버깅: 차트 데이터 로그 (첫 번째 주식만, 6턴마다)
+  if (stock.id === 'KAKAO' && currentTurn % 6 === 0) {
+    console.log(`📊 [${stock.name}] 턴 ${currentTurn}: 차트 데이터`, {
+      rawDataPoints: rawData.length,
+      sampledPoints: chartData.length,
+      prices: chartData.map(d => d.price),
+      minPrice: Math.min(...chartData.map(d => d.price)),
+      maxPrice: Math.max(...chartData.map(d => d.price)),
+    })
+  }
+
+  // 현재 몇 주차인지 계산
+  const weekNumber = Math.floor(currentTurn / TURNS_PER_WEEK)
 
   return (
     <div
@@ -139,7 +218,13 @@ const renderStockItem = (
       className="flex items-center justify-between py-4 px-3 mb-2 bg-[#252525] hover:bg-[#2a2a2a] active:scale-[0.98] transition-all cursor-pointer rounded-xl border border-gray-800 shadow-sm"
     >
       <div className="flex items-center min-w-0 flex-1">
-        <MiniChart data={chartData} color={isUp ? "#ef4444" : "#3b82f6"} isUp={isUp} />
+        <MiniChart 
+          key={`${stock.id}-${currentTurn}`}
+          data={chartData} 
+          color={isUp ? "#ef4444" : "#3b82f6"} 
+          isUp={isUp} 
+          weekNumber={weekNumber}
+        />
 
         <div className="min-w-0 flex-1 pr-2">
           <div className="font-bold text-gray-100 truncate text-[15px]">{stock.name}</div>
@@ -254,58 +339,110 @@ const StockChart = ({
   height = 200,
   color = "red",
   dataKey = "price",
-  showXAxis = false,
+  showXAxis = true,
+  chartPeriod = "1M",
 }: {
   data: any[]
   height?: number
   color?: "red" | "blue"
   dataKey?: string
   showXAxis?: boolean
+  chartPeriod?: "1D" | "1W" | "1M" | "1Y"
 }) => {
   const colorMap = {
-    red: "#F04452", // Toss Red
-    blue: "#3182F6", // Toss Blue
+    red: "#F87171", // 빨간색
+    blue: "#60A5FA", // 파란색
   }
 
   const chartColor = colorMap[color]
   const gradientId = `gradient-${color}-${Math.random().toString(36).substr(2, 9)}`
 
-  const { min, max, maxPoint, minPoint } = useMemo(() => {
-    if (!data || data.length === 0) return { min: 0, max: 0, maxPoint: null, minPoint: null }
+  const { min, max, maxPointIndex, minPointIndex, maxPrice, minPrice } = useMemo(() => {
+    if (!data || data.length === 0) return { 
+      min: 0, max: 0, 
+      maxPointIndex: -1, minPointIndex: -1,
+      maxPrice: 0, minPrice: 0
+    }
     const values = data.map((d: any) => d[dataKey])
     const minVal = Math.min(...values)
     const maxVal = Math.max(...values)
-    const padding = (maxVal - minVal) * 0.3
+    const padding = (maxVal - minVal) * 0.2
 
-    const maxPoint = data.find((d) => d[dataKey] === maxVal)
-    const minPoint = data.find((d) => d[dataKey] === minVal)
+    // 배열 인덱스 찾기 (ReferenceDot에서 사용할 실제 위치)
+    const maxPointIndex = values.indexOf(maxVal)
+    const minPointIndex = values.indexOf(minVal)
 
     return {
       min: Math.floor(minVal - padding),
       max: Math.ceil(maxVal + padding),
-      maxPoint,
-      minPoint,
+      maxPointIndex,
+      minPointIndex,
+      maxPrice: maxVal,
+      minPrice: minVal,
     }
   }, [data, dataKey])
+
+  // 날짜 포맷팅 함수 - 기간에 따라 다르게 표시
+  const formatXAxis = (value: any, index: number) => {
+    if (!data || !data[index]) return ''
+    const dateStr = data[index].date || ''
+    
+    if (dateStr.includes('-')) {
+      const parts = dateStr.split(' ')
+      const datePart = parts[0].split('-')
+      const year = datePart[0]
+      const month = parseInt(datePart[1])
+      const day = parseInt(datePart[2])
+      const timePart = parts[1] // "09:30" 형식
+      
+      // 1일: 시간만 표시
+      if (chartPeriod === "1D" && timePart) {
+        return timePart
+      }
+      // 1년: 년도/월 표시
+      else if (chartPeriod === "1Y") {
+        return `${year.slice(2)}/${month}` // "24/1" 형식
+      }
+      // 1주, 1개월: 월/일만 표시
+      else {
+        return `${month}/${day}`
+      }
+    }
+    return ''
+  }
 
   return (
     <div className="w-full select-none" style={{ height }}>
       <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 20, right: 0, left: 0, bottom: 20 }}>
+        <AreaChart data={data} margin={{ top: 25, right: 10, left: 10, bottom: 30 }}>
           <defs>
             <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={chartColor} stopOpacity={0.4} />
+              <stop offset="5%" stopColor={chartColor} stopOpacity={0.3} />
               <stop offset="95%" stopColor={chartColor} stopOpacity={0} />
             </linearGradient>
           </defs>
           <YAxis hide domain={[min, max]} />
-          <XAxis dataKey="index" hide />
+          <XAxis 
+            dataKey="index" 
+            type="number"
+            hide={!showXAxis}
+            tickFormatter={formatXAxis}
+            tick={{ fill: '#6B7280', fontSize: 10 }}
+            stroke="transparent"
+            axisLine={false}
+            tickLine={false}
+            interval="preserveStartEnd"
+            minTickGap={40}
+            domain={[0, data.length - 1]}
+          />
           <Tooltip
             content={({ active, payload }) => {
               if (active && payload && payload.length) {
+                const pointData = payload[0].payload
                 return (
-                  <div className="bg-gray-900/90 backdrop-blur border border-gray-700 text-white text-xs font-bold py-1.5 px-3 rounded-xl shadow-xl">
-                    {Number(payload[0].value).toLocaleString()}원
+                  <div className="bg-gray-900/90 backdrop-blur border border-gray-700 text-white text-xs font-bold py-2 px-3 rounded-xl shadow-xl">
+                    <div className="text-gray-400">{pointData.date || ''}</div>
+                    <div className="mt-1">{Number(payload[0].value).toLocaleString()}원</div>
                   </div>
                 )
               }
@@ -317,38 +454,69 @@ const StockChart = ({
             type="monotone"
             dataKey={dataKey}
             stroke={chartColor}
-            strokeWidth={3}
+            strokeWidth={2}
             fill={`url(#${gradientId})`}
-            animationDuration={1000}
+            animationDuration={600}
             isAnimationActive={true}
+            dot={false}
           />
-          {maxPoint && (
-            <ReferenceDot x={maxPoint.index} y={maxPoint.price} r={4} fill={chartColor} stroke="white" strokeWidth={2}>
+          
+          {/* 최고점 */}
+          {maxPointIndex >= 0 && data[maxPointIndex] && (
+            <ReferenceDot 
+              x={maxPointIndex} 
+              y={maxPrice} 
+              r={3} 
+              fill="#F87171" 
+              stroke="white" 
+              strokeWidth={1.5}
+            >
               <Label
                 content={({ viewBox }: any) => {
                   const { x, y } = viewBox
                   return (
-                    <text x={x} y={y - 10} fill="#F04452" fontSize={12} textAnchor="middle" fontWeight="bold">
-                      최고 {maxPoint.price.toLocaleString()}원
+                    <text x={x} y={y - 12} fill="#F87171" fontSize={10} textAnchor="middle" fontWeight="600">
+                      최고 {maxPrice.toLocaleString()}원
                     </text>
                   )
                 }}
               />
             </ReferenceDot>
           )}
-          {minPoint && (
-            <ReferenceDot x={minPoint.index} y={minPoint.price} r={4} fill={chartColor} stroke="white" strokeWidth={2}>
+          
+          {/* 최저점 */}
+          {minPointIndex >= 0 && data[minPointIndex] && (
+            <ReferenceDot 
+              x={minPointIndex} 
+              y={minPrice} 
+              r={3} 
+              fill="#9CA3AF" 
+              stroke="white" 
+              strokeWidth={1.5}
+            >
               <Label
                 content={({ viewBox }: any) => {
                   const { x, y } = viewBox
                   return (
-                    <text x={x} y={y + 20} fill="#3182F6" fontSize={12} textAnchor="middle" fontWeight="bold">
-                      최저 {minPoint.price.toLocaleString()}원
+                    <text x={x} y={y + 18} fill="#9CA3AF" fontSize={10} textAnchor="middle" fontWeight="600">
+                      최저 {minPrice.toLocaleString()}원
                     </text>
                   )
                 }}
               />
             </ReferenceDot>
+          )}
+          
+          {/* 현재 포인트 */}
+          {data && data.length > 0 && (
+            <ReferenceDot 
+              x={data.length - 1} 
+              y={data[data.length - 1][dataKey]} 
+              r={4} 
+              fill={chartColor} 
+              stroke="white" 
+              strokeWidth={2}
+            />
           )}
         </AreaChart>
       </ResponsiveContainer>
@@ -396,7 +564,42 @@ export default function GamePlayPage() {
   const [inputValue, setInputValue] = useState<string>("")
   const [showOrderTypeSheet, setShowOrderTypeSheet] = useState(false)
 
-  const scenario = scenariosData.scenarios.find((s) => s.id === scenarioId)
+  // 새로운 기능 상태
+  const [showAIRanking, setShowAIRanking] = useState(false)
+  const [showHintModal, setShowHintModal] = useState(false)
+  const [showItemsShop, setShowItemsShop] = useState(false)
+  const [showEnhancedReport, setShowEnhancedReport] = useState(false)
+  const [hintLevel, setHintLevel] = useState<1 | 2>(1)
+  const [userPoints, setUserPoints] = useState(1000)
+  const [ownedItems, setOwnedItems] = useState<string[]>([])
+  const [aiNotification, setAiNotification] = useState<{
+    isVisible: boolean
+    aiName: string
+    action: "buy" | "sell"
+    stockName: string
+    price: number
+  }>({
+    isVisible: false,
+    aiName: "",
+    action: "buy",
+    stockName: "",
+    price: 0,
+  })
+
+  // 실시간 업데이트 속도 설정 (턴당 5초 → 1일 30초)
+  const [playSpeed, setPlaySpeed] = useState<PlaySpeed>(5) // 기본 5초 × 6턴 = 30초/일
+
+  // 시나리오 데이터 선택: scenario-100days면 100일 데이터 사용
+  const allScenarios = [...scenariosData.scenarios, scenarios100DaysData]
+  const scenario = allScenarios.find((s) => s.id === scenarioId)
+  
+  console.log("🎮 시나리오 로드:", {
+    scenarioId,
+    found: !!scenario,
+    title: scenario?.title || scenario?.name,
+    totalTurns: scenario?.totalTurns,
+    stocksCount: scenario?.stocks?.length,
+  })
 
   // localStorage에서 데이터를 로드하는 함수 (JSON API 형식)
   const loadSessionData = useCallback(() => {
@@ -432,13 +635,39 @@ export default function GamePlayPage() {
         cash: newCash,
       })
 
-      setCurrentTurn(savedSession.currentTurn || 0)
+      // 턴이 최대값을 초과하지 않도록 체크 (1일 = 4턴)
+      const settingsDuration = settings?.duration ? settings.duration * 30 * TURNS_PER_DAY : null
+      const scenarioTurns = scenario?.totalTurns || 10
+      const maxTurns = settingsDuration || scenarioTurns
+      const safeTurn = Math.min(savedSession.currentTurn || 0, maxTurns - 1)
+      console.log("🔄 턴 설정:", { 
+        saved: savedSession.currentTurn, 
+        max: maxTurns, 
+        safe: safeTurn,
+        settingsDuration,
+        scenarioTurns 
+      })
+      setCurrentTurn(safeTurn)
       setHoldings(newHoldings)
       setAveragePrices(newAveragePrices)
       setCash(newCash)
       setPendingOrders(savedSession.pendingOrders || [])
       setWeeklyHistory(savedSession.weeklyHistory || [])
       setLastWeekValue(savedSession.lastWeekValue || 0)
+      
+      // isPlaying 상태 복원 (저장된 값이 있어도 강제로 true로 시작하여 자동 진행 보장)
+      // const savedIsPlaying = savedSession.isPlaying !== undefined ? savedSession.isPlaying : true
+      console.log("▶️ 세션 로드됨 - 자동 시작")
+      setIsPlaying(true)
+      
+      // selectedStockId 복원 또는 기본값 설정
+      if (savedSession.selectedStockId) {
+        console.log("📍 저장된 주식 ID 복원:", savedSession.selectedStockId)
+        setSelectedStockId(savedSession.selectedStockId)
+      } else if (scenario && scenario.stocks && scenario.stocks.length > 0) {
+        console.log("📍 첫 번째 주식 자동 선택:", scenario.stocks[0].id)
+        setSelectedStockId(scenario.stocks[0].id)
+      }
       
       console.log("✅ 세션 적용 완료")
       console.log("적용된 holdings:", newHoldings)
@@ -455,17 +684,30 @@ export default function GamePlayPage() {
       setHoldings({})
       setAveragePrices({})
       setCurrentTurn(0)
+      
+      // 새 세션은 자동으로 시작
+      console.log("▶️ 새 세션 자동 시작")
+      setIsPlaying(true)
+      
+      // 새 세션 시작 시 첫 번째 주식 선택
+      if (scenario && scenario.stocks && scenario.stocks.length > 0) {
+        console.log("📍 새 세션 - 첫 번째 주식 선택:", scenario.stocks[0].id)
+        setSelectedStockId(scenario.stocks[0].id)
+      }
     }
     
     console.log("=== 세션 데이터 로드 완료 ===")
     
-    // 로딩 완료 후 자동 저장 재개
+    // 로딩 완료 후 자동 저장 재개 및 자동 시작
     setTimeout(() => {
       console.log("자동 저장 재개")
       setIsInitialLoad(false)
       setPauseAutoSave(false)
+      
+      // 로드 완료 후 isPlaying 상태 확인 및 로그
+      console.log("🎮 로드 완료 - isPlaying 상태 확인")
     }, 200)
-  }, [scenarioId])
+  }, [scenarioId, scenario])
 
   useEffect(() => {
     loadSessionData()
@@ -533,6 +775,7 @@ export default function GamePlayPage() {
       weeklyHistory,
       lastWeekValue,
       selectedStockId,
+      isPlaying, // 재생 상태 저장
     }
     storage.setGameSession(scenarioId, session)
   }, [
@@ -544,6 +787,7 @@ export default function GamePlayPage() {
     weeklyHistory,
     lastWeekValue,
     selectedStockId,
+    isPlaying,
     scenario,
     scenarioId,
     isInitialLoad,
@@ -570,6 +814,7 @@ export default function GamePlayPage() {
           weeklyHistory,
           lastWeekValue,
           selectedStockId: stockId,
+          isPlaying, // 재생 상태도 저장
         }
         
         console.log("거래 페이지로 이동 전 저장:", session)
@@ -591,6 +836,7 @@ export default function GamePlayPage() {
       weeklyHistory,
       lastWeekValue,
       selectedStockId,
+      isPlaying,
       scenarioId,
       router,
     ],
@@ -642,6 +888,7 @@ export default function GamePlayPage() {
   // Initialize selected stock but keep view in list mode initially
   useEffect(() => {
     if (scenario && scenario.stocks.length > 0 && !selectedStockId) {
+      console.log("📍 초기 주식 선택:", scenario.stocks[0].id, scenario.stocks[0].name)
       setSelectedStockId(scenario.stocks[0].id)
     }
   }, [scenario, selectedStockId])
@@ -663,23 +910,64 @@ export default function GamePlayPage() {
     setOrderType("market") // Reset order type
   }, [selectedStockId, viewMode]) // Reset quantity when changing stock or view mode
 
+  // 실시간 자동 업데이트 타이머
   useEffect(() => {
     let interval: NodeJS.Timeout
-    const maxTurns = gameSettings ? gameSettings.duration * 20 : scenario?.totalTurns || 60 // Use settings for duration (approx 20 days/month)
+    
+    // gameSettings의 duration을 우선 사용 (3개월 = 90일 = 360턴)
+    const settingsDuration = gameSettings?.duration ? gameSettings.duration * 30 * TURNS_PER_DAY : null
+    const scenarioTurns = scenario?.totalTurns || 10
+    const maxTurns = settingsDuration || scenarioTurns
+
+    console.log("⏱️ 타이머 체크:", { 
+      isPlaying, 
+      showResult,
+      hasScenario: !!scenario,
+      currentTurn, 
+      maxTurns, 
+      maxIndex: maxTurns - 1,
+      showWeeklyReport,
+      playSpeed: `${playSpeed}초`,
+      조건충족: isPlaying && !showResult && !!scenario && currentTurn < maxTurns - 1 && !showWeeklyReport
+    })
 
     if (isPlaying && !showResult && scenario && currentTurn < maxTurns - 1 && !showWeeklyReport) {
+      console.log(`✅ 타이머 시작: ${playSpeed}초마다 턴 업데이트`)
+      // playSpeed 초마다 턴 진행
       interval = setInterval(() => {
-        setCurrentTurn((prev) => prev + 1)
-      }, 60000) // 1 minute per day
-    } else if (currentTurn >= maxTurns - 1) {
+        setCurrentTurn((prev) => {
+          const next = prev + 1
+          console.log("➡️ 턴 진행:", prev, "→", next, "/", maxTurns - 1)
+          return next
+        })
+      }, playSpeed * 1000)
+    } else {
+      console.log("⏸️ 타이머 중지:", {
+        reason: !isPlaying ? "게임 일시정지" : 
+                !scenario ? "시나리오 없음" : 
+                currentTurn >= maxTurns - 1 ? "게임 종료" :
+                showWeeklyReport ? "주간 리포트 표시 중" :
+                showResult ? "결과 표시 중" : "알 수 없음"
+      })
+    }
+    
+    if (currentTurn >= maxTurns - 1 && !showResult) {
+      console.log("🏁 게임 종료 조건 충족:", currentTurn, ">=", maxTurns - 1)
       setIsPlaying(false)
       setTimeout(() => setShowResult(true), 1000)
     }
-    return () => clearInterval(interval)
-  }, [isPlaying, currentTurn, scenario, showResult, showWeeklyReport, gameSettings])
+    
+    return () => {
+      if (interval) {
+        console.log("🧹 타이머 정리")
+        clearInterval(interval)
+      }
+    }
+  }, [isPlaying, currentTurn, scenario, showResult, showWeeklyReport, playSpeed, gameSettings])
 
+  // 1주(7일 = TURNS_PER_WEEK턴)마다 주간 리포트 표시
   useEffect(() => {
-    if (currentTurn > 0 && currentTurn % 5 === 0) {
+    if (currentTurn > 0 && currentTurn % TURNS_PER_WEEK === 0) {
       setIsPlaying(false)
       setShowWeeklyReport(true)
     }
@@ -805,8 +1093,55 @@ export default function GamePlayPage() {
     }
   }, [])
 
-  const currentStock = scenario?.stocks.find((s) => s.id === selectedStockId)
-  const turnData = currentStock?.turns[currentTurn]
+  // currentStock을 useMemo로 최적화하여 주기적으로 업데이트
+  const currentStock = useMemo(() => {
+    if (!scenario || !scenario.stocks || !selectedStockId) {
+      console.log("⚠️ currentStock 계산 실패:", { 
+        hasScenario: !!scenario, 
+        stocksCount: scenario?.stocks?.length,
+        selectedStockId 
+      })
+      return undefined
+    }
+    const stock = scenario.stocks.find((s) => s.id === selectedStockId)
+    console.log("🔄 currentStock 업데이트:", { 
+      stockId: selectedStockId, 
+      stockName: stock?.name,
+      found: !!stock,
+      turnsAvailable: stock?.turns?.length 
+    })
+    return stock
+  }, [scenario, selectedStockId])
+  
+  const turnData = currentStock?.turns?.[currentTurn]
+
+  const derivedMaxTurns = useMemo(() => {
+    const settingsTurns = gameSettings?.duration ? gameSettings.duration * 30 * TURNS_PER_DAY : null
+    return settingsTurns || scenario?.totalTurns || 0
+  }, [gameSettings, scenario])
+
+  const totalDays = derivedMaxTurns > 0 ? Math.ceil(derivedMaxTurns / TURNS_PER_DAY) : 0
+  const currentDayNumber = Math.floor(currentTurn / TURNS_PER_DAY) + 1
+  const currentDayName = DAY_NAMES[(currentDayNumber - 1) % DAY_NAMES.length]
+  const currentDayPhase = DAY_PHASES[currentTurn % TURNS_PER_DAY]
+  const currentWeekNumber = Math.floor(currentTurn / TURNS_PER_WEEK) + 1
+  const turnsIntoWeek = currentTurn % TURNS_PER_WEEK
+  const turnsUntilReport = turnsIntoWeek === 0 ? TURNS_PER_WEEK : TURNS_PER_WEEK - turnsIntoWeek
+  const daysUntilReport = Math.ceil(turnsUntilReport / TURNS_PER_DAY)
+  const secondsPerDay = playSpeed * TURNS_PER_DAY
+  const tenDayMinutes = ((secondsPerDay * 10) / 60).toFixed(1)
+  const ninetyDayHours = ((secondsPerDay * 90) / 3600).toFixed(1)
+  
+  console.log("📊 현재 데이터:", {
+    scenarioId,
+    selectedStockId,
+    currentStock: currentStock?.name,
+    currentTurn,
+    maxValidIndex: (currentStock?.turns?.length || 0) - 1,
+    turnData: turnData ? { date: turnData.date, price: turnData.price } : null,
+    totalTurns: currentStock?.turns?.length,
+    isIndexValid: currentTurn < (currentStock?.turns?.length || 0),
+  })
 
   const currentPrice = turnData?.price || 0
   const currentHoldings = holdings[selectedStockId] || 0
@@ -843,25 +1178,33 @@ export default function GamePlayPage() {
 
     const history = generateHistory(currentStock.initialPrice, 365) // Generate 1 year history
     const gameData = currentStock.turns.slice(0, currentTurn + 1).map((t, idx) => ({
-      index: idx,
+      index: history.length + idx,
       price: t.price,
       date: t.date,
     }))
 
     const fullData = [...history, ...gameData]
 
+    let filteredData
     switch (chartPeriod) {
       case "1D":
-        return fullData.slice(-20) // Approx 1 day in game minutes
+        filteredData = fullData.slice(-20) // Approx 1 day in game minutes
+        break
       case "1W":
-        return fullData.slice(-100) // Approx 1 week
+        filteredData = fullData.slice(-100) // Approx 1 week
+        break
       case "1M":
-        return fullData.slice(-400) // Approx 1 month
+        filteredData = fullData.slice(-400) // Approx 1 month
+        break
       case "1Y":
-        return fullData // Full history
+        filteredData = fullData // Full history
+        break
       default:
-        return fullData.slice(-400)
+        filteredData = fullData.slice(-400)
     }
+    
+    // 인덱스 재정렬
+    return filteredData.map((d, idx) => ({ ...d, index: idx }))
   }, [currentStock, currentTurn, chartPeriod])
 
   const maxBuyQuantity = Math.floor(cash / currentPrice)
@@ -892,13 +1235,45 @@ export default function GamePlayPage() {
         <div className="flex flex-col items-center animate-in zoom-in-50 duration-500">
           <div className="text-2xl text-gray-300 mb-2 font-medium">Today is</div>
           <div className="text-6xl md:text-8xl font-bold text-white tracking-tight drop-shadow-2xl">
-            {turnData.date}
+            {turnData?.date || ""}
           </div>
         </div>
       </div>
     )
 
-  if (!scenario || !selectedStockId || !currentStock || !turnData) return null
+  // 로딩 화면 - 디버깅 정보 포함
+  if (!scenario || !selectedStockId || !currentStock || !turnData) {
+    const loadingReason = !scenario ? "시나리오 로드 중" :
+                          !selectedStockId ? "주식 선택 중" :
+                          !currentStock ? "주식 데이터 로드 중" :
+                          !turnData ? "턴 데이터 로드 중" : "알 수 없음"
+    
+    console.log("⏳ 로딩 중:", {
+      reason: loadingReason,
+      hasScenario: !!scenario,
+      scenarioId,
+      selectedStockId,
+      hasCurrentStock: !!currentStock,
+      hasTurnData: !!turnData,
+      currentTurn
+    })
+    
+    return (
+      <div className="min-h-screen bg-[#191919] flex flex-col items-center justify-center text-white">
+        <div className="flex flex-col items-center gap-4 animate-pulse">
+          <div className="w-16 h-16 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
+          <div className="text-xl font-bold text-gray-300">게임 로딩 중...</div>
+          <div className="text-sm text-gray-500">{loadingReason}</div>
+          <div className="text-xs text-gray-600 mt-2 font-mono bg-gray-800 px-3 py-2 rounded">
+            scenario: {!!scenario ? "✅" : "❌"} | 
+            stock: {!!selectedStockId ? "✅" : "❌"} | 
+            data: {!!currentStock ? "✅" : "❌"} | 
+            turn: {!!turnData ? "✅" : "❌"}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   if (showResult) {
     return (
@@ -1041,6 +1416,85 @@ export default function GamePlayPage() {
       <div className="min-h-screen bg-[#191919] text-white pb-32">
         <DatePopup />
 
+        {/* 모달들 */}
+        <HintModal
+          isOpen={showHintModal}
+          onClose={() => setShowHintModal(false)}
+          hintLevel={hintLevel}
+          stockData={{
+            stockName: currentStock?.name || "",
+            currentPrice: currentPrice,
+            volume: 1250000,
+            volumeChange: 145,
+            supportLevel: Math.floor(currentPrice * 0.95),
+            resistanceLevel: Math.floor(currentPrice * 1.05),
+            rsi: 58,
+            pattern: "3파 상승 초기",
+            confidence: 78,
+          }}
+          onUsePoints={(points) => {
+            setUserPoints((prev) => prev - points)
+            setShowHintModal(false)
+          }}
+        />
+
+        <ItemsShopModal
+          isOpen={showItemsShop}
+          onClose={() => setShowItemsShop(false)}
+          userPoints={userPoints}
+          onPurchase={(itemId, cost) => {
+            setUserPoints((prev) => prev - cost)
+            setOwnedItems((prev) => [...prev, itemId])
+            setShowItemsShop(false)
+          }}
+        />
+
+        <EnhancedReportModal
+          isOpen={showEnhancedReport}
+          onClose={() => setShowEnhancedReport(false)}
+          data={{
+            type: "weekly",
+            weekNumber: currentWeekNumber,
+            totalDays: totalDays || (gameSettings?.duration ? gameSettings.duration * 30 : 90),
+            currentDay: currentDayNumber,
+            initialCash: initialValue,
+            currentAssets: totalValue,
+            profitRate: profitRate,
+            aiRankings: aiCompetitorsData.competitors.map((ai) => ({
+              name: ai.name,
+              profitRate: ai.stats.profitRate,
+              winRate: ai.stats.winRate,
+              avgTradeTime: 37,
+              mdd: ai.stats.mdd,
+            })),
+            userStats: {
+              profitRate: profitRate,
+              winRate: 65,
+              avgTradeTime: 42,
+              mdd: -3.2,
+              totalTrades: 18,
+              wins: 11,
+              losses: 7,
+            },
+            waveSkills: {
+              lowPointCapture: 82,
+              highPointSell: 68,
+              waveAvoidance: 95,
+              thirdWaveRecognition: 65,
+            },
+            chartData: weeklyHistory.map((h) => ({ turn: h.turn, value: h.value })),
+          }}
+        />
+
+        <AINotification
+          aiName={aiNotification.aiName}
+          action={aiNotification.action}
+          stockName={aiNotification.stockName}
+          price={aiNotification.price}
+          isVisible={aiNotification.isVisible}
+          onClose={() => setAiNotification({ ...aiNotification, isVisible: false })}
+        />
+
         {/* 거래 완료 피드백 토스트 */}
         {feedback && (
           <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[150] animate-in slide-in-from-top duration-300">
@@ -1067,10 +1521,27 @@ export default function GamePlayPage() {
 
         {/* Header */}
         <div className="px-5 py-4 sticky top-0 z-10 bg-[#191919]/95 backdrop-blur-sm border-b border-gray-800/50">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <span className="text-gray-400 font-bold">나스닥</span>
-              <span className="text-red-500 font-bold">22,564.22 +0.5%</span>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <span className="text-gray-400 font-bold">나스닥</span>
+                <span className="text-red-500 font-bold">22,564.22 +0.5%</span>
+              </div>
+              {/* 현재 게임 날짜 및 주차 정보 */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-blue-400 font-bold bg-blue-500/10 px-2 py-0.5 rounded-full">
+                  {currentDayNumber}일차 · {currentWeekNumber}주차
+                </span>
+                <span className="text-xs text-gray-500">
+                  {`${currentDayName} (${currentDayPhase})`}
+                </span>
+                {isPlaying && (
+                  <span className="flex items-center gap-1 text-xs text-green-400 animate-pulse">
+                    <span className="w-2 h-2 bg-green-400 rounded-full" />
+                    진행 중
+                  </span>
+                )}
+              </div>
             </div>
             <div className="flex gap-4">
               <Search className="w-6 h-6 text-gray-400" />
@@ -1130,6 +1601,53 @@ export default function GamePlayPage() {
 
           {activeTab !== "watch" && activeTab !== "all" && (
             <>
+              {/* AI 순위 카드 */}
+              <div className="mb-6">
+                <AIRankingCard userProfit={profitRate} userName="당신" isVisible={true} />
+              </div>
+
+              {/* 기능 버튼들 */}
+              <div className="mb-6 grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => {
+                    setHintLevel(1)
+                    setShowHintModal(true)
+                  }}
+                  className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl p-3 hover:from-yellow-500/20 hover:to-orange-500/20 transition-all active:scale-95"
+                >
+                  <div className="text-2xl mb-1">💡</div>
+                  <div className="text-xs font-bold text-yellow-400">힌트</div>
+                </button>
+                <button
+                  onClick={() => setShowItemsShop(true)}
+                  className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-2xl p-3 hover:from-purple-500/20 hover:to-pink-500/20 transition-all active:scale-95"
+                >
+                  <div className="text-2xl mb-1">🎁</div>
+                  <div className="text-xs font-bold text-purple-400">아이템</div>
+                </button>
+                <button
+                  onClick={() => setShowEnhancedReport(true)}
+                  className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 border border-blue-500/30 rounded-2xl p-3 hover:from-blue-500/20 hover:to-cyan-500/20 transition-all active:scale-95"
+                >
+                  <div className="text-2xl mb-1">📊</div>
+                  <div className="text-xs font-bold text-blue-400">보고서</div>
+                </button>
+              </div>
+
+              {/* 포인트 표시 */}
+              <div className="mb-6 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">💎</span>
+                    <div>
+                      <div className="text-xs text-gray-400">보유 포인트</div>
+                      <div className="text-lg font-bold text-yellow-500">{userPoints.toLocaleString()}P</div>
+                    </div>
+                  </div>
+                  <OwnedItemsBadge itemCount={ownedItems.length} />
+                </div>
+              </div>
+
               {pendingOrders.length > 0 && (
                 <div className="mb-6">
                   <button
@@ -1171,25 +1689,98 @@ export default function GamePlayPage() {
             </>
           )}
 
-          <div className="flex items-center justify-between mt-4 bg-gray-800/30 p-2 rounded-xl">
-            <span className="text-sm font-mono text-gray-300 ml-2">{turnData.date}</span>
-            <button
-              onClick={() => setIsPlaying(!isPlaying)}
-              className={cn(
-                "px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs font-bold transition-colors",
-                isPlaying ? "bg-gray-700 text-gray-300" : "bg-blue-500 text-white",
-              )}
-            >
-              {isPlaying ? (
-                <>
-                  <Pause className="w-3 h-3 fill-current" /> 일시정지
-                </>
-              ) : (
-                <>
-                  <Play className="w-3 h-3 fill-current" /> 재생
-                </>
-              )}
-            </button>
+          <div className="mt-4 space-y-2">
+            {/* 날짜 및 재생 컨트롤 */}
+            <div className="flex items-center justify-between bg-gray-800/30 p-2 rounded-xl">
+              <span className="text-sm font-mono text-gray-300 ml-2">{turnData.date}</span>
+              <button
+                onClick={() => setIsPlaying(!isPlaying)}
+                className={cn(
+                  "px-3 py-1.5 rounded-lg flex items-center gap-2 text-xs font-bold transition-colors",
+                  isPlaying ? "bg-gray-700 text-gray-300" : "bg-blue-500 text-white",
+                )}
+              >
+                {isPlaying ? (
+                  <>
+                    <Pause className="w-3 h-3 fill-current" /> 일시정지
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-3 h-3 fill-current" /> 재생
+                  </>
+                )}
+              </button>
+            </div>
+
+             {/* 재생 속도 조절 */}
+             <div className="bg-gray-800/30 p-2 rounded-xl">
+               <div className="flex items-center justify-between mb-2">
+                 <span className="text-xs text-gray-400 ml-2">재생 속도 (턴당)</span>
+                 <span className="text-xs text-blue-400 font-bold">{playSpeed}초 · 1일 {secondsPerDay}초</span>
+               </div>
+               <div className="flex gap-1">
+                 {PLAY_SPEED_OPTIONS.map((speed) => (
+                   <button
+                     key={speed}
+                     onClick={() => setPlaySpeed(speed)}
+                     className={cn(
+                       "flex-1 py-1.5 text-xs font-bold rounded-lg transition-all",
+                       playSpeed === speed
+                         ? "bg-blue-600 text-white"
+                         : "bg-gray-700 text-gray-400 hover:bg-gray-600",
+                     )}
+                   >
+                     {PLAY_SPEED_LABELS[speed]}
+                   </button>
+                 ))}
+               </div>
+               <div className="mt-2 text-[10px] text-gray-500 text-center">
+                 1일 {secondsPerDay}초 · 10일 ≈ {tenDayMinutes}분 · 90일 ≈ {ninetyDayHours}시간 (규칙: 1일 &gt; 30초)
+               </div>
+             </div>
+
+             {/* 진행 상황 표시 - 개선된 버전 */}
+             <div className="bg-gray-800/30 p-3 rounded-xl relative overflow-hidden">
+               {/* 실시간 업데이트 애니메이션 (게임 진행 중) */}
+               {isPlaying && (
+                 <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-blue-500 to-transparent animate-pulse" />
+               )}
+               
+               <div className="flex items-center justify-between mb-2">
+                 <div className="flex items-center gap-2">
+                   <span className="text-xs text-gray-400">진행 상황</span>
+                   {/* 주차 표시 */}
+                   <span className="text-[10px] bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-bold">
+                     {currentWeekNumber}주차
+                   </span>
+                 </div>
+                 <span className="text-xs text-gray-300 font-bold">
+                   {currentDayNumber}일차 ({currentTurn + 1}턴) / {totalDays || "?"}일 ({derivedMaxTurns || "?"}턴)
+                 </span>
+               </div>
+               
+               {/* 프로그레스 바 */}
+               <div className="w-full bg-gray-700 rounded-full h-2.5 overflow-hidden">
+                 <div
+                   className={cn(
+                     "h-2.5 rounded-full transition-all duration-1000 ease-out",
+                     isPlaying ? "bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700" : "bg-blue-600"
+                   )}
+                   style={{ width: `${derivedMaxTurns > 0 ? ((currentTurn + 1) / derivedMaxTurns) * 100 : 0}%` }}
+                 />
+               </div>
+               
+              {/* 오늘 요일 표시 (TURNS_PER_DAY턴 = 1일) */}
+               <div className="flex items-center justify-between mt-2">
+                 <span className="text-[10px] text-gray-500">
+                   {`${currentDayName} (${currentDayPhase})`}
+                 </span>
+                 {/* 다음 주간 리포트까지 남은 일수 */}
+                 <span className="text-[10px] text-gray-500">
+                   주간 리포트까지 {daysUntilReport}일 ({turnsUntilReport}턴)
+                 </span>
+               </div>
+             </div>
           </div>
         </div>
 
@@ -1314,27 +1905,55 @@ export default function GamePlayPage() {
         <WeeklyReportModal
           isOpen={showWeeklyReport}
           onClose={handleCloseReport}
-          weekNumber={Math.floor(currentTurn / 5)}
+          weekNumber={currentWeekNumber}
           weeklyReturn={weeklyReturn}
           totalReturn={profitRate}
-          chartData={weeklyHistory.slice(-7)} // Show last 7 points
+          chartData={weeklyHistory.slice(-TURNS_PER_WEEK)} // Show last 1주간 (turn 기준)
         />
 
         {/* Header */}
-        <div className="px-4 py-3 flex items-center justify-between sticky top-0 bg-[#191919] z-10">
-          <button onClick={() => setViewMode("list")} className="p-1">
-            <ArrowLeft className="w-6 h-6 text-gray-300" />
-          </button>
-          <div className="flex gap-4">
-            <Heart
-              className={cn(
-                "w-6 h-6 transition-colors",
-                favorites.includes(selectedStockId) ? "text-red-500 fill-current" : "text-gray-400",
-              )}
-              onClick={() => toggleFavorite(selectedStockId)}
-            />
-            <Bell className="w-6 h-6 text-gray-400" />
-            <MoreHorizontal className="w-6 h-6 text-gray-400" />
+        <div className="px-4 py-3 sticky top-0 bg-[#191919]/95 backdrop-blur-sm z-10 border-b border-gray-800">
+          <div className="flex items-center justify-between mb-2">
+            <button onClick={() => setViewMode("list")} className="p-1">
+              <ArrowLeft className="w-6 h-6 text-gray-300" />
+            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setHintLevel(2)
+                  setShowHintModal(true)
+                }}
+                className="px-3 py-1.5 bg-yellow-500/10 border border-yellow-500/30 rounded-xl hover:bg-yellow-500/20 transition-all active:scale-95 flex items-center gap-1"
+              >
+                <span className="text-sm">💡</span>
+                <span className="text-xs font-bold text-yellow-400">심층분석</span>
+              </button>
+              <Heart
+                className={cn(
+                  "w-6 h-6 transition-colors cursor-pointer",
+                  favorites.includes(selectedStockId) ? "text-red-500 fill-current" : "text-gray-400",
+                )}
+                onClick={() => toggleFavorite(selectedStockId)}
+              />
+              <Bell className="w-6 h-6 text-gray-400" />
+              <MoreHorizontal className="w-6 h-6 text-gray-400" />
+            </div>
+          </div>
+          
+          {/* 현재 날짜 및 주차 정보 */}
+          <div className="flex items-center justify-center gap-2 pb-2">
+            <span className="text-xs text-blue-400 font-bold bg-blue-500/10 px-2 py-0.5 rounded-full">
+              {currentDayNumber}일차 · {currentWeekNumber}주차
+            </span>
+            <span className="text-xs text-gray-500">
+              {`${currentDayName} (${currentDayPhase})`}
+            </span>
+            {isPlaying && (
+              <span className="flex items-center gap-1 text-xs text-green-400 animate-pulse">
+                <span className="w-2 h-2 bg-green-400 rounded-full" />
+                진행 중
+              </span>
+            )}
           </div>
         </div>
 
@@ -1370,8 +1989,14 @@ export default function GamePlayPage() {
           </div>
 
           {/* Chart */}
-          <div className="h-[360px] w-full mb-4 relative">
-            <StockChart data={chartData} height={360} color={isUp ? "red" : "blue"} showXAxis={chartPeriod !== "1D"} />
+          <div className="h-[360px] w-full mb-4 relative bg-gray-900 rounded-xl overflow-hidden">
+            <StockChart 
+              data={chartData} 
+              height={360} 
+              color={isUp ? "red" : "blue"} 
+              showXAxis={true}
+              chartPeriod={chartPeriod}
+            />
           </div>
 
           <div className="px-5 mb-8 flex items-center justify-between">

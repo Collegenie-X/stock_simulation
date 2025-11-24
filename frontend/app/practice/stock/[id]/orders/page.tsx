@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import { storage } from "@/lib/storage"
 import scenariosData from "@/data/game-scenarios.json"
+import scenarios100DaysData from "@/data/stock-100days-data.json"
 import { cn } from "@/lib/utils"
 
 export default function PendingOrdersPage() {
@@ -15,7 +16,9 @@ export default function PendingOrdersPage() {
   const [scenario, setScenario] = useState<any>(null)
 
   useEffect(() => {
-    const foundScenario = scenariosData.scenarios.find((s) => s.id === scenarioId)
+    // 100일 데이터 포함하여 시나리오 검색
+    const allScenarios = [...scenariosData.scenarios, scenarios100DaysData]
+    const foundScenario = allScenarios.find((s) => s.id === scenarioId)
     setScenario(foundScenario)
 
     const savedSession = storage.getGameSession(scenarioId)

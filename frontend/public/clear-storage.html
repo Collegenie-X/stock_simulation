@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>스토리지 초기화</title>
+  <style>
+    body {
+      background: #191919;
+      color: white;
+      font-family: system-ui;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .container {
+      text-align: center;
+      padding: 40px;
+      background: #252525;
+      border-radius: 20px;
+      max-width: 500px;
+    }
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px;
+    }
+    button:hover {
+      background: #2563eb;
+    }
+    .success {
+      color: #10b981;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔧 스토리지 초기화</h1>
+    <p>게임 데이터를 초기화합니다</p>
+    <button onclick="clearStorage()">스토리지 초기화</button>
+    <button onclick="location.href='/'">홈으로</button>
+    <div id="result"></div>
+  </div>
+  
+  <script>
+    function clearStorage() {
+      localStorage.clear();
+      document.getElementById('result').innerHTML = '<div class="success">✅ 초기화 완료! 홈으로 이동하세요.</div>';
+    }
+  </script>
+</body>
+</html>

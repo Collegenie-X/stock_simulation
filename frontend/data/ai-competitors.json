@@ -1,49 +1,258 @@
 {
   "competitors": [
     {
-      "id": "ai-1",
-      "name": "파도타기 고수",
-      "avatar": "🏄",
-      "level": 15,
-      "totalAssets": 12500000,
-      "profitRate": 25.0,
-      "strategy": "공격적"
+      "id": "conservative-king",
+      "name": "보수왕",
+      "emoji": "🛡️",
+      "nickname": "Conservative King",
+      "level": 8,
+      "strategy": {
+        "type": "conservative",
+        "investmentRatio": 0.3,
+        "stopLoss": -3,
+        "takeProfit": 8,
+        "description": "손실 최소화, MDD -5% 이내"
+      },
+      "personality": {
+        "riskTolerance": "very_low",
+        "tradingStyle": "defensive",
+        "motto": "살아남는 것이 이기는 것"
+      },
+      "stats": {
+        "totalAssets": 10450000,
+        "profitRate": 4.5,
+        "winRate": 78,
+        "avgReturn": 2.8,
+        "mdd": -4.2
+      }
     },
     {
-      "id": "ai-2",
-      "name": "안정투자왕",
-      "avatar": "🛡️",
+      "id": "stable-king",
+      "name": "김철수",
+      "emoji": "🧘",
+      "nickname": "안정왕",
       "level": 12,
-      "totalAssets": 11200000,
-      "profitRate": 12.0,
-      "strategy": "안정적"
+      "strategy": {
+        "type": "stable",
+        "investmentRatio": 0.5,
+        "stopLoss": -5,
+        "takeProfit": 10,
+        "description": "지지선 신뢰, 분할 매수"
+      },
+      "personality": {
+        "riskTolerance": "low",
+        "tradingStyle": "patient",
+        "motto": "인내심이 수익을 만든다"
+      },
+      "stats": {
+        "totalAssets": 11200000,
+        "profitRate": 12.0,
+        "winRate": 68,
+        "avgReturn": 5.2,
+        "mdd": -6.8
+      }
     },
     {
-      "id": "ai-3",
-      "name": "차트마스터",
-      "avatar": "📊",
-      "level": 18,
-      "totalAssets": 10800000,
-      "profitRate": 8.0,
-      "strategy": "기술적"
-    },
-    {
-      "id": "ai-4",
-      "name": "가치투자자",
-      "avatar": "💎",
+      "id": "balanced-king",
+      "name": "균형왕",
+      "emoji": "⚖️",
+      "nickname": "Balanced King",
       "level": 10,
-      "totalAssets": 10500000,
-      "profitRate": 5.0,
-      "strategy": "가치투자"
+      "strategy": {
+        "type": "balanced",
+        "investmentRatio": 0.6,
+        "stopLoss": -7,
+        "takeProfit": 12,
+        "description": "기술적+기본적 분석 병행"
+      },
+      "personality": {
+        "riskTolerance": "medium",
+        "tradingStyle": "analytical",
+        "motto": "리스크와 수익의 균형"
+      },
+      "stats": {
+        "totalAssets": 11850000,
+        "profitRate": 18.5,
+        "winRate": 65,
+        "avgReturn": 7.1,
+        "mdd": -8.5
+      }
     },
     {
-      "id": "ai-5",
-      "name": "초보투자자",
-      "avatar": "🌱",
-      "level": 5,
-      "totalAssets": 9800000,
-      "profitRate": -2.0,
-      "strategy": "학습중"
+      "id": "aggressive-king",
+      "name": "박영희",
+      "emoji": "⚡",
+      "nickname": "공격왕",
+      "level": 15,
+      "strategy": {
+        "type": "aggressive",
+        "investmentRatio": 0.7,
+        "stopLoss": -8,
+        "takeProfit": 15,
+        "description": "3파 상승 집중 공략"
+      },
+      "personality": {
+        "riskTolerance": "high",
+        "tradingStyle": "opportunistic",
+        "motto": "기대값이 플러스면 진입"
+      },
+      "stats": {
+        "totalAssets": 12500000,
+        "profitRate": 25.0,
+        "winRate": 62,
+        "avgReturn": 9.8,
+        "mdd": -12.3
+      }
+    },
+    {
+      "id": "ultra-aggressive-king",
+      "name": "초공격왕",
+      "emoji": "🔥",
+      "nickname": "Ultra-Aggressive King",
+      "level": 18,
+      "strategy": {
+        "type": "ultra_aggressive",
+        "investmentRatio": 0.9,
+        "stopLoss": -10,
+        "takeProfit": 20,
+        "description": "고변동 종목 선호"
+      },
+      "personality": {
+        "riskTolerance": "very_high",
+        "tradingStyle": "all_in",
+        "motto": "한 방에 승부"
+      },
+      "stats": {
+        "totalAssets": 11800000,
+        "profitRate": 18.0,
+        "winRate": 55,
+        "avgReturn": 12.5,
+        "mdd": -18.7
+      }
     }
-  ]
+  ],
+  "hints": [
+    {
+      "id": "hint-1",
+      "level": 1,
+      "title": "간단 힌트",
+      "description": "빠른 조언과 추천 전략",
+      "cost": 300,
+      "uses": 2
+    },
+    {
+      "id": "hint-2",
+      "level": 2,
+      "title": "심층 분석",
+      "description": "10단계 분석 + 기대값 계산",
+      "cost": 500,
+      "uses": 1
+    }
+  ],
+  "items": [
+    {
+      "id": "time-freeze",
+      "name": "타임프리즈",
+      "emoji": "⏰",
+      "description": "30초 동안 시간 정지, 차트 분석",
+      "cost": 1000,
+      "uses": 3
+    },
+    {
+      "id": "ai-peek",
+      "name": "AI 전략 엿보기",
+      "emoji": "🔮",
+      "description": "거래 전 AI 결정 미리 보기",
+      "cost": 500,
+      "uses": 5
+    },
+    {
+      "id": "perfect-timing",
+      "name": "완벽한 타이밍",
+      "emoji": "🎯",
+      "description": "AI가 최적 매수/매도 시점 알림",
+      "cost": 2000,
+      "uses": 1
+    },
+    {
+      "id": "loss-insurance",
+      "name": "손실 보험",
+      "emoji": "🛡️",
+      "description": "손실 시 50% 복구",
+      "cost": 800,
+      "uses": 3
+    },
+    {
+      "id": "combo-booster",
+      "name": "콤보 부스터",
+      "emoji": "🔥",
+      "description": "1시간 동안 포인트 2배",
+      "cost": 1500,
+      "uses": 1
+    }
+  ],
+  "achievements": [
+    {
+      "id": "first-profit",
+      "title": "첫 수익",
+      "emoji": "🏅",
+      "description": "+5% 달성",
+      "reward": 100
+    },
+    {
+      "id": "ai-first-win",
+      "title": "AI 첫 승리",
+      "emoji": "🏅",
+      "description": "김철수 넘기",
+      "reward": 150
+    },
+    {
+      "id": "perfect-timing-achievement",
+      "title": "완벽한 타이밍",
+      "emoji": "🏅",
+      "description": "저점 매수 + 고점 매도",
+      "reward": 200
+    },
+    {
+      "id": "survivor",
+      "title": "생존왕",
+      "emoji": "🏅",
+      "description": "MDD -5% 이내 유지",
+      "reward": 250
+    },
+    {
+      "id": "top-100",
+      "title": "전국 Top 100",
+      "emoji": "🏅",
+      "description": "전국 Top 100 진입",
+      "reward": 500
+    }
+  ],
+  "rankings": {
+    "bronze": {
+      "name": "파도 입문자",
+      "emoji": "🥉",
+      "range": [0, 10]
+    },
+    "silver": {
+      "name": "파도 탐험가",
+      "emoji": "🥈",
+      "range": [10, 20]
+    },
+    "gold": {
+      "name": "파도 서퍼",
+      "emoji": "🥇",
+      "range": [20, 30]
+    },
+    "diamond": {
+      "name": "파도 마스터",
+      "emoji": "💎",
+      "range": [30, 50]
+    },
+    "legend": {
+      "name": "파도 신",
+      "emoji": "👑",
+      "range": [50, 999]
+    }
+  }
 }

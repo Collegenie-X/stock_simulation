@@ -7,6 +7,7 @@ import { ArrowLeft, ChevronDown, Target, Lock, ArrowRight, MoreHorizontal, Minus
 import { cn } from "@/lib/utils"
 import { storage } from "@/lib/storage"
 import scenariosData from "@/data/game-scenarios.json"
+import scenarios100DaysData from "@/data/stock-100days-data.json"
 
 export default function TradePage() {
   const params = useParams()
@@ -71,8 +72,16 @@ export default function TradePage() {
     }
   }, [scenarioId, router])
 
-  // 시나리오 및 주식 정보 확인
-  const scenario = scenariosData.scenarios.find((s) => s.id === scenarioId)
+  // 시나리오 및 주식 정보 확인 (100일 데이터 포함)
+  const allScenarios = [...scenariosData.scenarios, scenarios100DaysData]
+  const scenario = allScenarios.find((s) => s.id === scenarioId)
+  
+  console.log("🔍 시나리오 검색:", {
+    scenarioId,
+    allScenariosCount: allScenarios.length,
+    found: !!scenario,
+    scenarioIds: allScenarios.map(s => s.id)
+  })
   
   if (!scenario) {
     console.error("❌ 시나리오를 찾을 수 없음:", scenarioId)

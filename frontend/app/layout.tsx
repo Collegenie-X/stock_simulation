@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 
 import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
@@ -14,14 +14,6 @@ export const metadata: Metadata = {
   title: '파도를 타라 - 투자 교육 게임',
   description: '엘리엇 파동 이론으로 배우는 주식 투자 시뮬레이션',
   generator: 'v0.app',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-    viewportFit: 'cover'
-  },
-  themeColor: '#4A6BFF',
   icons: {
     icon: [
       {
@@ -39,6 +31,15 @@ export const metadata: Metadata = {
     ],
     apple: '/apple-icon.png',
   },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: '#4A6BFF',
 }
 
 export default function RootLayout({
