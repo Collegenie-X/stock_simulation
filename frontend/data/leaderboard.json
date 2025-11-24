@@ -1,0 +1,49 @@
+{
+  "rankings": [
+    {
+      "rank": 1,
+      "userId": "user_001",
+      "nickname": "파도마스터",
+      "profitRate": 45.8,
+      "totalAssets": 14580000,
+      "badges": ["🏆", "💎", "⭐"],
+      "level": 15
+    },
+    {
+      "rank": 2,
+      "userId": "user_002",
+      "nickname": "투자왕초보",
+      "profitRate": 38.2,
+      "totalAssets": 13820000,
+      "badges": ["🥈", "💡"],
+      "level": 12
+    },
+    {
+      "rank": 3,
+      "userId": "user_003",
+      "nickname": "차트분석가",
+      "profitRate": 35.6,
+      "totalAssets": 13560000,
+      "badges": ["🥉", "📊"],
+      "level": 14
+    },
+    {
+      "rank": 4,
+      "userId": "user_004",
+      "nickname": "엘리엇파동",
+      "profitRate": 32.1,
+      "totalAssets": 13210000,
+      "badges": ["🌊"],
+      "level": 11
+    },
+    {
+      "rank": 5,
+      "userId": "user_005",
+      "nickname": "안정투자",
+      "profitRate": 28.9,
+      "totalAssets": 12890000,
+      "badges": ["🛡️"],
+      "level": 10
+    }
+  ]
+}

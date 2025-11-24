@@ -1,0 +1,189 @@
+{
+  "theory": [
+    {
+      "id": 1,
+      "category": "risk_tolerance",
+      "question": "보유 주식이 -10% 하락했습니다. 어떻게 하시겠습니까?",
+      "options": [
+        { "text": "즉시 손절한다", "score": 10, "type": "리스크 회피형" },
+        { "text": "추가 매수를 고려한다", "score": 30, "type": "공격형" },
+        { "text": "분석 후 결정한다 ⭐", "score": 20, "type": "신중형" },
+        { "text": "그냥 기다린다", "score": 15, "type": "장기 투자형" }
+      ]
+    },
+    {
+      "id": 2,
+      "category": "analysis_style",
+      "question": "투자 결정을 내릴 때 가장 중요한 요소는?",
+      "options": [
+        { "text": "빠른 직감 (감각형)", "score": 10, "type": "분석력" },
+        { "text": "차트 패턴 분석 (기술적) ⭐", "score": 30, "type": "분석력" },
+        { "text": "뉴스와 재무제표 (기본적)", "score": 25, "type": "분석력" },
+        { "text": "전문가 의견 (추종형)", "score": 15, "type": "분석력" }
+      ]
+    },
+    {
+      "id": 3,
+      "category": "period",
+      "question": "선호하는 투자 기간은?",
+      "options": [
+        { "text": "당일~1주 (단타형)", "score": 30, "type": "거래빈도" },
+        { "text": "1주~1개월 (스윙형) ⭐", "score": 20, "type": "거래빈도" },
+        { "text": "1개월~3개월 (중기형)", "score": 15, "type": "거래빈도" },
+        { "text": "3개월 이상 (장기형)", "score": 10, "type": "거래빈도" }
+      ]
+    },
+    {
+      "id": 4,
+      "category": "return_risk",
+      "question": "예상 수익률과 리스크 선호는?",
+      "options": [
+        { "text": "연 5~10% / 낮은 리스크", "score": 10, "type": "리스크" },
+        { "text": "연 10~30% / 중간 리스크 ⭐", "score": 20, "type": "리스크" },
+        { "text": "연 30~100% / 높은 리스크", "score": 30, "type": "리스크" },
+        { "text": "연 100%+ / 매우 높은 리스크", "score": 40, "type": "리스크" }
+      ]
+    },
+    {
+      "id": 5,
+      "category": "failure_response",
+      "question": "투자 실패 시 어떻게 대응하나요?",
+      "options": [
+        { "text": "바로 분석해서 원인 찾기 ⭐", "score": 30, "type": "학습력" },
+        { "text": "잠시 쉬었다가 다시", "score": 20, "type": "학습력" },
+        { "text": "전략을 완전히 바꾼다", "score": 15, "type": "학습력" },
+        { "text": "더 신중하게 움직인다", "score": 25, "type": "학습력" }
+      ]
+    }
+  ],
+  "chart": [
+    {
+      "id": 6,
+      "title": "급등주 포착",
+      "stock": "에코프로",
+      "sector": "2차전지",
+      "situation": "3일간 +25% 급등 후 현재 시점",
+      "currentPrice": 195000,
+      "change": "+28%",
+      "volume": "+380%",
+      "news": "정부 2차전지 지원 발표",
+      "chartData": [120000, 125000, 130000, 135000, 130000, 145000, 160000, 180000, 195000],
+      "question": "당신의 선택은?",
+      "options": [
+        {
+          "text": "지금 즉시 매수!",
+          "emotion": "욕심 80%, 두려움 20%",
+          "pattern": "충동형",
+          "result": "-15%",
+          "score": 10
+        },
+        {
+          "text": "조정 올 때까지 대기 ⭐",
+          "emotion": "이성 70%, 욕심 30%",
+          "pattern": "신중형",
+          "result": "+8%",
+          "score": 30
+        },
+        {
+          "text": "절반만 매수",
+          "emotion": "균형 50%, 불안 50%",
+          "pattern": "균형형",
+          "result": "+2%",
+          "score": 20
+        },
+        {
+          "text": "매수 안 함",
+          "emotion": "두려움 80%, 안도 20%",
+          "pattern": "보수형",
+          "result": "0%",
+          "score": 15
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "하락장 대응",
+      "stock": "삼성바이오",
+      "sector": "바이오",
+      "situation": "850,000원에 매수 후 현재 -8% 손실",
+      "currentPrice": 782000,
+      "buyPrice": 850000,
+      "loss": -680000,
+      "shares": 10,
+      "question": "당신의 감정과 선택은?",
+      "options": [
+        {
+          "text": "즉시 손절!",
+          "emotion": "공포 90%, 분노 10%",
+          "pattern": "손실 회피",
+          "result": "-8% 확정",
+          "score": 10
+        },
+        {
+          "text": "물타기",
+          "emotion": "억울함 60%, 계산 40%",
+          "pattern": "손실 부정",
+          "result": "-15%",
+          "score": 5
+        },
+        {
+          "text": "기다리며 분석 ⭐",
+          "emotion": "침착 70%, 불안 30%",
+          "pattern": "이성적 판단",
+          "result": "-5% or +3%",
+          "score": 30
+        },
+        {
+          "text": "그냥 기다림",
+          "emotion": "무기력 60%, 희망 40%",
+          "pattern": "현실 도피",
+          "result": "-18%",
+          "score": 15
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "B파 함정 회피",
+      "stock": "셀트리온",
+      "sector": "바이오",
+      "situation": "하락 후 반등 시작, B파 의심 구간",
+      "currentPrice": 168000,
+      "change": "+5%",
+      "volume": "-20%",
+      "warning": "거래량이 부족합니다. B파 함정 가능성 80%",
+      "aiWarning": "거래량이 부족합니다. B파 함정 가능성 높음. C파 하락이 올 수 있습니다. 진입 주의!",
+      "question": "당신의 감정과 선택은?",
+      "options": [
+        {
+          "text": "매수! (반등 기회다!)",
+          "emotion": "탐욕 80%",
+          "pattern": "확증 편향",
+          "result": "-12%",
+          "score": 5
+        },
+        {
+          "text": "저항선 돌파 확인 후 매수",
+          "emotion": "신중 60%, 불안 40%",
+          "pattern": "이성 + 약간 욕심",
+          "result": "진입 안 함",
+          "score": 25
+        },
+        {
+          "text": "진입 안 함 (AI 경고 신뢰) ⭐",
+          "emotion": "이성 90%, 아쉬움 10%",
+          "pattern": "함정 회피 능력 우수",
+          "result": "0% (손실 없음)",
+          "score": 30
+        },
+        {
+          "text": "소량만 매수",
+          "emotion": "반신반의 50%",
+          "pattern": "우유부단",
+          "result": "-12% (소액)",
+          "score": 15
+        }
+      ]
+    }
+  ]
+}

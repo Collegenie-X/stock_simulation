@@ -1,0 +1,49 @@
+{
+  "competitors": [
+    {
+      "id": "ai-1",
+      "name": "파도타기 고수",
+      "avatar": "🏄",
+      "level": 15,
+      "totalAssets": 12500000,
+      "profitRate": 25.0,
+      "strategy": "공격적"
+    },
+    {
+      "id": "ai-2",
+      "name": "안정투자왕",
+      "avatar": "🛡️",
+      "level": 12,
+      "totalAssets": 11200000,
+      "profitRate": 12.0,
+      "strategy": "안정적"
+    },
+    {
+      "id": "ai-3",
+      "name": "차트마스터",
+      "avatar": "📊",
+      "level": 18,
+      "totalAssets": 10800000,
+      "profitRate": 8.0,
+      "strategy": "기술적"
+    },
+    {
+      "id": "ai-4",
+      "name": "가치투자자",
+      "avatar": "💎",
+      "level": 10,
+      "totalAssets": 10500000,
+      "profitRate": 5.0,
+      "strategy": "가치투자"
+    },
+    {
+      "id": "ai-5",
+      "name": "초보투자자",
+      "avatar": "🌱",
+      "level": 5,
+      "totalAssets": 9800000,
+      "profitRate": -2.0,
+      "strategy": "학습중"
+    }
+  ]
+}

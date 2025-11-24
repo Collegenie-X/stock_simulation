@@ -1,0 +1,88 @@
+{
+  "stocks": [
+    {
+      "id": "KAKAO",
+      "name": "카카오",
+      "type": "변동형",
+      "currentPrice": 72000,
+      "change": 3.5,
+      "volume": 1250000,
+      "chartData": [68000, 69500, 71000, 70500, 72000],
+      "info": {
+        "marketCap": "32조원",
+        "per": 15.2,
+        "description": "모바일 메신저 기반 IT 플랫폼 기업"
+      }
+    },
+    {
+      "id": "SAMSUNG",
+      "name": "삼성전자",
+      "type": "안정형",
+      "currentPrice": 68000,
+      "change": 1.2,
+      "volume": 18500000,
+      "chartData": [67000, 67200, 67800, 68200, 68000],
+      "info": {
+        "marketCap": "405조원",
+        "per": 12.5,
+        "description": "글로벌 전자 및 반도체 기업"
+      }
+    },
+    {
+      "id": "NAVER",
+      "name": "네이버",
+      "type": "변동형",
+      "currentPrice": 185000,
+      "change": -2.1,
+      "volume": 850000,
+      "chartData": [190000, 188000, 187000, 186000, 185000],
+      "info": {
+        "marketCap": "60조원",
+        "per": 18.3,
+        "description": "국내 최대 검색 포털 및 IT 서비스 기업"
+      }
+    },
+    {
+      "id": "TESLA",
+      "name": "테슬라 (해외)",
+      "type": "고변동형",
+      "currentPrice": 245000,
+      "change": 5.8,
+      "volume": 320000,
+      "chartData": [230000, 235000, 240000, 238000, 245000],
+      "info": {
+        "marketCap": "780조원",
+        "per": 45.2,
+        "description": "전기차 및 에너지 솔루션 기업"
+      }
+    },
+    {
+      "id": "HYUNDAI",
+      "name": "현대차",
+      "type": "안정형",
+      "currentPrice": 198000,
+      "change": 0.5,
+      "volume": 620000,
+      "chartData": [196000, 197000, 197500, 198500, 198000],
+      "info": {
+        "marketCap": "42조원",
+        "per": 8.9,
+        "description": "글로벌 자동차 제조 기업"
+      }
+    },
+    {
+      "id": "LG",
+      "name": "LG에너지솔루션",
+      "type": "변동형",
+      "currentPrice": 420000,
+      "change": 4.2,
+      "volume": 450000,
+      "chartData": [400000, 410000, 415000, 418000, 420000],
+      "info": {
+        "marketCap": "98조원",
+        "per": 28.6,
+        "description": "전기차 배터리 제조 기업"
+      }
+    }
+  ]
+}
