@@ -2177,77 +2177,54 @@ export default function GamePlayPage() {
             </button>
           </div>
 
-          {/* My Investment Card - 상세 정보 */}
+          {/* My Investment Card - 간소화 */}
           {currentHoldings > 0 && (
             <div className="px-5 mb-6">
-              <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-2 border-blue-500/30 rounded-3xl p-5 shadow-lg">
+              <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-2 border-blue-500/30 rounded-3xl p-5">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-2">
                     <span className="text-2xl">💼</span>
-                    <h3 className="font-bold text-white text-lg">내 주식 정보</h3>
+                    <h3 className="font-bold text-white text-base">내 주식 정보</h3>
                   </div>
-                  <span className="text-xs bg-blue-500/20 text-blue-300 px-3 py-1.5 rounded-full font-bold">보유 중</span>
+                  <span className="text-xs bg-blue-500/20 text-blue-300 px-2.5 py-1 rounded-full font-bold">{currentHoldings}주</span>
                 </div>
 
-                {/* 핵심 지표 */}
-                <div className="mb-4 pb-4 border-b border-gray-700/50">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-800/50 rounded-xl p-3">
-                      <div className="text-xs text-gray-400 mb-1">평가손익</div>
-                      <div className={cn("text-2xl font-bold", isProfit ? "text-red-500" : "text-blue-500")}>
-                        {isProfit ? "+" : ""}
-                        {((currentPrice - myAvg) * currentHoldings).toLocaleString()}원
-                      </div>
+                {/* 평가손익 & 수익률 */}
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                  <div className="bg-gray-900/40 rounded-2xl p-4">
+                    <div className="text-xs text-gray-400 mb-1">평가손익</div>
+                    <div className={cn("text-2xl font-bold", isProfit ? "text-red-500" : "text-blue-500")}>
+                      {isProfit ? "+" : ""}
+                      {((currentPrice - myAvg) * currentHoldings).toLocaleString()}
+                      <span className="text-sm ml-0.5">원</span>
                     </div>
-                    <div className="bg-gray-800/50 rounded-xl p-3">
-                      <div className="text-xs text-gray-400 mb-1">수익률</div>
-                      <div className={cn("text-2xl font-bold", isProfit ? "text-red-500" : "text-blue-500")}>
-                        {isProfit ? "+" : ""}
-                        {myReturn}%
-                      </div>
+                  </div>
+                  <div className="bg-gray-900/40 rounded-2xl p-4">
+                    <div className="text-xs text-gray-400 mb-1">수익률</div>
+                    <div className={cn("text-2xl font-bold", isProfit ? "text-red-500" : "text-blue-500")}>
+                      {isProfit ? "+" : ""}
+                      {myReturn}%
                     </div>
                   </div>
                 </div>
 
-                {/* 상세 정보 */}
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-sm text-gray-400">보유수량</span>
-                    <span className="text-base font-bold text-white">{currentHoldings}주</span>
-                  </div>
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-sm text-gray-400">평균 매입가</span>
-                    <span className="text-base font-bold text-white">{myAvg.toLocaleString()}원</span>
-                  </div>
-                  <div className="flex items-center justify-between py-2">
-                    <span className="text-sm text-gray-400">현재가</span>
-                    <span className="text-base font-bold text-white">{currentPrice.toLocaleString()}원</span>
-                  </div>
-                  <div className="flex items-center justify-between py-2 pt-3 border-t border-gray-700/50">
-                    <span className="text-sm text-gray-400">총 매입금액</span>
-                    <span className="text-base font-bold text-gray-200">{(myAvg * currentHoldings).toLocaleString()}원</span>
-                  </div>
-                  <div className="flex items-center justify-between py-2">
+                {/* 현재 평가금액 */}
+                <div className="bg-gray-800/30 rounded-xl p-3.5 mb-3">
+                  <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-400">현재 평가금액</span>
-                    <span className="text-base font-bold text-white">{(currentPrice * currentHoldings).toLocaleString()}원</span>
+                    <span className="text-xl font-bold text-white">{(currentPrice * currentHoldings).toLocaleString()}원</span>
                   </div>
                 </div>
 
-                {/* 투자 조언 */}
-                <div className="mt-4 pt-4 border-t border-gray-700/50">
-                  <div className="bg-gray-800/30 rounded-xl p-3">
-                    <div className="flex items-start gap-2">
-                      <span className="text-lg">💡</span>
-                      <div className="flex-1">
-                        <div className="text-xs font-bold text-gray-300 mb-1">투자 팁</div>
-                        <div className="text-xs text-gray-400 leading-relaxed">
-                          {isProfit 
-                            ? `현재 ${myReturn}%의 수익을 내고 있습니다. 목표 수익률에 도달했다면 일부 매도를 고려해보세요.`
-                            : `현재 ${myReturn}%의 손실입니다. 추가 하락 시 손절 또는 분할 매수를 고려해보세요.`
-                          }
-                        </div>
-                      </div>
-                    </div>
+                {/* 가격 비교 - 작게 */}
+                <div className="flex items-center justify-between text-xs px-1">
+                  <div className="text-gray-400">
+                    <span>평균 매입가 </span>
+                    <span className="text-gray-300 font-medium">{myAvg.toLocaleString()}원</span>
+                  </div>
+                  <div className="text-gray-400">
+                    <span>현재가 </span>
+                    <span className="text-white font-medium">{currentPrice.toLocaleString()}원</span>
                   </div>
                 </div>
               </div>
