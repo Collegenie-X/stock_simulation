@@ -1663,8 +1663,10 @@ export default function GamePlayPage() {
                       전체보기
                     </button>
                   </div>
-                  <div className="bg-gray-800/30 rounded-2xl p-4 border border-gray-700/50">
-                    <div className="grid grid-cols-2 gap-4 mb-3">
+                  
+                  {/* 요약 통계 */}
+                  <div className="bg-gray-800/30 rounded-2xl p-4 border border-gray-700/50 mb-3">
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <div className="text-xs text-gray-400 mb-1">보유 종목</div>
                         <div className="text-xl font-bold text-white">{myStocks.length}개</div>
@@ -1686,31 +1688,86 @@ export default function GamePlayPage() {
                         </div>
                       </div>
                     </div>
-                    {/* 상위 3개 종목만 표시 */}
-                    <div className="space-y-2">
-                      {myStocks.slice(0, 3).map((stock) => {
-                        const currentTurnData = stock.turns[currentTurn]
-                        const sPrice = currentTurnData?.price || 0
-                        const myQty = holdings[stock.id] || 0
-                        const myAvg = averagePrices[stock.id] || 0
-                        const profit = (sPrice - myAvg) * myQty
-                        const profitRate = myAvg > 0 ? ((sPrice - myAvg) / myAvg) * 100 : 0
-                        const isProfit = profit >= 0
+                  </div>
 
-                        return (
-                          <div key={stock.id} className="flex items-center justify-between text-sm">
-                            <span className="text-gray-300 font-medium">{stock.name}</span>
+                  {/* 보유 종목 카드 리스트 - 상위 3개 */}
+                  <div className="space-y-2">
+                    {myStocks.slice(0, 3).map((stock) => {
+                      const currentTurnData = stock.turns[currentTurn]
+                      const sPrice = currentTurnData?.price || 0
+                      const sPrevPrice = currentTurn > 0 ? stock.turns[currentTurn - 1]?.price || stock.initialPrice : stock.initialPrice
+                      const sChange = (((sPrice - sPrevPrice) / sPrevPrice) * 100).toFixed(1)
+                      const isPriceUp = Number.parseFloat(sChange) >= 0
+                      
+                      const myQty = holdings[stock.id] || 0
+                      const myAvg = averagePrices[stock.id] || 0
+                      const profit = (sPrice - myAvg) * myQty
+                      const profitRate = myAvg > 0 ? ((sPrice - myAvg) / myAvg) * 100 : 0
+                      const isProfit = profit >= 0
+                      const totalValue = sPrice * myQty
+
+                      return (
+                        <div 
+                          key={stock.id} 
+                          onClick={() => {
+                            setSelectedStockId(stock.id)
+                            setViewMode("detail")
+                          }}
+                          className="bg-gray-800/50 hover:bg-gray-800/70 active:scale-[0.98] border border-gray-700/50 rounded-2xl p-4 cursor-pointer transition-all"
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="font-bold text-white text-base mb-1">{stock.name}</div>
+                              <div className="text-xs text-gray-400">{stock.category}</div>
+                            </div>
+                            <div className="text-right ml-3">
+                              <div className="text-white font-bold text-base">
+                                {sPrice.toLocaleString()}원
+                              </div>
+                              <div className={cn("text-xs font-medium", isPriceUp ? "text-red-500" : "text-blue-500")}>
+                                {isPriceUp ? "+" : ""}{sChange}%
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-3 pt-3 border-t border-gray-700/50">
+                            <div>
+                              <div className="text-xs text-gray-500 mb-1">보유수량</div>
+                              <div className="text-sm font-bold text-gray-200">{myQty}주</div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-gray-500 mb-1">평가금액</div>
+                              <div className="text-sm font-bold text-gray-200">{totalValue.toLocaleString()}원</div>
+                            </div>
                             <div className="text-right">
-                              <div className="text-gray-200 font-bold">{myQty}주</div>
-                              <div className={cn("text-xs font-medium", isProfit ? "text-red-500" : "text-blue-500")}>
+                              <div className="text-xs text-gray-500 mb-1">수익률</div>
+                              <div className={cn("text-sm font-bold", isProfit ? "text-red-500" : "text-blue-500")}>
                                 {isProfit ? "+" : ""}{profitRate.toFixed(1)}%
                               </div>
                             </div>
                           </div>
-                        )
-                      })}
-                    </div>
+
+                          <div className="mt-2 flex items-center justify-between">
+                            <div className="text-xs text-gray-500">
+                              평균 {myAvg.toLocaleString()}원
+                            </div>
+                            <div className={cn("text-sm font-bold", isProfit ? "text-red-500" : "text-blue-500")}>
+                              {isProfit ? "+" : ""}{profit.toLocaleString()}원
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
                   </div>
+
+                  {myStocks.length > 3 && (
+                    <button 
+                      onClick={() => setActiveTab("my")}
+                      className="w-full mt-2 py-3 bg-gray-800/30 hover:bg-gray-800/50 border border-gray-700/50 rounded-xl text-sm text-gray-400 font-medium transition-all"
+                    >
+                      +{myStocks.length - 3}개 종목 더보기
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -2120,36 +2177,77 @@ export default function GamePlayPage() {
             </button>
           </div>
 
-          {/* My Investment Card */}
+          {/* My Investment Card - 상세 정보 */}
           {currentHoldings > 0 && (
             <div className="px-5 mb-6">
-              <div className="bg-gray-800/50 rounded-2xl p-5">
+              <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-2 border-blue-500/30 rounded-3xl p-5 shadow-lg">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-bold text-gray-200">내 주식</h3>
-                  <span className="text-xs bg-gray-700 px-2 py-1 rounded text-gray-300">물타기 계산기</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">💼</span>
+                    <h3 className="font-bold text-white text-lg">내 주식 정보</h3>
+                  </div>
+                  <span className="text-xs bg-blue-500/20 text-blue-300 px-3 py-1.5 rounded-full font-bold">보유 중</span>
                 </div>
-                <div className="grid grid-cols-2 gap-y-4">
-                  <div>
-                    <div className="text-xs text-gray-500 mb-1">평가손익</div>
-                    <div className={cn("font-bold", isProfit ? "text-red-500" : "text-blue-500")}>
-                      {isProfit ? "+" : ""}
-                      {((currentPrice - myAvg) * currentHoldings).toLocaleString()}원
+
+                {/* 핵심 지표 */}
+                <div className="mb-4 pb-4 border-b border-gray-700/50">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-gray-800/50 rounded-xl p-3">
+                      <div className="text-xs text-gray-400 mb-1">평가손익</div>
+                      <div className={cn("text-2xl font-bold", isProfit ? "text-red-500" : "text-blue-500")}>
+                        {isProfit ? "+" : ""}
+                        {((currentPrice - myAvg) * currentHoldings).toLocaleString()}원
+                      </div>
+                    </div>
+                    <div className="bg-gray-800/50 rounded-xl p-3">
+                      <div className="text-xs text-gray-400 mb-1">수익률</div>
+                      <div className={cn("text-2xl font-bold", isProfit ? "text-red-500" : "text-blue-500")}>
+                        {isProfit ? "+" : ""}
+                        {myReturn}%
+                      </div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-xs text-gray-500 mb-1">수익률</div>
-                    <div className={cn("text-bold", isProfit ? "text-red-500" : "text-blue-500")}>
-                      {isProfit ? "+" : ""}
-                      {myReturn}%
+                </div>
+
+                {/* 상세 정보 */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-sm text-gray-400">보유수량</span>
+                    <span className="text-base font-bold text-white">{currentHoldings}주</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-sm text-gray-400">평균 매입가</span>
+                    <span className="text-base font-bold text-white">{myAvg.toLocaleString()}원</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-sm text-gray-400">현재가</span>
+                    <span className="text-base font-bold text-white">{currentPrice.toLocaleString()}원</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2 pt-3 border-t border-gray-700/50">
+                    <span className="text-sm text-gray-400">총 매입금액</span>
+                    <span className="text-base font-bold text-gray-200">{(myAvg * currentHoldings).toLocaleString()}원</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <span className="text-sm text-gray-400">현재 평가금액</span>
+                    <span className="text-base font-bold text-white">{(currentPrice * currentHoldings).toLocaleString()}원</span>
+                  </div>
+                </div>
+
+                {/* 투자 조언 */}
+                <div className="mt-4 pt-4 border-t border-gray-700/50">
+                  <div className="bg-gray-800/30 rounded-xl p-3">
+                    <div className="flex items-start gap-2">
+                      <span className="text-lg">💡</span>
+                      <div className="flex-1">
+                        <div className="text-xs font-bold text-gray-300 mb-1">투자 팁</div>
+                        <div className="text-xs text-gray-400 leading-relaxed">
+                          {isProfit 
+                            ? `현재 ${myReturn}%의 수익을 내고 있습니다. 목표 수익률에 도달했다면 일부 매도를 고려해보세요.`
+                            : `현재 ${myReturn}%의 손실입니다. 추가 하락 시 손절 또는 분할 매수를 고려해보세요.`
+                          }
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-500 mb-1">보유수량</div>
-                    <div className="font-bold text-gray-200">{currentHoldings}주</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-xs text-gray-500 mb-1">매입금액</div>
-                    <div className="font-bold text-gray-200">{(myAvg * currentHoldings).toLocaleString()}원</div>
                   </div>
                 </div>
               </div>
