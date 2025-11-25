@@ -24,7 +24,7 @@ import { cn } from "@/lib/utils"
 // Added XAxis, YAxis, Tooltip
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, ReferenceDot, Label } from "recharts" // Added ReferenceDot, Label
 import { storage } from "@/lib/storage"
-import { AIRankingCard, AINotification } from "@/components/ai-ranking-card"
+import { AIRankingCard, AIRankingDetailModal, AINotification } from "@/components/ai-ranking-card"
 import { HintModal } from "@/components/hint-modal"
 import { EnhancedReportModal } from "@/components/enhanced-report-modal"
 import { ItemsShopModal, OwnedItemsBadge } from "@/components/items-shop-modal"
@@ -566,6 +566,7 @@ export default function GamePlayPage() {
 
   // 새로운 기능 상태
   const [showAIRanking, setShowAIRanking] = useState(false)
+  const [showAIRankingDetail, setShowAIRankingDetail] = useState(false)
   const [showHintModal, setShowHintModal] = useState(false)
   const [showItemsShop, setShowItemsShop] = useState(false)
   const [showEnhancedReport, setShowEnhancedReport] = useState(false)
@@ -1417,6 +1418,13 @@ export default function GamePlayPage() {
         <DatePopup />
 
         {/* 모달들 */}
+        <AIRankingDetailModal
+          isOpen={showAIRankingDetail}
+          onClose={() => setShowAIRankingDetail(false)}
+          userProfit={profitRate}
+          userName="당신"
+        />
+
         <HintModal
           isOpen={showHintModal}
           onClose={() => setShowHintModal(false)}
@@ -1601,10 +1609,137 @@ export default function GamePlayPage() {
 
           {activeTab !== "watch" && activeTab !== "all" && (
             <>
-              {/* AI 순위 카드 */}
-              <div className="mb-6">
-                <AIRankingCard userProfit={profitRate} userName="당신" isVisible={true} />
+              {/* 내 자산 - 가장 중요하게 크게 표시 */}
+              <div className="mb-6 bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-2 border-blue-500/30 rounded-3xl p-6 shadow-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-gray-300 font-bold text-base">💰 총 자산</span>
+                </div>
+                <h1 className="text-4xl font-black mb-3 text-white">
+                  {currencyMode === "USD" ? "$" : ""}
+                  {(currencyMode === "USD" ? totalValue / EXCHANGE_RATE : totalValue).toLocaleString(undefined, {
+                    maximumFractionDigits: 0,
+                  })}
+                  {currencyMode === "KRW" ? "원" : ""}
+                </h1>
+                <div className="flex items-center justify-between">
+                  <div
+                    className={cn(
+                      "text-lg font-bold flex items-center gap-1",
+                      profitRate >= 0 ? "text-red-500" : "text-blue-500",
+                    )}
+                  >
+                    {profitRate >= 0 ? "+" : ""}
+                    {profitRate}% ({profitRate >= 0 ? "+" : ""}
+                    {(totalValue - initialValue).toLocaleString()}원)
+                  </div>
+                </div>
+                
+                {/* 자산 구성 */}
+                <div className="mt-4 pt-4 border-t border-gray-700/50 grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-xs text-gray-400 mb-1">현금</div>
+                    <div className="text-base font-bold text-gray-200">
+                      {cash.toLocaleString()}원
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-xs text-gray-400 mb-1">주식 평가액</div>
+                    <div className="text-base font-bold text-gray-200">
+                      {totalStockValue.toLocaleString()}원
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              {/* 투자 포트폴리오 요약 */}
+              {myStocks.length > 0 && (
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-base font-bold text-gray-200">📊 내 투자 현황</h3>
+                    <button 
+                      onClick={() => setActiveTab("my")}
+                      className="text-xs text-blue-400 font-bold hover:text-blue-300 transition-colors"
+                    >
+                      전체보기
+                    </button>
+                  </div>
+                  <div className="bg-gray-800/30 rounded-2xl p-4 border border-gray-700/50">
+                    <div className="grid grid-cols-2 gap-4 mb-3">
+                      <div>
+                        <div className="text-xs text-gray-400 mb-1">보유 종목</div>
+                        <div className="text-xl font-bold text-white">{myStocks.length}개</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-gray-400 mb-1">총 평가손익</div>
+                        <div className={cn("text-xl font-bold", totalStockValue - Object.entries(holdings).reduce((acc, [id, qty]) => {
+                          const avg = averagePrices[id] || 0
+                          return acc + (avg * qty)
+                        }, 0) >= 0 ? "text-red-500" : "text-blue-500")}>
+                          {totalStockValue - Object.entries(holdings).reduce((acc, [id, qty]) => {
+                            const avg = averagePrices[id] || 0
+                            return acc + (avg * qty)
+                          }, 0) >= 0 ? "+" : ""}
+                          {(totalStockValue - Object.entries(holdings).reduce((acc, [id, qty]) => {
+                            const avg = averagePrices[id] || 0
+                            return acc + (avg * qty)
+                          }, 0)).toLocaleString()}원
+                        </div>
+                      </div>
+                    </div>
+                    {/* 상위 3개 종목만 표시 */}
+                    <div className="space-y-2">
+                      {myStocks.slice(0, 3).map((stock) => {
+                        const currentTurnData = stock.turns[currentTurn]
+                        const sPrice = currentTurnData?.price || 0
+                        const myQty = holdings[stock.id] || 0
+                        const myAvg = averagePrices[stock.id] || 0
+                        const profit = (sPrice - myAvg) * myQty
+                        const profitRate = myAvg > 0 ? ((sPrice - myAvg) / myAvg) * 100 : 0
+                        const isProfit = profit >= 0
+
+                        return (
+                          <div key={stock.id} className="flex items-center justify-between text-sm">
+                            <span className="text-gray-300 font-medium">{stock.name}</span>
+                            <div className="text-right">
+                              <div className="text-gray-200 font-bold">{myQty}주</div>
+                              <div className={cn("text-xs font-medium", isProfit ? "text-red-500" : "text-blue-500")}>
+                                {isProfit ? "+" : ""}{profitRate.toFixed(1)}%
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* AI 순위 - Compact 모드 */}
+              <div className="mb-6">
+                <AIRankingCard 
+                  userProfit={profitRate} 
+                  userName="당신" 
+                  isVisible={true} 
+                  compact={true}
+                  onShowDetail={() => setShowAIRankingDetail(true)}
+                />
+              </div>
+
+              {/* 대기 중인 주문 */}
+              {pendingOrders.length > 0 && (
+                <div className="mb-6">
+                  <button
+                    onClick={() => router.push(`/practice/stock/${scenarioId}/orders`)}
+                    className="bg-[#1E3E3E] hover:bg-[#264f4f] transition-colors rounded-2xl px-4 py-3 flex items-center justify-between w-full group"
+                  >
+                    <div className="text-left">
+                      <div className="text-[#4CD9C0] text-sm font-bold mb-0.5">대기 중인 주문</div>
+                      <div className="text-[#4CD9C0] text-lg font-bold">조건부 주문 {pendingOrders.length}건</div>
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-[#4CD9C0] group-hover:translate-x-1 transition-transform" />
+                  </button>
+                </div>
+              )}
 
               {/* 기능 버튼들 */}
               <div className="mb-6 grid grid-cols-3 gap-2">
@@ -1645,45 +1780,6 @@ export default function GamePlayPage() {
                     </div>
                   </div>
                   <OwnedItemsBadge itemCount={ownedItems.length} />
-                </div>
-              </div>
-
-              {pendingOrders.length > 0 && (
-                <div className="mb-6">
-                  <button
-                    onClick={() => router.push(`/practice/stock/${scenarioId}/orders`)}
-                    className="bg-[#1E3E3E] hover:bg-[#264f4f] transition-colors rounded-2xl px-4 py-3 flex items-center justify-between w-full group"
-                  >
-                    <div className="text-left">
-                      <div className="text-[#4CD9C0] text-sm font-bold mb-0.5">대기 중인 주문</div>
-                      <div className="text-[#4CD9C0] text-lg font-bold">조건부 주문 {pendingOrders.length}건</div>
-                    </div>
-                    <ChevronRight className="w-5 h-5 text-[#4CD9C0] group-hover:translate-x-1 transition-transform" />
-                  </button>
-                </div>
-              )}
-
-              <div className="mb-2">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-gray-400 font-medium">내 자산</span>
-                  <ChevronRight className="w-4 h-4 text-gray-500" />
-                </div>
-                <h1 className="text-3xl font-bold mb-1">
-                  {currencyMode === "USD" ? "$" : ""}
-                  {(currencyMode === "USD" ? totalValue / EXCHANGE_RATE : totalValue).toLocaleString(undefined, {
-                    maximumFractionDigits: 0,
-                  })}
-                  {currencyMode === "KRW" ? "원" : ""}
-                </h1>
-                <div
-                  className={cn(
-                    "text-sm font-medium flex items-center gap-1",
-                    profitRate >= 0 ? "text-red-500" : "text-blue-500",
-                  )}
-                >
-                  {profitRate >= 0 ? "+" : ""}
-                  {profitRate}% ({profitRate >= 0 ? "+" : ""}
-                  {(totalValue - initialValue).toLocaleString()}원)
                 </div>
               </div>
             </>
