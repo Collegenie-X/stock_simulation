@@ -5,6 +5,13 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, ChevronRight, Zap, TrendingUp } from "lucide-react"
 import { storage } from "@/lib/storage"
+import { cn } from "@/lib/utils"
+
+/**
+ * 투자 성향 분석 페이지
+ * - 다크 테마 모바일 최적화
+ * - 8가지 질문으로 투자 성향 분석
+ */
 
 const analysisData = {
   theory: [
@@ -159,8 +166,6 @@ export default function AnalysisPage() {
         storage.setGuideComplete()
 
         console.log("[v0] Analysis complete, profile saved:", storage.getUserProfile())
-        console.log("[v0] Onboarding status:", storage.getOnboardingStatus())
-        console.log("[v0] Guide complete status:", storage.getGuideComplete())
 
         setTimeout(() => {
           setShowResult(true)
@@ -169,6 +174,7 @@ export default function AnalysisPage() {
     }, 1500)
   }
 
+  // 결과 화면
   if (showResult) {
     const avgScore = Math.round(totalScore / allQuestions.length)
 
@@ -187,8 +193,8 @@ export default function AnalysisPage() {
     }
 
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#4A6BFF] to-[#6B8FFF] px-5 py-8 flex flex-col items-center justify-center">
-        <div className="max-w-md w-full animate-in zoom-in duration-500">
+      <div className="min-h-screen-mobile bg-gradient-to-b from-blue-600 to-purple-700 px-5 py-8 flex flex-col items-center justify-center">
+        <div className="max-w-md w-full animate-slide-up">
           <div className="text-center mb-8">
             <div className="text-8xl mb-6 animate-bounce">{emoji}</div>
             <div className="inline-flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 mb-4">
@@ -199,19 +205,19 @@ export default function AnalysisPage() {
             <p className="text-blue-100 text-lg">당신은...</p>
           </div>
 
-          <div className="bg-white rounded-3xl p-8 shadow-2xl mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">{investorType}</h2>
-            <p className="text-gray-600 text-center leading-relaxed mb-6">{description}</p>
+          <div className="bg-[#252525] rounded-3xl p-8 shadow-2xl mb-6 border border-white/10">
+            <h2 className="text-2xl font-bold text-white mb-3 text-center">{investorType}</h2>
+            <p className="text-gray-400 text-center leading-relaxed mb-6">{description}</p>
 
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-600">리스크 감수</span>
-                  <span className="font-bold text-gray-900">{Math.min(avgScore * 4, 100)}%</span>
+                  <span className="text-gray-400">리스크 감수</span>
+                  <span className="font-bold text-white">{Math.min(avgScore * 4, 100)}%</span>
                 </div>
-                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-[#4A6BFF] to-[#6B8FFF] rounded-full transition-all duration-1000"
+                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-1000"
                     style={{ width: `${Math.min(avgScore * 4, 100)}%` }}
                   />
                 </div>
@@ -219,12 +225,12 @@ export default function AnalysisPage() {
 
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-600">분석 선호도</span>
-                  <span className="font-bold text-gray-900">85%</span>
+                  <span className="text-gray-400">분석 선호도</span>
+                  <span className="font-bold text-white">85%</span>
                 </div>
-                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-[#00C853] to-[#00E676] rounded-full transition-all duration-1000 delay-200"
+                    className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full transition-all duration-1000 delay-200"
                     style={{ width: "85%" }}
                   />
                 </div>
@@ -232,12 +238,12 @@ export default function AnalysisPage() {
 
               <div>
                 <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-600">감정 통제</span>
-                  <span className="font-bold text-gray-900">65%</span>
+                  <span className="text-gray-400">감정 통제</span>
+                  <span className="font-bold text-white">65%</span>
                 </div>
-                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-[#FFD93D] to-[#FFC107] rounded-full transition-all duration-1000 delay-300"
+                    className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full transition-all duration-1000 delay-300"
                     style={{ width: "65%" }}
                   />
                 </div>
@@ -246,11 +252,9 @@ export default function AnalysisPage() {
           </div>
 
           <Button
-            className="w-full h-16 bg-white hover:bg-gray-50 text-[#4A6BFF] rounded-2xl text-xl font-bold shadow-2xl"
+            className="w-full h-16 bg-white hover:bg-gray-100 text-blue-600 rounded-2xl text-xl font-bold shadow-2xl"
             onClick={() => {
               storage.setGuideComplete()
-              console.log("[v0] Final guide status before navigation:", storage.getGuideComplete())
-              console.log("[v0] Navigating to home...")
               router.push("/")
             }}
           >
@@ -262,8 +266,10 @@ export default function AnalysisPage() {
     )
   }
 
+  // 질문 화면
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#4A6BFF] to-[#6B8FFF] flex flex-col">
+    <div className="min-h-screen-mobile bg-gradient-to-b from-blue-600 to-purple-700 flex flex-col">
+      {/* 헤더 */}
       <div className="bg-white/10 backdrop-blur-sm border-b border-white/20 px-5 py-4">
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-between mb-3">
@@ -292,10 +298,11 @@ export default function AnalysisPage() {
         </div>
       </div>
 
+      {/* 질문 내용 */}
       <div className="flex-1 px-5 py-6 max-w-md mx-auto w-full">
         {isTheory ? (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 mb-6 border border-white/50">
+          <div className="animate-slide-up">
+            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 mb-6 border border-white/20">
               <h2 className="text-2xl font-bold text-white leading-relaxed text-center">{currentQuestion.question}</h2>
             </div>
 
@@ -310,25 +317,23 @@ export default function AnalysisPage() {
                     key={index}
                     onClick={() => !showFeedback && handleAnswer(index)}
                     disabled={showFeedback}
-                    className={`
-                      w-full p-5 rounded-2xl text-left transition-all duration-300 transform
-                      ${showFeedback ? "cursor-not-allowed" : "active:scale-95 hover:scale-102"}
-                      ${
-                        isSelected && showResult
-                          ? isBest
-                            ? "bg-green-500 border-2 border-green-400 shadow-lg shadow-green-500/50"
-                            : "bg-blue-500 border-2 border-blue-400 shadow-lg shadow-blue-500/50"
-                          : "bg-white/90 backdrop-blur-sm border-2 border-white/50 hover:bg-white hover:border-white"
-                      }
-                    `}
+                    className={cn(
+                      "w-full p-5 rounded-2xl text-left transition-all duration-300 transform touch-feedback",
+                      showFeedback ? "cursor-not-allowed" : "",
+                      isSelected && showResult
+                        ? isBest
+                          ? "bg-green-500 border-2 border-green-400 shadow-lg shadow-green-500/50"
+                          : "bg-blue-500 border-2 border-blue-400 shadow-lg shadow-blue-500/50"
+                        : "bg-white/90 backdrop-blur-sm border-2 border-white/50 hover:bg-white hover:border-white"
+                    )}
                   >
                     <div className="flex items-center gap-4">
                       <div className="text-4xl">{(option as any).emoji}</div>
                       <div className="flex-1">
-                        <p className={`font-bold text-lg mb-1 ${showResult ? "text-white" : "text-gray-900"}`}>
+                        <p className={cn("font-bold text-lg mb-1", showResult ? "text-white" : "text-gray-900")}>
                           {option.text}
                         </p>
-                        <p className={`text-sm ${showResult ? "text-white/80" : "text-gray-600"}`}>
+                        <p className={cn("text-sm", showResult ? "text-white/80" : "text-gray-600")}>
                           {(option as any).type}
                         </p>
                         {showResult && (
@@ -351,44 +356,44 @@ export default function AnalysisPage() {
             </div>
           </div>
         ) : (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-            <div className="bg-white rounded-3xl p-6 mb-4 shadow-xl">
+          <div className="animate-slide-up">
+            <div className="bg-[#252525] rounded-3xl p-6 mb-4 shadow-xl border border-white/10">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">{(currentQuestion as any).title}</h3>
-                  <p className="text-sm text-gray-600">{(currentQuestion as any).stock}</p>
+                  <h3 className="text-xl font-bold text-white mb-1">{(currentQuestion as any).title}</h3>
+                  <p className="text-sm text-gray-400">{(currentQuestion as any).stock}</p>
                 </div>
                 <div className="text-4xl">📊</div>
               </div>
 
-              <div className="bg-gray-50 rounded-2xl p-4 mb-4">
+              <div className="bg-gray-800/50 rounded-2xl p-4 mb-4">
                 <div className="flex items-baseline justify-between mb-3">
-                  <span className="text-sm text-gray-600">현재가</span>
-                  <span className="text-3xl font-bold text-gray-900">
+                  <span className="text-sm text-gray-400">현재가</span>
+                  <span className="text-3xl font-bold text-white">
                     {(currentQuestion as any).currentPrice.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex gap-4 text-sm">
                   <div className="flex items-center gap-1">
-                    <TrendingUp className="w-4 h-4 text-red-600" />
-                    <span className="text-gray-600">등락:</span>
-                    <span className="font-bold text-red-600">{(currentQuestion as any).change}</span>
+                    <TrendingUp className="w-4 h-4 text-red-500" />
+                    <span className="text-gray-400">등락:</span>
+                    <span className="font-bold text-red-500">{(currentQuestion as any).change}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <TrendingUp className="w-4 h-4 text-blue-600" />
-                    <span className="text-gray-600">거래량:</span>
-                    <span className="font-bold text-blue-600">{(currentQuestion as any).volume}</span>
+                    <TrendingUp className="w-4 h-4 text-blue-500" />
+                    <span className="text-gray-400">거래량:</span>
+                    <span className="font-bold text-blue-500">{(currentQuestion as any).volume}</span>
                   </div>
                 </div>
               </div>
 
               {(currentQuestion as any).aiWarning && (
-                <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-3 mb-4">
-                  <p className="text-sm font-semibold text-yellow-800">⚠️ {(currentQuestion as any).aiWarning}</p>
+                <div className="bg-yellow-500/10 border-2 border-yellow-500/30 rounded-xl p-3 mb-4">
+                  <p className="text-sm font-semibold text-yellow-400">⚠️ {(currentQuestion as any).aiWarning}</p>
                 </div>
               )}
 
-              <p className="text-gray-600 text-sm">{(currentQuestion as any).situation}</p>
+              <p className="text-gray-400 text-sm">{(currentQuestion as any).situation}</p>
             </div>
 
             <h2 className="text-xl font-bold text-white mb-4 text-center">{currentQuestion.question}</h2>
@@ -404,26 +409,24 @@ export default function AnalysisPage() {
                     key={index}
                     onClick={() => !showFeedback && handleAnswer(index)}
                     disabled={showFeedback}
-                    className={`
-                      w-full p-5 rounded-2xl text-left transition-all duration-300 transform
-                      ${showFeedback ? "cursor-not-allowed" : "active:scale-95 hover:scale-102"}
-                      ${
-                        isSelected && showResult
-                          ? isBest
-                            ? "bg-green-500 border-2 border-green-400 shadow-lg shadow-green-500/50"
-                            : "bg-blue-500 border-2 border-blue-400 shadow-lg shadow-blue-500/50"
-                          : "bg-white/90 backdrop-blur-sm border-2 border-white/50 hover:bg-white hover:border-white"
-                      }
-                    `}
+                    className={cn(
+                      "w-full p-5 rounded-2xl text-left transition-all duration-300 transform touch-feedback",
+                      showFeedback ? "cursor-not-allowed" : "",
+                      isSelected && showResult
+                        ? isBest
+                          ? "bg-green-500 border-2 border-green-400 shadow-lg shadow-green-500/50"
+                          : "bg-blue-500 border-2 border-blue-400 shadow-lg shadow-blue-500/50"
+                        : "bg-white/90 backdrop-blur-sm border-2 border-white/50 hover:bg-white hover:border-white"
+                    )}
                   >
                     <div className="flex items-center gap-4">
                       <div className="text-4xl">{(option as any).emoji}</div>
                       <div className="flex-1">
-                        <p className={`font-bold text-lg mb-2 ${showResult ? "text-white" : "text-gray-900"}`}>
+                        <p className={cn("font-bold text-lg mb-2", showResult ? "text-white" : "text-gray-900")}>
                           {option.text}
                         </p>
                         <div
-                          className={`flex items-center gap-3 text-sm ${showResult ? "text-white/80" : "text-gray-600"}`}
+                          className={cn("flex items-center gap-3 text-sm", showResult ? "text-white/80" : "text-gray-600")}
                         >
                           <span>{(option as any).emotion}</span>
                           <span>•</span>

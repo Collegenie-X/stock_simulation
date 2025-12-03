@@ -1,0 +1,33 @@
+{
+  "name": "파도를 타라 - 투자 교육 게임",
+  "short_name": "파도를 타라",
+  "description": "엘리엇 파동 이론으로 배우는 주식 투자 시뮬레이션",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#191919",
+  "theme_color": "#191919",
+  "orientation": "portrait",
+  "scope": "/",
+  "lang": "ko-KR",
+  "icons": [
+    {
+      "src": "/icon-dark-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "finance", "games"],
+  "prefer_related_applications": false
+}
+

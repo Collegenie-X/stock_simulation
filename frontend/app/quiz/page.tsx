@@ -4,6 +4,13 @@ import { useState } from "react"
 import { ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { storage } from "@/lib/storage"
+import { cn } from "@/lib/utils"
+
+/**
+ * 퀴즈 페이지
+ * - 다크 테마 모바일 최적화
+ * - 투자 성향 퀴즈
+ */
 
 const questions = [
   {
@@ -124,20 +131,23 @@ export default function QuizPage() {
   const question = questions[currentQuestion]
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col">
+    <div className="min-h-screen-mobile bg-[#191919] flex flex-col">
       {/* Header */}
       <div className="px-5 pt-6 pb-4 max-w-md mx-auto w-full">
         <div className="flex items-center justify-between mb-4">
-          <button onClick={() => router.back()} className="text-gray-600 hover:text-gray-900">
+          <button 
+            onClick={() => router.back()} 
+            className="text-gray-400 hover:text-white touch-feedback"
+          >
             <ArrowLeft className="w-6 h-6" />
           </button>
-          <span className="text-sm font-semibold text-gray-600">
+          <span className="text-sm font-semibold text-gray-400">
             {currentQuestion + 1} / {questions.length}
           </span>
         </div>
 
         {/* Progress bar */}
-        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
             style={{ width: `${progress}%` }}
@@ -148,8 +158,8 @@ export default function QuizPage() {
       {/* Question */}
       <div className="flex-1 px-5 py-8 max-w-md mx-auto w-full">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2 text-balance">{question.question}</h2>
-          <p className="text-gray-600">가장 가까운 답변을 선택해주세요</p>
+          <h2 className="text-2xl font-bold text-white mb-2 text-balance">{question.question}</h2>
+          <p className="text-gray-400">가장 가까운 답변을 선택해주세요</p>
         </div>
 
         <div className="space-y-3">
@@ -157,7 +167,11 @@ export default function QuizPage() {
             <button
               key={index}
               onClick={() => handleAnswer(option.score)}
-              className="w-full p-5 bg-white rounded-2xl border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all text-left font-medium text-gray-900"
+              className={cn(
+                "w-full p-5 bg-[#252525] rounded-2xl border-2 border-white/5",
+                "hover:border-blue-500/50 hover:bg-[#2a2a2a] transition-all",
+                "text-left font-medium text-white touch-feedback"
+              )}
             >
               {option.text}
             </button>
