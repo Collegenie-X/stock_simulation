@@ -97,12 +97,12 @@ flowchart LR
     L4 -->|"+25% 달성"| L5
     L5 -->|"+20% 달성"| L6
     
-    style L1 fill:#e8f5e9
-    style L2 fill:#c8e6c9
-    style L3 fill:#a5d6a7
-    style L4 fill:#81c784
-    style L5 fill:#66bb6a
-    style L6 fill:#ffd700,color:#000
+    style L1 fill:#e8f5e9,color:#111
+    style L2 fill:#c8e6c9,color:#111
+    style L3 fill:#a5d6a7,color:#111
+    style L4 fill:#81c784,color:#111
+    style L5 fill:#66bb6a,color:#111
+    style L6 fill:#ffd700,color:#000,color:#111
 ```
 
 ### 레벨별 학습 포인트
@@ -316,7 +316,7 @@ flowchart TB
     W3 -->|"테스트 통과"| W4
     W4 -->|"테스트 통과"| W5
     
-    style W5 fill:#ffd700,color:#000
+    style W5 fill:#ffd700,color:#000,color:#111
 ```
 
 ### 파도별 매수/매도 판단 기준
@@ -477,9 +477,9 @@ flowchart TD
     Check -->|"3~7종목"| OK["✅ 적정 분산"]
     Check -->|"8종목 이상"| Alert2["⚠️ 과다 분산!<br/>관리 불가"]
     
-    style OK fill:#4caf50,color:#fff
-    style Alert1 fill:#ff9800,color:#000
-    style Alert2 fill:#f44336,color:#fff
+    style OK fill:#4caf50,color:#fff,color:#111
+    style Alert1 fill:#ff9800,color:#000,color:#111
+    style Alert2 fill:#f44336,color:#fff,color:#111
 ```
 
 ### 포트폴리오 구성 가이드
@@ -755,9 +755,9 @@ flowchart TB
     R1 --> W3
     R2 --> W4
     
-    style W1 fill:#8d6e63,color:#fff
-    style W2 fill:#ffd700,color:#000
-    style W3 fill:#e91e63,color:#fff
+    style W1 fill:#8d6e63,color:#fff,color:#111
+    style W2 fill:#ffd700,color:#000,color:#111
+    style W3 fill:#e91e63,color:#fff,color:#111
 ```
 
 ### 보상 상세
@@ -895,9 +895,9 @@ flowchart TD
     BigPrize --> Next
     Point --> Next
     
-    style Prize fill:#8d6e63,color:#fff
-    style BigPrize fill:#ffd700,color:#000
-    style Final fill:#4caf50,color:#fff
+    style Prize fill:#8d6e63,color:#fff,color:#111
+    style BigPrize fill:#ffd700,color:#000,color:#111
+    style Final fill:#4caf50,color:#fff,color:#111
 ```
 
 ---
