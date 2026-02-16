@@ -255,7 +255,7 @@ export default function AnalysisPage() {
             className="w-full h-16 bg-white hover:bg-gray-100 text-blue-600 rounded-2xl text-xl font-bold shadow-2xl"
             onClick={() => {
               storage.setGuideComplete()
-              router.push("/")
+              router.push("/home")
             }}
           >
             홈으로 이동

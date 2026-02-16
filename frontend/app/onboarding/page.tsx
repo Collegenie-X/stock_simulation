@@ -74,12 +74,8 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#4A6BFF] to-[#6B8FFF] flex flex-col">
-      {/* Skip Button */}
-      <div className="p-5 flex justify-end">
-        <Button variant="ghost" className="text-white/80 hover:text-white hover:bg-white/10" onClick={handleSkip}>
-          건너뛰기
-        </Button>
-      </div>
+      {/* 건너뛰기 버튼 제거 - 투자 성향 테스트 필수 */}
+      <div className="p-5 h-14"></div>
 
       {/* Slides */}
       <div

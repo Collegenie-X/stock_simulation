@@ -170,16 +170,8 @@ export default function AnalysisIntroPage() {
             onClick={() => router.push("/analysis")}
             className="w-full h-14 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-2xl font-bold text-lg shadow-lg"
           >
-            시작하기
+            투자 성향 테스트 시작하기
           </Button>
-          <button
-            onClick={() => {
-              router.push("/guide")
-            }}
-            className="w-full mt-3 text-gray-500 text-sm font-medium hover:text-gray-300 transition-colors"
-          >
-            건너뛰고 바로 시작하기
-          </button>
         </div>
       </div>
     </div>

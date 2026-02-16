@@ -1,6 +1,6 @@
 'use client';
 
-import { Map, BookOpen, Trophy, User } from 'lucide-react';
+import { Map, LineChart, Trophy, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -19,8 +19,8 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { icon: Map, label: '홈', href: '/' },
-  { icon: BookOpen, label: '학습', href: '/learn' },
+  { icon: Map, label: '홈', href: '/home' },
+  { icon: LineChart, label: '학습', href: '/learn' },
   { icon: Trophy, label: '랭킹', href: '/compete' },
   { icon: User, label: 'MY', href: '/profile' },
 ];
@@ -40,7 +40,7 @@ export function MobileNav() {
       <div className="flex justify-around items-center h-16 max-w-md mx-auto px-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href || 
-            (item.href !== '/' && pathname.startsWith(item.href));
+            (item.href !== '/home' && pathname.startsWith(item.href));
           const Icon = item.icon;
           
           return (

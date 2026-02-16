@@ -104,7 +104,7 @@ export default function CareerModePage() {
       {/* Header */}
       <div className="pt-safe-top px-5 py-4 flex items-center gap-3 sticky top-0 z-10 bg-[#191919]/95 backdrop-blur-lg border-b border-white/5">
         <button
-          onClick={() => window.location.href = '/'}
+          onClick={() => window.location.href = '/home'}
           className="p-2 -ml-2 hover:bg-white/10 rounded-full transition-colors"
         >
           <ArrowLeft className="w-6 h-6" />
