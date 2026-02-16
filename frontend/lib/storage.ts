@@ -30,9 +30,19 @@ export interface Character {
   totalExp: number
   exp: number
   hearts: number
+  maxHearts: number
   streak: number
+  bestStreak: number
+  combo: number
+  bestCombo: number
+  badges: string[]
   achievements: string[]
+  investorDNA: "turtle" | "eagle" | "monkey" | "fox" | "lion" | "owl" | null
+  crisisGrade: "S" | "A" | "B" | "C" | "D" | "F" | null
+  totalDecisions: number
+  correctDecisions: number
   createdAt: string
+  lastPlayedAt: string | null
 }
 
 export interface Progress {
@@ -55,6 +65,11 @@ export interface Portfolio {
 
 export interface GameSettings {
   difficulty?: "easy" | "medium" | "hard"
+  speedMode?: "sprint" | "standard" | "marathon"
+  dailyOpportunities?: 2 | 3
+  timerSeconds?: number
+  simulationMonths?: number
+  initialCash?: number
   soundEnabled?: boolean
   notificationsEnabled?: boolean
   [key: string]: any

@@ -3,8 +3,17 @@
 import { useEffect, useState } from "react"
 import { MobileNav } from "@/components/mobile-nav"
 import { storage } from "@/lib/storage"
-import { Settings, TrendingUp, Play, Zap, Target, ChevronRight } from "lucide-react"
+import { Settings, TrendingUp, Zap, Target, ChevronRight, Shield, Timer } from "lucide-react"
 import charactersData from "@/data/characters.json"
+
+const DNA_LABELS: Record<string, { emoji: string; name: string }> = {
+  turtle: { emoji: "🐢", name: "거북이형" },
+  eagle: { emoji: "🦅", name: "독수리형" },
+  monkey: { emoji: "🐒", name: "원숭이형" },
+  fox: { emoji: "🦊", name: "여우형" },
+  lion: { emoji: "🦁", name: "사자형" },
+  owl: { emoji: "🦉", name: "부엉이형" },
+}
 
 export default function HomePage() {
   const [progress, setProgress] = useState<any>(null)
@@ -13,27 +22,16 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    console.log("[v0] HomePage useEffect - checking status")
-
     const onboardingComplete = storage.getOnboardingStatus()
-    console.log("[v0] Onboarding complete:", onboardingComplete)
-
     if (!onboardingComplete) {
-      console.log("[v0] Redirecting to onboarding")
       window.location.href = "/onboarding"
       return
     }
 
-    const guideComplete = storage.getGuideComplete()
-    console.log("[v0] Guide complete:", guideComplete)
-
-    if (!guideComplete) {
-      console.log("[v0] Redirecting to analysis-intro")
-      window.location.href = "/analysis-intro"
-      return
+    // 무료 버전: 가이드를 건너뛰고 바로 게임 시작 가능
+    if (!storage.getGuideComplete()) {
+      storage.setGuideComplete()
     }
-
-    console.log("[v0] Loading home page data...")
 
     const userProgress = storage.getProgress()
     const userPortfolio = storage.getPortfolio()
@@ -54,9 +52,19 @@ export default function HomePage() {
         totalExp: 0,
         exp: 0,
         hearts: 5,
+        maxHearts: 5,
         streak: 0,
+        bestStreak: 0,
+        combo: 0,
+        bestCombo: 0,
+        badges: [],
         achievements: [],
+        investorDNA: null,
+        crisisGrade: null,
+        totalDecisions: 0,
+        correctDecisions: 0,
         createdAt: new Date().toISOString(),
+        lastPlayedAt: null,
       }
       storage.setCharacter(userCharacter)
     }
@@ -70,7 +78,7 @@ export default function HomePage() {
   if (isLoading || !progress || !character) {
     return (
       <div className="min-h-screen bg-[#191919] flex items-center justify-center">
-        <div className="animate-pulse text-4xl">🌊</div>
+        <div className="animate-pulse text-4xl">🏄</div>
       </div>
     )
   }
@@ -86,41 +94,77 @@ export default function HomePage() {
     ? ((character.totalExp - currentLevel.minExp) / (nextLevel.minExp - currentLevel.minExp)) * 100
     : 100
 
+  const hearts = character.hearts ?? 5
+  const maxHearts = character.maxHearts ?? 5
+  const streak = character.streak ?? 0
+  const combo = character.bestCombo ?? 0
+  const dna = character.investorDNA ? DNA_LABELS[character.investorDNA] : null
+  const crisisGrade = character.crisisGrade ?? null
+
   return (
     <div className="min-h-screen bg-[#191919] text-white pb-24">
       {/* Header */}
       <div className="pt-safe-top px-5 py-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">🌊</span>
+          <span className="text-2xl">🏄</span>
           <span className="font-bold text-lg">파도를 타라</span>
+          <span className="text-[10px] px-1.5 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full font-bold border border-emerald-500/30">FREE</span>
         </div>
         <button className="p-2 bg-white/10 rounded-full">
           <Settings className="w-5 h-5 text-white" />
         </button>
       </div>
 
-      <div className="px-5 space-y-6">
+      <div className="px-5 space-y-5">
+        {/* HP + Streak + Combo Bar */}
+        <div className="flex items-center justify-between bg-[#222] rounded-2xl px-4 py-3 border border-white/5">
+          {/* HP */}
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-gray-400 mr-1">HP</span>
+            {Array.from({ length: maxHearts }).map((_, i) => (
+              <span key={i} className={`text-base ${i < hearts ? "" : "opacity-20"}`}>
+                {i < hearts ? "❤️" : "🖤"}
+              </span>
+            ))}
+          </div>
+          {/* Streak */}
+          <div className="flex items-center gap-1">
+            <span className="text-base">🔥</span>
+            <span className="font-bold text-sm text-orange-400">{streak}</span>
+          </div>
+          {/* Combo */}
+          <div className="flex items-center gap-1">
+            <span className="text-base">⚡</span>
+            <span className="font-bold text-sm text-yellow-400">{combo}</span>
+          </div>
+        </div>
+
         {/* Character Card */}
-        <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl p-6 border border-white/10 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl p-5 border border-white/10 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl -mr-10 -mt-10"></div>
 
-          <div className="flex items-start justify-between mb-6">
+          <div className="flex items-start justify-between mb-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs font-bold rounded-full border border-blue-500/30">
                   Lv.{character.level} {currentLevel.title}
                 </span>
+                {dna && (
+                  <span className="px-2 py-0.5 bg-purple-500/20 text-purple-400 text-xs font-bold rounded-full border border-purple-500/30">
+                    {dna.emoji} {dna.name}
+                  </span>
+                )}
               </div>
-              <h2 className="text-xl font-bold mb-1">{characterInfo.name}</h2>
+              <h2 className="text-xl font-bold mb-0.5">{characterInfo.name}</h2>
               <p className="text-sm text-gray-400">{characterInfo.type}</p>
             </div>
-            <div className="w-16 h-16 bg-gradient-to-br from-gray-700 to-gray-600 rounded-2xl flex items-center justify-center text-4xl shadow-lg border border-white/10">
+            <div className="w-14 h-14 bg-gradient-to-br from-gray-700 to-gray-600 rounded-2xl flex items-center justify-center text-3xl shadow-lg border border-white/10">
               {characterInfo.emoji}
             </div>
           </div>
 
           {/* EXP Bar */}
-          <div className="mb-2">
+          <div>
             <div className="flex justify-between text-xs text-gray-400 mb-1">
               <span>EXP</span>
               <span>{Math.floor(expProgress)}%</span>
@@ -134,70 +178,123 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Main Stats */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-[#222] rounded-2xl p-4 border border-white/5">
-            <div className="flex items-center gap-2 text-gray-400 text-xs mb-2">
-              <TrendingUp className="w-4 h-4" />
-              <span>총 자산</span>
-            </div>
-            <div className="text-lg font-bold">{totalAssets.toLocaleString()}원</div>
+        {/* Quick Stats */}
+        <div className="grid grid-cols-3 gap-2.5">
+          <div className="bg-[#222] rounded-2xl p-3 border border-white/5 text-center">
+            <div className="text-gray-400 text-[10px] mb-1">총 자산</div>
+            <div className="text-sm font-bold">{(totalAssets / 10000).toFixed(0)}만원</div>
           </div>
-          <div className="bg-[#222] rounded-2xl p-4 border border-white/5">
-            <div className="flex items-center gap-2 text-gray-400 text-xs mb-2">
-              <Zap className="w-4 h-4" />
-              <span>수익률</span>
+          <div className="bg-[#222] rounded-2xl p-3 border border-white/5 text-center">
+            <div className="text-gray-400 text-[10px] mb-1">수익률</div>
+            <div className={`text-sm font-bold ${Number(profitRate) >= 0 ? "text-red-400" : "text-blue-400"}`}>
+              {Number(profitRate) >= 0 ? "+" : ""}{profitRate}%
             </div>
-            <div className={`text-lg font-bold ${Number(profitRate) >= 0 ? "text-red-400" : "text-blue-400"}`}>
-              {Number(profitRate) >= 0 ? "+" : ""}
-              {profitRate}%
-            </div>
+          </div>
+          <div className="bg-[#222] rounded-2xl p-3 border border-white/5 text-center">
+            <div className="text-gray-400 text-[10px] mb-1">대처 능력</div>
+            <div className="text-sm font-bold text-emerald-400">{crisisGrade ?? "-"}</div>
           </div>
         </div>
 
-        {/* Game Modes */}
+        {/* Speed Mode Selection */}
         <div>
-          <h3 className="text-lg font-bold mb-3">게임 모드</h3>
-          <div className="space-y-3">
+          <h3 className="text-lg font-bold mb-3 flex items-center gap-2">
+            <Timer className="w-5 h-5 text-blue-400" />
+            스피드 모드
+          </h3>
+          <div className="space-y-2.5">
+            {/* Sprint */}
             <button
-              onClick={() => (window.location.href = "/practice/setup")} // Changed link to setup page
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-500 rounded-2xl p-1 shadow-lg active:scale-[0.98] transition-transform group"
+              onClick={() => {
+                storage.setGameSettings({ speedMode: "sprint", timerSeconds: 10, simulationMonths: 1, dailyOpportunities: 2 })
+                window.location.href = "/practice/setup"
+              }}
+              className="w-full bg-gradient-to-r from-orange-600/80 to-orange-500/80 rounded-2xl p-[1px] active:scale-[0.98] transition-transform"
             >
-              <div className="bg-[#191919] rounded-xl p-4 flex items-center justify-between h-full group-hover:bg-opacity-90 transition-colors">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center text-2xl">
-                    📈
-                  </div>
+              <div className="bg-[#191919] rounded-[15px] p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full bg-orange-500/20 flex items-center justify-center text-xl">⚡</div>
                   <div className="text-left">
-                    <div className="font-bold text-lg text-white">실전 연습</div>
-                    <div className="text-sm text-gray-400">가상 자금으로 파도 타기 연습</div>
+                    <div className="font-bold text-white">스프린트</div>
+                    <div className="text-xs text-gray-400">5분 · 1개월 · 22회 결정</div>
                   </div>
                 </div>
-                <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
-                  <Play className="w-4 h-4 text-white fill-current" />
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] px-2 py-0.5 bg-orange-500/20 text-orange-400 rounded-full font-bold">10초</span>
+                  <ChevronRight className="w-4 h-4 text-gray-500" />
                 </div>
               </div>
             </button>
 
+            {/* Standard */}
             <button
-              onClick={() => (window.location.href = "/compete")}
-              className="w-full bg-[#222] rounded-2xl p-4 flex items-center justify-between border border-white/5 active:bg-[#2a2a2a] transition-colors"
+              onClick={() => {
+                storage.setGameSettings({ speedMode: "standard", timerSeconds: 15, simulationMonths: 3, dailyOpportunities: 2 })
+                window.location.href = "/practice/setup"
+              }}
+              className="w-full bg-gradient-to-r from-blue-600/80 to-blue-500/80 rounded-2xl p-[1px] active:scale-[0.98] transition-transform"
             >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center text-2xl">
-                  🏆
+              <div className="bg-[#191919] rounded-[15px] p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full bg-blue-500/20 flex items-center justify-center text-xl">🏃</div>
+                  <div className="text-left">
+                    <div className="font-bold text-white">스탠다드</div>
+                    <div className="text-xs text-gray-400">10분 · 3개월 · 33회 결정</div>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <div className="font-bold text-lg text-white">랭킹전</div>
-                  <div className="text-sm text-gray-400">다른 투자자들과 수익률 경쟁</div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded-full font-bold">15초</span>
+                  <ChevronRight className="w-4 h-4 text-gray-500" />
                 </div>
               </div>
-              <ChevronRight className="w-5 h-5 text-gray-500" />
+            </button>
+
+            {/* Marathon */}
+            <button
+              onClick={() => {
+                storage.setGameSettings({ speedMode: "marathon", timerSeconds: 20, simulationMonths: 12, dailyOpportunities: 3 })
+                window.location.href = "/practice/setup"
+              }}
+              className="w-full bg-gradient-to-r from-purple-600/80 to-purple-500/80 rounded-2xl p-[1px] active:scale-[0.98] transition-transform"
+            >
+              <div className="bg-[#191919] rounded-[15px] p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-11 h-11 rounded-full bg-purple-500/20 flex items-center justify-center text-xl">🏔️</div>
+                  <div className="text-left">
+                    <div className="font-bold text-white">마라톤</div>
+                    <div className="text-xs text-gray-400">30분 · 12개월 · 66회 결정</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] px-2 py-0.5 bg-purple-500/20 text-purple-400 rounded-full font-bold">20초</span>
+                  <ChevronRight className="w-4 h-4 text-gray-500" />
+                </div>
+              </div>
             </button>
           </div>
         </div>
 
-        {/* Daily Mission / Status */}
+        {/* Other Modes */}
+        <div className="grid grid-cols-2 gap-2.5">
+          <button
+            onClick={() => (window.location.href = "/practice")}
+            className="bg-[#222] rounded-2xl p-4 border border-white/5 active:bg-[#2a2a2a] transition-colors text-left"
+          >
+            <div className="text-2xl mb-2">🎯</div>
+            <div className="font-bold text-sm text-white">커리어 모드</div>
+            <div className="text-xs text-gray-500 mt-0.5">1~6단계 전체 도전</div>
+          </button>
+          <button
+            onClick={() => (window.location.href = "/compete")}
+            className="bg-[#222] rounded-2xl p-4 border border-white/5 active:bg-[#2a2a2a] transition-colors text-left"
+          >
+            <div className="text-2xl mb-2">🏆</div>
+            <div className="font-bold text-sm text-white">랭킹전</div>
+            <div className="text-xs text-gray-500 mt-0.5">AI와 수익률 대결</div>
+          </button>
+        </div>
+
+        {/* Daily Mission */}
         <div className="bg-[#222] rounded-2xl p-5 border border-white/5">
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-bold flex items-center gap-2">
@@ -206,16 +303,30 @@ export default function HomePage() {
             </h3>
             <span className="text-xs text-gray-400">0/3 완료</span>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div className="flex items-center gap-3 p-3 bg-[#191919] rounded-xl">
               <div className="w-2 h-2 rounded-full bg-gray-600"></div>
-              <span className="text-sm text-gray-300">수익률 5% 달성하기</span>
+              <span className="text-sm text-gray-300">스프린트 1판 완료하기</span>
+              <span className="ml-auto text-xs text-gray-500">+50 EXP</span>
             </div>
             <div className="flex items-center gap-3 p-3 bg-[#191919] rounded-xl">
               <div className="w-2 h-2 rounded-full bg-gray-600"></div>
-              <span className="text-sm text-gray-300">3일 연속 접속하기</span>
+              <span className="text-sm text-gray-300">위기 대처 성공 1회</span>
+              <span className="ml-auto text-xs text-gray-500">+30 EXP</span>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-[#191919] rounded-xl">
+              <div className="w-2 h-2 rounded-full bg-gray-600"></div>
+              <span className="text-sm text-gray-300">3 COMBO 달성</span>
+              <span className="ml-auto text-xs text-gray-500">+20 EXP</span>
             </div>
           </div>
+        </div>
+
+        {/* Free Banner */}
+        <div className="bg-gradient-to-r from-emerald-600/20 to-teal-600/20 border border-emerald-500/30 rounded-2xl p-4 text-center">
+          <div className="text-lg font-bold text-emerald-400 mb-1">🎉 100% 무료 버전</div>
+          <p className="text-xs text-gray-400">회원가입 없이 · 모든 기능 무료 · 광고 없음</p>
+          <p className="text-xs text-gray-500 mt-1">데이터는 내 기기에만 안전하게 저장됩니다</p>
         </div>
       </div>
 

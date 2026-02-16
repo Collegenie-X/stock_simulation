@@ -28,9 +28,9 @@ const onboardingSlides = [
   },
   {
     emoji: "🏆",
-    title: "경쟁과 보상",
-    description: "리더보드 순위 경쟁\n실제 상금 획득",
-    detail: "실력을 겨루고 주간 500만원, 시즌 5억원 상금",
+    title: "AI와 경쟁하기",
+    description: "AI 멘토와 수익률 대결\n나만의 투자 DNA 발견",
+    detail: "100% 무료! 회원가입 없이 바로 시작하세요",
   },
 ]
 
