@@ -221,16 +221,22 @@ export const storage = {
   getProgress(): Progress | null {
     const progress = getStorageItem<Progress>(STORAGE_KEYS.PROGRESS)
     
-    // 기본값 반환
-    if (!progress) {
-      return {
-        lessonsCompleted: 0,
-        quizzesCompleted: 0,
-        practiceCompleted: 0,
-      }
+    const defaults = {
+      lessonsCompleted: 0,
+      quizzesCompleted: 0,
+      practiceCompleted: 0,
+      level: 1,
+      exp: 0,
+      totalExp: 1000,
+      completedChapters: [] as number[],
+      currentChapter: 1,
     }
     
-    return progress
+    if (!progress) {
+      return defaults
+    }
+    
+    return { ...defaults, ...progress }
   },
 
   /**

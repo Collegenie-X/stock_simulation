@@ -61,7 +61,7 @@ export default function ProfilePage() {
                 <h2 className="text-2xl font-bold mb-1">나</h2>
                 <div className="flex items-center gap-2">
                   <Crown className="w-4 h-4 text-yellow-300" />
-                  <span className="font-semibold">Level {progress.level}</span>
+                  <span className="font-semibold">Level {progress.level || 1}</span>
                 </div>
               </div>
             </div>
@@ -69,12 +69,12 @@ export default function ProfilePage() {
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
               <div className="flex justify-between text-sm mb-2">
                 <span className="text-blue-100">다음 레벨까지</span>
-                <span className="font-bold">{progress.totalExp - progress.exp} XP</span>
+                <span className="font-bold">{(progress.totalExp || 1000) - (progress.exp || 0)} XP</span>
               </div>
               <div className="h-3 bg-white/20 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-white rounded-full transition-all duration-500"
-                  style={{ width: `${(progress.exp / progress.totalExp) * 100}%` }}
+                  style={{ width: `${((progress.exp || 0) / (progress.totalExp || 1000)) * 100}%` }}
                 />
               </div>
             </div>
@@ -87,7 +87,7 @@ export default function ProfilePage() {
             <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-2">
               <BookOpen className="w-5 h-5 text-blue-400" />
             </div>
-            <p className="text-2xl font-bold text-white">{progress.completedChapters.length}</p>
+            <p className="text-2xl font-bold text-white">{(progress.completedChapters || []).length}</p>
             <p className="text-xs text-gray-400 mt-1">완료 강의</p>
           </div>
           

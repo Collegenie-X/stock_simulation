@@ -47,52 +47,141 @@ export default function LearnPage() {
           <div className="relative z-10">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <p className="text-sm font-semibold text-blue-200 mb-1">현재 레벨</p>
-                <h2 className="text-3xl font-bold">Level {progress.level}</h2>
-                <p className="text-sm text-blue-200 mt-1">기초 과정</p>
+                <p className="text-sm font-semibold text-blue-200 mb-1">투자 단계</p>
+                <h2 className="text-3xl font-bold">🌱 {progress.level || 1}단계</h2>
+                <p className="text-sm text-blue-200 mt-1">
+                  {(progress.level || 1) === 1 && "새싹 투자자 • 500만원"}
+                  {(progress.level || 1) === 2 && "초보 투자자 • 1,000만원"}
+                  {(progress.level || 1) === 3 && "중급 투자자 • 5,000만원"}
+                </p>
               </div>
               <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-4xl">
-                📚
+                🌊
               </div>
             </div>
             
             <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3">
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-blue-100">경험치</span>
-                <span className="font-bold">{progress.exp} / {progress.totalExp} XP</span>
+                <span className="text-blue-100">다음 단계까지</span>
+                <span className="font-bold">{progress.exp || 0} / {progress.totalExp || 1000} XP</span>
               </div>
               <div className="h-2.5 bg-white/20 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-white rounded-full transition-all duration-500"
-                  style={{ width: `${(progress.exp / progress.totalExp) * 100}%` }}
+                  style={{ width: `${((progress.exp || 0) / (progress.totalExp || 1000)) * 100}%` }}
                 />
               </div>
             </div>
           </div>
         </section>
 
+        {/* 3타임 시스템 학습 */}
+        <section className="mt-6">
+          <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            ⏰ 3타임 시스템
+          </h3>
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-[#252525] rounded-xl p-4 border border-white/5">
+              <div className="text-2xl mb-2">🌅</div>
+              <p className="text-xs font-bold text-white mb-1">아침 타임</p>
+              <p className="text-xs text-gray-400">조건부 주문</p>
+            </div>
+            <div className="bg-[#252525] rounded-xl p-4 border border-white/5">
+              <div className="text-2xl mb-2">🌞</div>
+              <p className="text-xs font-bold text-white mb-1">점심 타임</p>
+              <p className="text-xs text-gray-400">지연 알림 확인</p>
+            </div>
+            <div className="bg-[#252525] rounded-xl p-4 border border-white/5">
+              <div className="text-2xl mb-2">🌙</div>
+              <p className="text-xs font-bold text-white mb-1">저녁 타임</p>
+              <p className="text-xs text-gray-400">결과 분석</p>
+            </div>
+          </div>
+        </section>
+
         {/* 탭 네비게이션 */}
-        <Tabs defaultValue="courses" className="mt-6">
-          <TabsList className="w-full bg-[#252525] border border-white/10 rounded-2xl p-1 grid grid-cols-3 mb-6">
+        <Tabs defaultValue="scenarios" className="mt-6">
+          <TabsList className="w-full bg-[#252525] border border-white/10 rounded-2xl p-1 grid grid-cols-4 mb-6">
+            <TabsTrigger 
+              value="scenarios"
+              className="data-[state=active]:bg-[#333] data-[state=active]:text-white text-gray-400 rounded-xl text-xs"
+            >
+              시나리오
+            </TabsTrigger>
             <TabsTrigger 
               value="courses"
-              className="data-[state=active]:bg-[#333] data-[state=active]:text-white text-gray-400 rounded-xl"
+              className="data-[state=active]:bg-[#333] data-[state=active]:text-white text-gray-400 rounded-xl text-xs"
             >
               강의
             </TabsTrigger>
             <TabsTrigger 
               value="patterns"
-              className="data-[state=active]:bg-[#333] data-[state=active]:text-white text-gray-400 rounded-xl"
+              className="data-[state=active]:bg-[#333] data-[state=active]:text-white text-gray-400 rounded-xl text-xs"
             >
               패턴
             </TabsTrigger>
             <TabsTrigger 
               value="ai"
-              className="data-[state=active]:bg-[#333] data-[state=active]:text-white text-gray-400 rounded-xl"
+              className="data-[state=active]:bg-[#333] data-[state=active]:text-white text-gray-400 rounded-xl text-xs"
             >
               AI 멘토
             </TabsTrigger>
           </TabsList>
+
+          {/* 5턴 시나리오 탭 */}
+          <TabsContent value="scenarios" className="space-y-4">
+            <div className="bg-gradient-to-br from-yellow-600 to-orange-700 rounded-2xl p-5 text-white relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full blur-xl -mr-5 -mt-5" />
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <p className="text-sm font-semibold text-yellow-200">전설의 5턴</p>
+                    <h3 className="text-xl font-bold">실전 시나리오 학습</h3>
+                  </div>
+                  <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-2xl">
+                    🎯
+                  </div>
+                </div>
+                <p className="text-sm text-yellow-100 mb-3">
+                  5턴 안에 최선의 선택을 찾아라
+                </p>
+                <Button className="w-full bg-white text-orange-600 hover:bg-gray-100 rounded-xl h-11 font-bold">
+                  시나리오 시작하기
+                </Button>
+              </div>
+            </div>
+
+            {/* 시나리오 리스트 */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-bold text-gray-400">학습 시나리오</h4>
+              
+              {[
+                { id: 1, title: '급등주의 유혹', difficulty: 2, emoji: '🔥', desc: 'RSI 과열 구간 대응' },
+                { id: 2, title: '실적 발표의 함정', difficulty: 3, emoji: '📊', desc: '선반영 vs 후반영' },
+                { id: 3, title: '하락장의 선택', difficulty: 4, emoji: '📉', desc: '손절 vs 물타기' },
+                { id: 4, title: '분할 매수 마스터', difficulty: 2, emoji: '📈', desc: '평균 단가 관리' },
+                { id: 5, title: '조건부 주문 훈련', difficulty: 3, emoji: '⚡', desc: '지연 정보 대응' }
+              ].map((scenario) => (
+                <div 
+                  key={scenario.id}
+                  className="bg-[#252525] rounded-xl p-4 border border-white/5 flex items-center justify-between touch-feedback cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-xl flex items-center justify-center text-lg">
+                      {scenario.emoji}
+                    </div>
+                    <div>
+                      <p className="font-bold text-white">{scenario.title}</p>
+                      <p className="text-xs text-gray-400">
+                        {scenario.desc} • {'⭐'.repeat(scenario.difficulty)}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-500" />
+                </div>
+              ))}
+            </div>
+          </TabsContent>
 
           {/* 강의 탭 */}
           <TabsContent value="courses" className="space-y-6 stagger-animation">
@@ -110,9 +199,10 @@ export default function LearnPage() {
                 </div>
                 <div className="space-y-3">
                   {course.chapters.map((chapter) => {
-                    const completed = progress.completedChapters.includes(chapter.id);
+                    const completedChapters = progress.completedChapters || [];
+                    const completed = completedChapters.includes(chapter.id);
                     const chapterProgress = completed ? 100 : 
-                      chapter.id === progress.currentChapter ? 65 : 0;
+                      chapter.id === (progress.currentChapter || 1) ? 65 : 0;
                     
                     return (
                       <div
@@ -209,24 +299,42 @@ export default function LearnPage() {
 
           {/* AI 멘토 탭 */}
           <TabsContent value="ai" className="space-y-4">
+            {/* 멘토 비교 배너 */}
+            <div className="bg-[#252525] rounded-2xl p-5 border border-white/5">
+              <h3 className="text-lg font-bold text-white mb-3">🤖 AI 멘토 비교 학습</h3>
+              <p className="text-sm text-gray-400 mb-4">
+                2명의 AI 멘토와 함께 투자하며 전략을 비교하고 학습하세요
+              </p>
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-xl p-3">
+                <p className="text-xs text-blue-300">
+                  💡 당신의 선택 → AI 멘토 전략 공개 → 3일 후 결과 비교
+                </p>
+              </div>
+            </div>
+
             {/* 안정형 멘토 */}
             <div className="bg-gradient-to-br from-green-600 to-green-700 rounded-2xl p-5 text-white relative overflow-hidden">
               <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full blur-xl -mr-5 -mt-5" />
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <p className="text-sm font-semibold text-green-200">안정형</p>
-                    <h3 className="text-xl font-bold">김철수 멘토</h3>
+                    <p className="text-sm font-semibold text-green-200">안정왕 • 수익률 +8~12%</p>
+                    <h3 className="text-xl font-bold">🛡️ 김철수 멘토</h3>
                   </div>
                   <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-2xl">
                     🛡️
                   </div>
                 </div>
-                <p className="text-sm text-green-100 mb-3 italic">
-                  "천천히, 그러나 확실하게"
+                <p className="text-sm text-green-100 mb-2 italic">
+                  "천천히, 확실하게"
                 </p>
+                <div className="bg-white/20 rounded-lg p-2 mb-3 text-xs space-y-1">
+                  <p>• 지지선 확인 후에만 매수</p>
+                  <p>• 무조건 분할 매수 (3단계)</p>
+                  <p>• 손절 -5% 엄격 준수</p>
+                </div>
                 <Button className="w-full bg-white text-green-600 hover:bg-gray-100 rounded-xl h-11 font-bold">
-                  멘토 만나기
+                  전략 배우기
                 </Button>
               </div>
             </div>
@@ -237,41 +345,43 @@ export default function LearnPage() {
               <div className="relative z-10">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <p className="text-sm font-semibold text-red-200">공격형</p>
-                    <h3 className="text-xl font-bold">박영희 멘토</h3>
+                    <p className="text-sm font-semibold text-red-200">공격왕 • 수익률 +15~30%</p>
+                    <h3 className="text-xl font-bold">⚡ 박영희 멘토</h3>
                   </div>
                   <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-2xl">
                     ⚡
                   </div>
                 </div>
-                <p className="text-sm text-red-100 mb-3 italic">
-                  "빠르게 움직이고 선점하라"
+                <p className="text-sm text-red-100 mb-2 italic">
+                  "리스크를 관리하며 공격하라"
                 </p>
+                <div className="bg-white/20 rounded-lg p-2 mb-3 text-xs space-y-1">
+                  <p>• 3파 상승 초기 적극 진입</p>
+                  <p>• 거래량 폭발 시 큰 비중</p>
+                  <p>• 목표 수익 +25~40%</p>
+                </div>
                 <Button className="w-full bg-white text-red-600 hover:bg-gray-100 rounded-xl h-11 font-bold">
-                  멘토 만나기
+                  전략 배우기
                 </Button>
               </div>
             </div>
 
-            {/* 기술형 멘토 */}
-            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-5 text-white relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full blur-xl -mr-5 -mt-5" />
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <p className="text-sm font-semibold text-purple-200">기술형</p>
-                    <h3 className="text-xl font-bold">이분석 멘토</h3>
-                  </div>
-                  <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center text-2xl">
-                    🧠
-                  </div>
+            {/* 비교 통계 */}
+            <div className="bg-[#252525] rounded-2xl p-5 border border-white/5">
+              <h4 className="text-sm font-bold text-white mb-3">📊 나의 학습 통계</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">김철수 멘토 추월</span>
+                  <span className="text-white font-bold">3회 / 10회</span>
                 </div>
-                <p className="text-sm text-purple-100 mb-3 italic">
-                  "데이터가 답을 알려준다"
-                </p>
-                <Button className="w-full bg-white text-purple-600 hover:bg-gray-100 rounded-xl h-11 font-bold">
-                  멘토 만나기
-                </Button>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">박영희 멘토 추월</span>
+                  <span className="text-white font-bold">1회 / 10회</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">평균 추월 시점</span>
+                  <span className="text-white font-bold">Week 8</span>
+                </div>
               </div>
             </div>
           </TabsContent>
