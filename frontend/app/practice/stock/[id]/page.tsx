@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useMemo, useCallback } from "react"
-import { useParams, useRouter, useSearchParams } from "next/navigation" // added useRouter, useSearchParams
+import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
   ArrowLeft,
@@ -17,16 +17,27 @@ import {
 } from "lucide-react"
 import scenariosData from "@/data/game-scenarios.json"
 import scenarios100DaysData from "@/data/stock-100days-data.json"
-// import { StockChart } from "@/components/stock-chart" // Removed as it's defined below
 import { cn } from "@/lib/utils"
-// Added XAxis, YAxis, Tooltip
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, ReferenceDot, Label } from "recharts" // Added ReferenceDot, Label
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, ReferenceDot, Label } from "recharts"
 import { storage } from "@/lib/storage"
 import { AIRankingCard, AIRankingDetailModal, AINotification } from "@/components/ai-ranking-card"
 import { HintModal } from "@/components/hint-modal"
 import { EnhancedReportModal } from "@/components/enhanced-report-modal"
 import { ItemsShopModal, OwnedItemsBadge } from "@/components/items-shop-modal"
 import aiCompetitorsData from "@/data/ai-competitors.json"
+
+// ── 분리된 컴포넌트 import ─────────────────────────────────────
+import {
+  MiniChart,
+  StockChart,
+  WeeklyReportModal,
+  GameHeader,
+  StockListSection,
+  ExitConfirmDialog,
+  CardFeedbackOverlay,
+  DaySummaryOverlay,
+} from "./components"
+import { EXCHANGE_RATE, DECISIONS_PER_DAY, DECISION_TIMER_SECONDS, DAYS_PER_WEEK, TURNS_PER_DECISION, DAY_PHASES, DAY_NAMES, LABELS, SPEED_MODE_TURNS, CHART_PERIOD_MAP } from "./config"
 
 // Mock data generator for history
 const generateHistory = (initialPrice: number, days: number) => {
@@ -48,63 +59,9 @@ const generateHistory = (initialPrice: number, days: number) => {
   return history
 }
 
-const MiniChart = ({ 
-  data, 
-  color, 
-  isUp, 
-  weekNumber = 0 
-}: { 
-  data: any[]
-  color: string
-  isUp: boolean
-  weekNumber?: number 
-}) => {
-  // Y축 범위 계산 (가격 변화가 잘 보이도록)
-  const prices = data.map(d => d.price).filter(p => p > 0)
-  const minPrice = Math.min(...prices)
-  const maxPrice = Math.max(...prices)
-  const padding = (maxPrice - minPrice) * 0.2 || maxPrice * 0.05 // 최소 5% 여유
-  const yMin = Math.floor(minPrice - padding)
-  const yMax = Math.ceil(maxPrice + padding)
-  
-  const strokeWidth = 2
-  const gradientId = `colorGradient-${isUp ? "up" : "down"}-${Math.random().toString(36).substr(2, 9)}`
-  
-  return (
-    <div className="h-12 w-16 shrink-0 mr-3 relative" style={{ minHeight: "48px", minWidth: "64px" }}>
-      <ResponsiveContainer width="100%" height="100%" minHeight={48} minWidth={64}>
-        <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 4, left: 4 }}>
-          <defs>
-            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={color} stopOpacity={0.2} />
-              <stop offset="95%" stopColor={color} stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <XAxis dataKey="index" hide />
-          <YAxis hide domain={[yMin, yMax]} />
-          <Area
-            type="monotone"
-            dataKey="price"
-            stroke={color}
-            strokeWidth={strokeWidth}
-            fill={`url(#${gradientId})`}
-            isAnimationActive={false}
-            dot={false}
-          />
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>
-  )
-}
+// MiniChart → components/MiniChart.tsx 로 이동됨
 
-const EXCHANGE_RATE = 1300
-const DECISIONS_PER_DAY = 3 // 하루 3번 투자 기회 (오전/점심/저녁)
-const DECISION_TIMER_SECONDS = 30 // 결정 제한시간 30초
-const DAYS_PER_WEEK = 7
-const DAY_PHASES = ["☀️ 오전", "🍚 점심", "🌙 저녁"]
-const DAY_NAMES = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"]
-
-// AI 분석 이유 데이터 (토스 스타일)
+// AI 분석 이유 데이터 (config에서 import된 상수 사용, 컨텐츠는 public/game-content/ai-reasons.json)
 const AI_REASONS_UP = [
   { emoji: "📈", reason: "최근 실적 발표에서 예상치를 상회하는 매출 달성" },
   { emoji: "🏢", reason: "신규 사업 진출로 성장 기대감 상승" },
@@ -120,16 +77,13 @@ const AI_REASONS_DOWN = [
   { emoji: "📰", reason: "규제 강화 이슈로 불확실성 증가" },
 ]
 
-// 캐릭터 반응 이모지
+// 캐릭터 반응 이모지 (public/game-content/character-reactions.json)
 const CHARACTER_REACTIONS = {
   buy: ["🤑", "💪", "🚀", "📈"],
   sell: ["💰", "🎯", "✨", "🏆"],
   skip: ["🤔", "😐", "⏭️", "💤"],
   timeout: ["⏰", "😱", "💨", "🏃"],
 }
-
-// 턴 매핑: 각 결정이 몇 턴 분량인지 (시나리오 데이터에 맞추어 조정)
-const TURNS_PER_DECISION = 1
 
 const renderStockItem = (
   stock: any,
@@ -260,285 +214,8 @@ const renderStockItem = (
   )
 }
 
-const WeeklyReportModal = ({
-  isOpen,
-  onClose,
-  weekNumber,
-  weeklyReturn,
-  totalReturn,
-  chartData,
-}: {
-  isOpen: boolean
-  onClose: () => void
-  weekNumber: number
-  weeklyReturn: number
-  totalReturn: number
-  chartData: any[]
-}) => {
-  if (!isOpen) return null
-
-  const isProfit = weeklyReturn >= 0
-
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6 animate-in fade-in duration-300">
-      <div className="bg-[#1E1E1E] w-full max-w-md rounded-3xl overflow-hidden shadow-2xl border border-gray-800 animate-in zoom-in-95 duration-300">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-white">주간 리포트</h2>
-              <p className="text-gray-400 text-sm">{weekNumber}주차 투자 분석</p>
-            </div>
-            <div
-              className={cn(
-                "w-12 h-12 rounded-full flex items-center justify-center text-2xl",
-                isProfit ? "bg-red-500/20" : "bg-blue-500/20",
-              )}
-            >
-              {isProfit ? "🔥" : "💧"}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div className="bg-gray-800/50 rounded-2xl p-4">
-              <p className="text-gray-400 text-xs mb-1">주간 수익률</p>
-              <p className={cn("text-xl font-bold", isProfit ? "text-red-500" : "text-blue-500")}>
-                {isProfit ? "+" : ""}
-                {weeklyReturn}%
-              </p>
-            </div>
-            <div className="bg-gray-800/50 rounded-2xl p-4">
-              <p className="text-gray-400 text-xs mb-1">누적 수익률</p>
-              <p className={cn("text-xl font-bold", totalReturn >= 0 ? "text-red-500" : "text-blue-500")}>
-                {totalReturn >= 0 ? "+" : ""}
-                {totalReturn}%
-              </p>
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <h3 className="text-sm font-bold text-gray-300 mb-3">자산 흐름도</h3>
-            <div className="h-48 bg-gray-800/30 rounded-2xl p-2 border border-gray-800/50">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={chartData}>
-                  <defs>
-                    <linearGradient id="reportGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={isProfit ? "#ef4444" : "#3b82f6"} stopOpacity={0.3} />
-                      <stop offset="95%" stopColor={isProfit ? "#ef4444" : "#3b82f6"} stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <Area
-                    type="monotone"
-                    dataKey="value"
-                    stroke={isProfit ? "#ef4444" : "#3b82f6"}
-                    strokeWidth={3}
-                    fill="url(#reportGradient)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
-
-          <Button
-            onClick={onClose}
-            className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-lg"
-          >
-            다음 주차 시작하기
-          </Button>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const StockChart = ({
-  data,
-  height = 200,
-  color = "red",
-  dataKey = "price",
-  showXAxis = true,
-  chartPeriod = "1M",
-}: {
-  data: any[]
-  height?: number
-  color?: "red" | "blue"
-  dataKey?: string
-  showXAxis?: boolean
-  chartPeriod?: "1D" | "1W" | "1M" | "1Y"
-}) => {
-  const colorMap = {
-    red: "#F87171", // 빨간색
-    blue: "#60A5FA", // 파란색
-  }
-
-  const chartColor = colorMap[color]
-  const gradientId = `gradient-${color}-${Math.random().toString(36).substr(2, 9)}`
-
-  const { min, max, maxPointIndex, minPointIndex, maxPrice, minPrice } = useMemo(() => {
-    if (!data || data.length === 0) return { 
-      min: 0, max: 0, 
-      maxPointIndex: -1, minPointIndex: -1,
-      maxPrice: 0, minPrice: 0
-    }
-    const values = data.map((d: any) => d[dataKey])
-    const minVal = Math.min(...values)
-    const maxVal = Math.max(...values)
-    const padding = (maxVal - minVal) * 0.2
-
-    // 배열 인덱스 찾기 (ReferenceDot에서 사용할 실제 위치)
-    const maxPointIndex = values.indexOf(maxVal)
-    const minPointIndex = values.indexOf(minVal)
-
-    return {
-      min: Math.floor(minVal - padding),
-      max: Math.ceil(maxVal + padding),
-      maxPointIndex,
-      minPointIndex,
-      maxPrice: maxVal,
-      minPrice: minVal,
-    }
-  }, [data, dataKey])
-
-  // 날짜 포맷팅 함수 - 기간에 따라 다르게 표시
-  const formatXAxis = (value: any, index: number) => {
-    if (!data || !data[index]) return ''
-    const dateStr = data[index].date || ''
-    
-    if (dateStr.includes('-')) {
-      const parts = dateStr.split(' ')
-      const datePart = parts[0].split('-')
-      const year = datePart[0]
-      const month = parseInt(datePart[1])
-      const day = parseInt(datePart[2])
-      const timePart = parts[1] // "09:30" 형식
-      
-      // 1일: 시간만 표시
-      if (chartPeriod === "1D" && timePart) {
-        return timePart
-      }
-      // 1년: 년도/월 표시
-      else if (chartPeriod === "1Y") {
-        return `${year.slice(2)}/${month}` // "24/1" 형식
-      }
-      // 1주, 1개월: 월/일만 표시
-      else {
-        return `${month}/${day}`
-      }
-    }
-    return ''
-  }
-
-  return (
-    <div className="w-full select-none" style={{ height }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data} margin={{ top: 25, right: 10, left: 10, bottom: 30 }}>
-          <defs>
-            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={chartColor} stopOpacity={0.3} />
-              <stop offset="95%" stopColor={chartColor} stopOpacity={0} />
-            </linearGradient>
-          </defs>
-          <YAxis hide domain={[min, max]} />
-          <XAxis 
-            dataKey="index" 
-            type="number"
-            hide={!showXAxis}
-            tickFormatter={formatXAxis}
-            tick={{ fill: '#6B7280', fontSize: 10 }}
-            stroke="transparent"
-            axisLine={false}
-            tickLine={false}
-            interval="preserveStartEnd"
-            minTickGap={40}
-            domain={[0, data.length - 1]}
-          />
-          <Tooltip
-            content={({ active, payload }) => {
-              if (active && payload && payload.length) {
-                const pointData = payload[0].payload
-                return (
-                  <div className="bg-gray-900/90 backdrop-blur border border-gray-700 text-white text-xs font-bold py-2 px-3 rounded-xl shadow-xl">
-                    <div className="text-gray-400">{pointData.date || ''}</div>
-                    <div className="mt-1">{Number(payload[0].value).toLocaleString()}원</div>
-                  </div>
-                )
-              }
-              return null
-            }}
-            cursor={{ stroke: chartColor, strokeWidth: 1, strokeDasharray: "4 4" }}
-          />
-          <Area
-            type="monotone"
-            dataKey={dataKey}
-            stroke={chartColor}
-            strokeWidth={2}
-            fill={`url(#${gradientId})`}
-            animationDuration={600}
-            isAnimationActive={true}
-            dot={false}
-          />
-          
-          {/* 최고점 */}
-          {maxPointIndex >= 0 && data[maxPointIndex] && (
-            <ReferenceDot 
-              x={maxPointIndex} 
-              y={maxPrice} 
-              r={3} 
-              fill="#F87171" 
-              stroke="white" 
-              strokeWidth={1.5}
-            >
-              <Label
-                content={({ viewBox }: any) => {
-                  const { x, y } = viewBox
-                  return (
-                    <text x={x} y={y - 12} fill="#F87171" fontSize={10} textAnchor="middle" fontWeight="600">
-                      최고 {maxPrice.toLocaleString()}원
-                    </text>
-                  )
-                }}
-              />
-            </ReferenceDot>
-          )}
-          
-          {/* 최저점 */}
-          {minPointIndex >= 0 && data[minPointIndex] && (
-            <ReferenceDot 
-              x={minPointIndex} 
-              y={minPrice} 
-              r={3} 
-              fill="#9CA3AF" 
-              stroke="white" 
-              strokeWidth={1.5}
-            >
-              <Label
-                content={({ viewBox }: any) => {
-                  const { x, y } = viewBox
-                  return (
-                    <text x={x} y={y + 18} fill="#9CA3AF" fontSize={10} textAnchor="middle" fontWeight="600">
-                      최저 {minPrice.toLocaleString()}원
-                    </text>
-                  )
-                }}
-              />
-            </ReferenceDot>
-          )}
-          
-          {/* 현재 포인트 */}
-          {data && data.length > 0 && (
-            <ReferenceDot 
-              x={data.length - 1} 
-              y={data[data.length - 1][dataKey]} 
-              r={4} 
-              fill={chartColor} 
-              stroke="white" 
-              strokeWidth={2}
-            />
-          )}
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>
-  )
-}
+// WeeklyReportModal → components/WeeklyReportModal.tsx 로 이동됨
+// StockChart → components/StockChart.tsx 로 이동됨
 
 export default function GamePlayPage() {
   const params = useParams()
@@ -622,6 +299,9 @@ export default function GamePlayPage() {
   const [showQuickTrade, setShowQuickTrade] = useState<"buy" | "sell" | null>(null)
   const [tradeQuantity, setTradeQuantity] = useState(1)
   const [showProfitAnalysis, setShowProfitAnalysis] = useState(false)
+  const [isTimerPaused, setIsTimerPaused] = useState(false)
+  const [showExitConfirm, setShowExitConfirm] = useState(false)
+  const [stockViewTab, setStockViewTab] = useState<"현재가" | "평가금">("현재가")
 
   // 시나리오 데이터 선택 및 확장
   const allScenarios = [...scenariosData.scenarios, scenarios100DaysData]
@@ -1164,6 +844,7 @@ export default function GamePlayPage() {
     setDailyStockIds(daily)
     setCurrentPhaseInDay(0)
     setDecisionTimer(DECISION_TIMER_SECONDS)
+    setIsTimerPaused(false)
     setIsWaitingForDecision(true)
     setShowQuickTrade(null)
     setTradeQuantity(1)
@@ -1192,6 +873,7 @@ export default function GamePlayPage() {
       const nextPhase = currentPhaseInDay + 1
       setCurrentPhaseInDay(nextPhase)
       setDecisionTimer(DECISION_TIMER_SECONDS)
+      setIsTimerPaused(false)
       setIsWaitingForDecision(true)
       setCurrentTurn(prev => Math.min(prev + TURNS_PER_DECISION, maxTurns - 1))
       if (dailyStockIds[nextPhase]) {
@@ -1233,6 +915,7 @@ export default function GamePlayPage() {
           setDailyStockIds(daily)
           setCurrentPhaseInDay(0)
           setDecisionTimer(DECISION_TIMER_SECONDS)
+          setIsTimerPaused(false)
           setIsWaitingForDecision(true)
           setSelectedStockId(daily[0])
         }
@@ -1242,12 +925,11 @@ export default function GamePlayPage() {
 
   // 30초 결정 타이머
   useEffect(() => {
-    if (!isWaitingForDecision || showCardFeedback || showDaySummary || showResult || showQuickTrade) return
+    if (!isWaitingForDecision || showCardFeedback || showDaySummary || showResult || showQuickTrade || isTimerPaused) return
 
     const timer = setInterval(() => {
       setDecisionTimer(prev => {
         if (prev <= 1) {
-          // 시간 초과 → 자동 건너뛰기
           clearInterval(timer)
           const reactions = CHARACTER_REACTIONS.timeout
           const emoji = reactions[Math.floor(Math.random() * reactions.length)]
@@ -1259,7 +941,6 @@ export default function GamePlayPage() {
             message: "시간 초과! 자동 건너뛰기",
           })
           setTotalDecisions(d => d + 1)
-          // 1.5초 후 다음 기회로
           setTimeout(() => advanceToNext(), 1500)
           return 0
         }
@@ -1268,7 +949,7 @@ export default function GamePlayPage() {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [isWaitingForDecision, showCardFeedback, showDaySummary, showResult, showQuickTrade, advanceToNext])
+  }, [isWaitingForDecision, showCardFeedback, showDaySummary, showResult, showQuickTrade, isTimerPaused, advanceToNext])
 
   useEffect(() => {
     if (!scenario) return
@@ -1489,7 +1170,7 @@ export default function GamePlayPage() {
       return acc + stockPrice * stockHoldings
     }, 0) || 0
 
-  const totalValue = cash + totalStockValue
+  const totalValue = Math.round(cash + totalStockValue)
   const initialValue = gameSettings ? gameSettings.initialCash : 1000000
   const profitRate = Number.parseFloat((((totalValue - initialValue) / initialValue) * 100).toFixed(1))
 
@@ -1733,49 +1414,16 @@ export default function GamePlayPage() {
     return (
       <div className="min-h-screen bg-[#191919] text-white flex flex-col">
         {/* 결정 피드백 오버레이 */}
-        {showCardFeedback && cardFeedbackData && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-            <div className="text-center animate-in zoom-in duration-300">
-              <div className="text-8xl mb-4 animate-bounce">{cardFeedbackData.emoji}</div>
-              <div className="text-2xl font-bold text-white mb-2">{cardFeedbackData.message}</div>
-              {cardFeedbackData.priceChange && (
-                <div className={cn(
-                  "text-lg font-bold",
-                  cardFeedbackData.type === "buy" ? "text-red-400" : 
-                  cardFeedbackData.type === "sell" ? "text-blue-400" : "text-gray-400"
-                )}>
-                  {cardFeedbackData.priceChange}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+        <CardFeedbackOverlay isVisible={showCardFeedback} data={cardFeedbackData} />
 
         {/* 하루 요약 오버레이 */}
-        {showDaySummary && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-            <div className="text-center animate-in fade-in duration-500 px-8">
-              <div className="text-5xl mb-4">🌅</div>
-              <div className="text-xl font-bold text-white mb-2">{currentDay}일차 종료</div>
-              <div className="text-sm text-gray-400 mb-4">{currentDayName}</div>
-              <div className="bg-gray-800/60 rounded-2xl p-4 inline-block">
-                <div className="flex items-center gap-6">
-                  <div>
-                    <div className="text-xs text-gray-400">총 자산</div>
-                    <div className="text-lg font-bold text-white">{totalValue.toLocaleString()}원</div>
-                  </div>
-                  <div>
-                    <div className="text-xs text-gray-400">수익률</div>
-                    <div className={cn("text-lg font-bold", profitRate >= 0 ? "text-red-500" : "text-blue-500")}>
-                      {profitRate >= 0 ? "+" : ""}{profitRate}%
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="mt-3 text-xs text-gray-500 animate-pulse">다음 날로 이동 중...</div>
-            </div>
-          </div>
-        )}
+        <DaySummaryOverlay
+          isVisible={showDaySummary}
+          currentDay={currentDay}
+          currentDayName={currentDayName}
+          totalValue={totalValue}
+          profitRate={profitRate}
+        />
 
         {/* 주간 리포트 모달 */}
         <WeeklyReportModal
@@ -1787,294 +1435,63 @@ export default function GamePlayPage() {
           chartData={weeklyHistory.slice(-(DAYS_PER_WEEK * DECISIONS_PER_DAY))}
         />
 
-        {/* Header - HP / Streak / Combo */}
-        <div className="px-5 py-3 sticky top-0 z-10 bg-[#191919]/95 backdrop-blur-sm border-b border-gray-800/50">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-1">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <span key={i} className="text-lg">
-                  {i < (characterData?.hearts ?? 5) ? "❤️" : "🖤"}
-                </span>
+        {/* 게임 헤더 (타이머 + 총 자산 + 종료 버튼) */}
+        <GameHeader
+          currentDay={currentDay}
+          totalDays={totalDays}
+          currentDayName={currentDayName}
+          currentDayPhase={currentDayPhase}
+          currentWeekNumber={currentWeekNumber}
+          totalValue={totalValue}
+          profitRate={profitRate}
+          decisionTimer={decisionTimer}
+          totalDecisions={totalDecisions}
+          remainingDecisions={Math.max(0, totalDays * DECISIONS_PER_DAY - totalDecisions)}
+          isTimerPaused={isTimerPaused}
+          isWaitingForDecision={isWaitingForDecision && !showQuickTrade}
+          onTogglePause={() => setIsTimerPaused(prev => !prev)}
+          onExitClick={() => setShowExitConfirm(true)}
+          onProfitClick={() => setShowProfitAnalysis(true)}
+        />
+
+        {/* 종료 확인 다이얼로그 */}
+        <ExitConfirmDialog
+          isOpen={showExitConfirm}
+          onCancel={() => setShowExitConfirm(false)}
+          onConfirm={() => router.push("/home")}
+        />
+
+        {/* 뷰 탭 (현재가 / 평가금) */}
+        {isWaitingForDecision && !showQuickTrade && (
+          <div className="px-4 pt-3 pb-2 flex items-center justify-between border-b border-gray-800/50">
+            <div className="flex bg-gray-800/60 rounded-xl p-0.5">
+              {(["현재가", "평가금"] as const).map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setStockViewTab(tab)}
+                  className={cn(
+                    "px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
+                    stockViewTab === tab ? "bg-white text-gray-900" : "text-gray-400 hover:text-gray-200"
+                  )}
+                >
+                  {tab}
+                </button>
               ))}
             </div>
-            <div className="flex items-center gap-3">
-              <span className="flex items-center gap-0.5 text-xs font-bold text-orange-400">🔥 {characterData?.streak ?? 0}</span>
-              <span className="flex items-center gap-0.5 text-xs font-bold text-yellow-400">⚡ {totalDecisions}</span>
-            </div>
           </div>
+        )}
 
-          {/* 시간대 + 날짜 + 진행률 */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-bold bg-blue-500/10 text-blue-400 px-2.5 py-0.5 rounded-full">
-                {currentDayPhase}
-              </span>
-              <span className="text-xs text-gray-400 font-bold">
-                {currentDayNumber}일차 · {currentWeekNumber}주차
-              </span>
-              <span className="text-xs text-gray-500">{currentDayName}</span>
-            </div>
-            <button onClick={() => router.push("/home")} className="p-1 text-gray-400 hover:text-white transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-
-        {/* 자산 요약 바 - 클릭 가능 */}
-        <button 
-          onClick={() => setShowProfitAnalysis(true)}
-          className="w-full px-5 py-3 bg-gray-800/30 border-b border-gray-800/50 hover:bg-gray-800/50 transition-all active:scale-[0.99]"
-        >
-          <div className="flex items-center justify-between">
-            <div className="text-left">
-              <div className="text-[10px] text-gray-500">총 자산</div>
-              <div className="text-base font-bold text-white">{totalValue.toLocaleString()}원</div>
-            </div>
-            <div className="text-center">
-              <div className="text-[10px] text-gray-500">수익률</div>
-              <div className={cn("text-base font-bold", profitRate >= 0 ? "text-red-500" : "text-blue-500")}>
-                {profitRate >= 0 ? "+" : ""}{profitRate}%
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-[10px] text-gray-500">목표</div>
-              <div className="text-base font-bold text-gray-300">{(gameSettings?.initialCash || 10000000).toLocaleString()}원</div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-gray-500 ml-1" />
-          </div>
-          {/* 진행 바 */}
-          <div className="mt-2">
-            <div className="flex items-center justify-between text-[10px] text-gray-500 mb-1">
-              <span>{totalDecisions}번째 결정</span>
-              <span>{currentDay}일 / {totalDays}일</span>
-            </div>
-            <div className="w-full bg-gray-700 rounded-full h-1">
-              <div 
-                className="bg-blue-500 h-1 rounded-full transition-all duration-500" 
-                style={{ width: `${totalDays > 0 ? Math.min((currentDay / totalDays) * 100, 100) : 0}%` }} 
-              />
-            </div>
-          </div>
-        </button>
-
-        {/* 오늘의 시간대 인디케이터 */}
-        <div className="px-5 py-2 flex items-center gap-1">
-          {DAY_PHASES.map((phase, idx) => (
-            <div key={phase} className="flex-1 flex flex-col items-center">
-              <div className={cn(
-                "w-full h-1 rounded-full mb-1 transition-all",
-                idx < currentPhaseInDay ? "bg-blue-500" :
-                idx === currentPhaseInDay ? "bg-blue-400 animate-pulse" : "bg-gray-700"
-              )} />
-              <span className={cn(
-                "text-[10px] font-bold transition-colors",
-                idx === currentPhaseInDay ? "text-blue-400" : "text-gray-600"
-              )}>
-                {phase}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        {/* 30초 자유 거래 타임 */}
+        {/* 자유 거래 타임 - 주식 리스트 */}
         {isWaitingForDecision && !showQuickTrade && (
-          <div className="flex-1 flex flex-col overflow-hidden">
-            {/* 타이머 헤더 */}
-            <div className="px-5 py-3 bg-gray-800/50 border-b border-gray-700/50">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">⏱️</span>
-                  <div>
-                    <div className="text-sm font-bold text-white">자유 거래 타임</div>
-                    <div className="text-xs text-gray-400">30초 동안 자유롭게 매수/매도</div>
-                  </div>
-                </div>
-                <div className={cn(
-                  "text-3xl font-black tabular-nums",
-                  decisionTimer > 20 ? "text-green-400" : 
-                  decisionTimer > 10 ? "text-yellow-400" : "text-red-400 animate-pulse"
-                )}>
-                  {decisionTimer}
-                </div>
-              </div>
-              <div className="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
-                <div 
-                  className={cn(
-                    "h-2 rounded-full transition-all duration-1000",
-                    decisionTimer > 20 ? "bg-green-500" : 
-                    decisionTimer > 10 ? "bg-yellow-500" : "bg-red-500"
-                  )}
-                  style={{ width: `${timerProgress * 100}%` }} 
-                />
-              </div>
-            </div>
-
-            {/* 주식 리스트 */}
-            <div className="flex-1 overflow-y-auto px-5 py-3 pb-24 space-y-4">
-              {/* 내 주식 섹션 */}
-              {allStocksData.filter((s: any) => s.myHoldings > 0).length > 0 && (
-                <div>
-                  <h3 className="text-sm font-bold text-gray-400 mb-3 flex items-center gap-2">
-                    <span className="text-base">💼</span>
-                    내 주식
-                  </h3>
-                  <div className="space-y-2">
-                    {allStocksData
-                      .filter((s: any) => s.myHoldings > 0)
-                      .map((stock: any) => {
-                        // 미니 차트 데이터 생성
-                        const historyNeeded = 30
-                        const sampleRate = 2
-                        let rawData = []
-                        
-                        if (currentTurn < historyNeeded) {
-                          const startPrice = stock.initialPrice
-                          for (let i = historyNeeded - currentTurn; i > 0; i--) {
-                            rawData.push({ price: startPrice, index: rawData.length })
-                          }
-                        }
-                        
-                        const startIdx = Math.max(0, currentTurn - historyNeeded + 1)
-                        for (let i = startIdx; i <= currentTurn; i++) {
-                          const p = stock.turns?.[i]?.price || stock.initialPrice
-                          rawData.push({ price: p, index: rawData.length })
-                        }
-                        
-                        const chartData = rawData.filter((_, idx) => idx % sampleRate === 0)
-                        const profit = (stock.currentPrice - stock.myAvg) * stock.myHoldings
-                        const profitRate = stock.myAvg > 0 ? ((profit / (stock.myAvg * stock.myHoldings)) * 100).toFixed(1) : "0.0"
-                        const isProfit = profit >= 0
-
-                        return (
-                          <button
-                            key={stock.id}
-                            onClick={() => {
-                              setSelectedStockId(stock.id)
-                              setViewMode("detail")
-                            }}
-                            className="w-full bg-gray-800/50 hover:bg-gray-800/80 border border-gray-700/50 hover:border-gray-600 rounded-2xl p-3 transition-all active:scale-[0.98]"
-                          >
-                            <div className="flex items-center gap-3 mb-2">
-                              {/* 미니 차트 */}
-                              <div className="shrink-0">
-                                <MiniChart 
-                                  data={chartData}
-                                  color={stock.isUp ? "#ef4444" : "#3b82f6"}
-                                  isUp={stock.isUp}
-                                />
-                              </div>
-                              
-                              {/* 주식 정보 */}
-                              <div className="flex-1 min-w-0 text-left">
-                                <div className="font-bold text-white text-sm truncate">{stock.name}</div>
-                                <div className="text-xs text-gray-400">{stock.myHoldings}주</div>
-                              </div>
-                              
-                              {/* 가격 정보 */}
-                              <div className="text-right">
-                                <div className="font-bold text-white text-sm">
-                                  {(stock.currentPrice * stock.myHoldings).toLocaleString()}원
-                                </div>
-                                <div className={cn("text-xs font-bold", isProfit ? "text-red-500" : "text-blue-500")}>
-                                  {isProfit ? "+" : ""}{profit.toLocaleString()}원 ({isProfit ? "+" : ""}{profitRate}%)
-                                </div>
-                              </div>
-                            </div>
-                          </button>
-                        )
-                      })}
-                  </div>
-                </div>
-              )}
-
-              {/* 전체 주식 섹션 */}
-              <div>
-                <h3 className="text-sm font-bold text-gray-400 mb-3 flex items-center gap-2">
-                  <span className="text-base">📊</span>
-                  전체 주식
-                </h3>
-                {Object.entries(stocksByCategory).map(([category, stocks]) => (
-                  <div key={category} className="mb-3">
-                    <div className="text-xs font-bold text-gray-500 mb-2 ml-1">{category}</div>
-                    <div className="space-y-2">
-                      {stocks.map((stock: any) => {
-                        // 미니 차트 데이터 생성
-                        const historyNeeded = 30
-                        const sampleRate = 2
-                        let rawData = []
-                        
-                        if (currentTurn < historyNeeded) {
-                          const startPrice = stock.initialPrice
-                          for (let i = historyNeeded - currentTurn; i > 0; i--) {
-                            rawData.push({ price: startPrice, index: rawData.length })
-                          }
-                        }
-                        
-                        const startIdx = Math.max(0, currentTurn - historyNeeded + 1)
-                        for (let i = startIdx; i <= currentTurn; i++) {
-                          const p = stock.turns?.[i]?.price || stock.initialPrice
-                          rawData.push({ price: p, index: rawData.length })
-                        }
-                        
-                        const chartData = rawData.filter((_, idx) => idx % sampleRate === 0)
-
-                        return (
-                          <button
-                            key={stock.id}
-                            onClick={() => {
-                              setSelectedStockId(stock.id)
-                              setViewMode("detail")
-                            }}
-                            className="w-full bg-gray-800/50 hover:bg-gray-800/80 border border-gray-700/50 hover:border-gray-600 rounded-2xl p-3 transition-all active:scale-[0.98]"
-                          >
-                            <div className="flex items-center gap-3">
-                              {/* 미니 차트 */}
-                              <div className="shrink-0">
-                                <MiniChart 
-                                  data={chartData}
-                                  color={stock.isUp ? "#ef4444" : "#3b82f6"}
-                                  isUp={stock.isUp}
-                                />
-                              </div>
-                              
-                              {/* 주식 정보 */}
-                              <div className="flex-1 min-w-0 text-left">
-                                <div className="font-bold text-white text-sm truncate">{stock.name}</div>
-                                <div className="text-xs text-gray-400 truncate">{stock.news}</div>
-                              </div>
-                              
-                              {/* 가격 정보 */}
-                              <div className="text-right">
-                                <div className="font-bold text-white text-sm">
-                                  {stock.currentPrice.toLocaleString()}원
-                                </div>
-                                <div className={cn("text-xs font-bold", stock.isUp ? "text-red-500" : "text-blue-500")}>
-                                  {stock.isUp ? "+" : ""}{stock.change}%
-                                </div>
-                              </div>
-                            </div>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* 다음 시간 버튼 - 하단 고정 */}
-            <div className="fixed bottom-0 left-0 right-0 px-5 py-3 bg-[#191919]/95 backdrop-blur-lg border-t border-gray-700/50 pb-safe-bottom z-10">
-              <button
-                onClick={() => handleDecision("skip")}
-                className="w-full py-4 bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 text-white rounded-2xl font-bold text-base transition-all active:scale-[0.98] shadow-lg"
-              >
-                <span className="flex items-center justify-center gap-2">
-                  다음 시간으로
-                  <ChevronRight className="w-5 h-5" />
-                </span>
-              </button>
-            </div>
-          </div>
+          <StockListSection
+            allStocksData={allStocksData as any}
+            currentTurn={currentTurn}
+            favorites={favorites}
+            stockViewTab={stockViewTab}
+            onSelectStock={(id) => { setSelectedStockId(id); setViewMode("detail") }}
+            onToggleFavorite={toggleFavorite}
+            onDecision={handleDecision}
+          />
         )}
 
         {/* 수익 분석 모달 (토스 스타일) */}

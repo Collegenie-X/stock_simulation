@@ -184,7 +184,7 @@ export default function GameSetupPage() {
         </section>
 
         {/* Mode Details */}
-        <section className={cn("rounded-2xl p-4 border", c.bg, c.border)}>
+        {/* <section className={cn("rounded-2xl p-4 border", c.bg, c.border)}>
           <h3 className={cn("font-bold mb-3 flex items-center gap-2", c.text)}>
             <span className="text-lg">{currentMode.icon}</span>
             {currentMode.name} 모드 상세
@@ -197,7 +197,7 @@ export default function GameSetupPage() {
               </div>
             ))}
           </div>
-        </section>
+        </section> */}
 
         {/* Daily Opportunities (for Standard mode) */}
         {currentMode.dailyOptions.length > 1 && (
@@ -299,8 +299,8 @@ export default function GameSetupPage() {
           </div>
         </section>
 
-        {/* Summary */}
-        <section className="bg-[#222] rounded-2xl p-4 border border-white/5">
+        {/* Summary (게임 요약)*/}
+        {/* <section className="bg-[#222] rounded-2xl p-4 border border-white/5">
           <h3 className="font-bold text-sm text-gray-400 mb-3">게임 요약</h3>
           <div className="grid grid-cols-2 gap-3">
             <div className="flex justify-between">
@@ -332,7 +332,7 @@ export default function GameSetupPage() {
               <span className="text-sm font-bold">{currentMode.period}</span>
             </div>
           </div>
-        </section>
+        </section> */}
       </div>
 
       {/* Start Button */}

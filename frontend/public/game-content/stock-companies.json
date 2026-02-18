@@ -1,0 +1,14 @@
+{
+  "ai": [
+    "OpenAI", "Anthropic", "DeepMind", "Cohere", "Hugging Face",
+    "Stability AI", "Midjourney", "Character.AI", "Jasper", "Copy.ai",
+    "Synthesia", "Runway", "Descript", "Otter.ai", "Grammarly",
+    "Notion AI", "GitHub Copilot", "Tabnine", "Replit", "Cursor AI"
+  ],
+  "robotAuto": [
+    "Tesla", "Rivian", "Lucid Motors", "NIO", "XPeng",
+    "BYD", "Boston Dynamics", "ABB Robotics", "FANUC", "KUKA",
+    "Yaskawa", "Universal Robots", "Teradyne", "iRobot", "Intuitive Surgical",
+    "Symbotic", "Sarcos", "Agility Robotics"
+  ]
+}
