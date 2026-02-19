@@ -2,23 +2,9 @@
 
 import { useEffect, useState, useMemo, useCallback } from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import {
-  ArrowLeft,
-  Heart,
-  ChevronRight,
-  Bell,
-  PieChart,
-  Search,
-  ArrowUpDown,
-  LineChart,
-  MoreHorizontal,
-  CandlestickChart,
-} from "lucide-react"
 import scenariosData from "@/data/game-scenarios.json"
 import scenarios100DaysData from "@/data/stock-100days-data.json"
 import { cn } from "@/lib/utils"
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, ReferenceDot, Label } from "recharts"
 import { storage } from "@/lib/storage"
 import { AIRankingCard, AIRankingDetailModal, AINotification } from "@/components/ai-ranking-card"
 import { HintModal } from "@/components/hint-modal"
@@ -28,194 +14,20 @@ import aiCompetitorsData from "@/data/ai-competitors.json"
 
 // ── 분리된 컴포넌트 import ─────────────────────────────────────
 import {
-  MiniChart,
-  StockChart,
-  WeeklyReportModal,
   GameHeader,
   StockListSection,
   ExitConfirmDialog,
   CardFeedbackOverlay,
   DaySummaryOverlay,
+  WeeklyReportModal,
+  LoadingScreen,
+  ResultScreen,
+  ProfitAnalysisModal,
+  DetailView,
 } from "./components"
-import { EXCHANGE_RATE, DECISIONS_PER_DAY, DECISION_TIMER_SECONDS, DAYS_PER_WEEK, TURNS_PER_DECISION, DAY_PHASES, DAY_NAMES, LABELS, SPEED_MODE_TURNS, CHART_PERIOD_MAP } from "./config"
-
-// Mock data generator for history
-const generateHistory = (initialPrice: number, days: number) => {
-  let currentPrice = initialPrice
-  const history = []
-  const today = new Date()
-  for (let i = days; i > 0; i--) {
-    const change = (Math.random() - 0.5) * 0.05 // +/- 2.5%
-    currentPrice = currentPrice * (1 + change)
-    const historyDate = new Date(today)
-    historyDate.setDate(today.getDate() - i)
-    const dateStr = `${historyDate.getFullYear()}-${String(historyDate.getMonth() + 1).padStart(2, '0')}-${String(historyDate.getDate()).padStart(2, '0')}`
-    history.push({
-      date: dateStr,
-      price: Math.round(currentPrice),
-      index: -i,
-    })
-  }
-  return history
-}
-
-// MiniChart → components/MiniChart.tsx 로 이동됨
-
-// AI 분석 이유 데이터 (config에서 import된 상수 사용, 컨텐츠는 public/game-content/ai-reasons.json)
-const AI_REASONS_UP = [
-  { emoji: "📈", reason: "최근 실적 발표에서 예상치를 상회하는 매출 달성" },
-  { emoji: "🏢", reason: "신규 사업 진출로 성장 기대감 상승" },
-  { emoji: "💰", reason: "외국인 투자자 순매수 증가 추세" },
-  { emoji: "📊", reason: "업종 대비 저평가 구간으로 반등 기대" },
-  { emoji: "🔥", reason: "주요 제품 수요 급증으로 수혜 전망" },
-]
-const AI_REASONS_DOWN = [
-  { emoji: "📉", reason: "실적 부진으로 투자 심리 위축" },
-  { emoji: "⚠️", reason: "경쟁사 신제품 출시로 시장 점유율 우려" },
-  { emoji: "🌐", reason: "글로벌 경기 둔화 우려 확산" },
-  { emoji: "💸", reason: "기관 투자자 대량 매도세 관찰" },
-  { emoji: "📰", reason: "규제 강화 이슈로 불확실성 증가" },
-]
-
-// 캐릭터 반응 이모지 (public/game-content/character-reactions.json)
-const CHARACTER_REACTIONS = {
-  buy: ["🤑", "💪", "🚀", "📈"],
-  sell: ["💰", "🎯", "✨", "🏆"],
-  skip: ["🤔", "😐", "⏭️", "💤"],
-  timeout: ["⏰", "😱", "💨", "🏃"],
-}
-
-const renderStockItem = (
-  stock: any,
-  currentTurn: number,
-  holdings: any,
-  averagePrices: any,
-  setSelectedStockId: any,
-  setViewMode: any,
-  currencyMode: "KRW" | "USD",
-  listDisplayMode: "price" | "valuation" = "price", // Added listDisplayMode parameter
-) => {
-  const currentTurnData = stock.turns[currentTurn]
-  if (!currentTurnData) {
-    console.error("❌ 턴 데이터 없음:", { stockId: stock.id, currentTurn, totalTurns: stock.turns.length })
-    return null
-  }
-  
-  const sPrice = currentTurnData.price
-  const sPrevPrice = currentTurn > 0 ? stock.turns[currentTurn - 1]?.price || stock.initialPrice : stock.initialPrice
-  const sChange = (((sPrice - sPrevPrice) / sPrevPrice) * 100).toFixed(1)
-  const isUp = Number.parseFloat(sChange) >= 0
-  const myQty = holdings[stock.id] || 0
-  const myAvg = averagePrices[stock.id] || 0
-
-  let displayValue = sPrice
-  let subText = stock.category
-  const changeText = `${isUp ? "+" : ""}${sChange}%`
-  const changeColorClass = isUp ? "text-red-500" : "text-blue-500"
-
-  let rightBottomText = changeText
-  let rightBottomClass = changeColorClass
-
-  if (myQty > 0) {
-    const avgPrice = currencyMode === "USD" ? myAvg / EXCHANGE_RATE : myAvg
-
-    if (listDisplayMode === "valuation") {
-      // Valuation Mode Logic
-      displayValue = sPrice * myQty // Total Value
-      subText = `${myQty}주` // Quantity as subtext
-
-      const profit = (sPrice - myAvg) * myQty
-      const profitRate = myAvg > 0 ? ((sPrice - myAvg) / myAvg) * 100 : 0
-      const isProfit = profit >= 0
-
-      // Format profit text for bottom right
-      const profitValue = currencyMode === "USD" ? profit / EXCHANGE_RATE : profit
-      rightBottomText = `${isProfit ? "+" : ""}${Math.round(profitValue).toLocaleString()}${currencyMode === "USD" ? "$" : "원"} (${profitRate.toFixed(1)}%)`
-      rightBottomClass = isProfit ? "text-red-500" : "text-blue-500"
-    } else {
-      // Price Mode Logic (Default)
-      subText = `내 평균 ${Math.round(avgPrice).toLocaleString()}${currencyMode === "USD" ? "$" : "원"}`
-    }
-  }
-
-  if (currencyMode === "USD") {
-    displayValue = displayValue / EXCHANGE_RATE
-  }
-
-  // 5일치 데이터 (30턴), 2턴당 1개씩 샘플링하여 15개 포인트 표시
-  const historyNeeded = 30 // 5일 × 6턴
-  const sampleRate = 2 // 2턴당 1개
-  let rawData = []
-
-  if (currentTurn < historyNeeded) {
-    const startPrice = stock.initialPrice
-    for (let i = historyNeeded - currentTurn; i > 0; i--) {
-      rawData.push({ price: startPrice, index: rawData.length })
-    }
-  }
-
-  const startIndex = Math.max(0, currentTurn - historyNeeded)
-  const recentTurns = stock.turns.slice(startIndex, currentTurn + 1)
-  rawData = [...rawData, ...recentTurns.map((t: any, idx: number) => ({ 
-    price: t.price, 
-    index: rawData.length + idx 
-  }))]
-
-  // 2턴당 1개씩 샘플링 (미니차트 최적화)
-  const chartData = rawData.filter((_, idx) => idx % sampleRate === 0 || idx === rawData.length - 1)
-  
-  // 디버깅: 차트 데이터 로그 (첫 번째 주식만, 6턴마다)
-  if (stock.id === 'KAKAO' && currentTurn % 6 === 0) {
-    console.log(`📊 [${stock.name}] 턴 ${currentTurn}: 차트 데이터`, {
-      rawDataPoints: rawData.length,
-      sampledPoints: chartData.length,
-      prices: chartData.map(d => d.price),
-      minPrice: Math.min(...chartData.map(d => d.price)),
-      maxPrice: Math.max(...chartData.map(d => d.price)),
-    })
-  }
-
-  // 현재 몇 주차인지 계산
-  const weekNumber = Math.floor(currentTurn / (DECISIONS_PER_DAY * DAYS_PER_WEEK))
-
-  return (
-    <div
-      key={stock.id}
-      onClick={() => {
-        setSelectedStockId(stock.id)
-        setViewMode("detail")
-      }}
-      className="flex items-center justify-between py-4 px-3 mb-2 bg-[#252525] hover:bg-[#2a2a2a] active:scale-[0.98] transition-all cursor-pointer rounded-xl border border-gray-800 shadow-sm"
-    >
-      <div className="flex items-center min-w-0 flex-1">
-        <MiniChart 
-          key={`${stock.id}-${currentTurn}`}
-          data={chartData} 
-          color={isUp ? "#ef4444" : "#3b82f6"} 
-          isUp={isUp} 
-          weekNumber={weekNumber}
-        />
-
-        <div className="min-w-0 flex-1 pr-2">
-          <div className="font-bold text-gray-100 truncate text-[15px]">{stock.name}</div>
-          <div className="text-xs text-gray-500 truncate mt-0.5">{subText}</div>
-        </div>
-      </div>
-
-      <div className="text-right shrink-0">
-        <div className="font-bold text-gray-100 text-[15px]">
-          {currencyMode === "USD" ? "$" : ""}
-          {displayValue.toLocaleString(undefined, { maximumFractionDigits: currencyMode === "USD" ? 2 : 0 })}
-          {currencyMode === "KRW" ? "원" : ""}
-        </div>
-        <div className={cn("text-xs font-medium mt-0.5", rightBottomClass)}>{rightBottomText}</div>
-      </div>
-    </div>
-  )
-}
-
-// WeeklyReportModal → components/WeeklyReportModal.tsx 로 이동됨
-// StockChart → components/StockChart.tsx 로 이동됨
+import { useLivePrices } from "./components/hooks/useLivePrices"
+import { generateHistory, generateAIStocks, generateRobotAutoStocks, CHARACTER_REACTIONS } from "./utils/stockDataUtils"
+import { EXCHANGE_RATE, DECISIONS_PER_DAY, DECISION_TIMER_SECONDS, DAYS_PER_WEEK, TURNS_PER_DECISION, DAY_PHASES, DAY_NAMES, LABELS, SPEED_MODE_TURNS } from "./config"
 
 export default function GamePlayPage() {
   const params = useParams()
@@ -233,8 +45,7 @@ export default function GamePlayPage() {
   const [feedback, setFeedback] = useState<{ text: string; type: "success" | "error" | "neutral" } | null>(null)
   const [hearts, setHearts] = useState(5)
   const [selectedStockId, setSelectedStockId] = useState<string>("")
-  // Changed 3M to 1Y
-  const [chartPeriod, setChartPeriod] = useState<"1D" | "1W" | "1M" | "1Y">("1M")
+  const [chartPeriod, setChartPeriod] = useState<"1D" | "1W" | "1M" | "1Y">("1D")
   const [favorites, setFavorites] = useState<string[]>([])
   const [quantity, setQuantity] = useState(1)
   const [activeTab, setActiveTab] = useState<"all" | "my" | "watch">("all")
@@ -319,120 +130,6 @@ export default function GamePlayPage() {
     // gameSettings가 없거나 speedMode가 없으면 100턴 (기본)
     return 100
   }, [gameSettings?.speedMode])
-
-  // AI 주식 100개 생성
-  const generateAIStocks = (count: number, startingPrice: number, requiredTurns: number) => {
-    const aiCompanies = [
-      "OpenAI", "Anthropic", "DeepMind", "Cohere", "Hugging Face", "Stability AI", "Midjourney",
-      "Character.AI", "Jasper", "Copy.ai", "Synthesia", "Runway", "Descript", "Otter.ai",
-      "Grammarly", "Notion AI", "GitHub Copilot", "Tabnine", "Replit", "Cursor AI"
-    ]
-    
-    const stocks = []
-    for (let i = 0; i < count; i++) {
-      const companyName = i < aiCompanies.length 
-        ? aiCompanies[i] 
-        : `AI-Tech-${String(i + 1).padStart(3, "0")}`
-      
-      const basePrice = startingPrice * (0.5 + Math.random())
-      const turns = []
-      let currentPrice = basePrice
-      const startDate = new Date(2024, 0, 1)
-      
-      for (let turn = 0; turn < requiredTurns; turn++) {
-        const change = (Math.random() - 0.48) * 0.08 // AI는 평균적으로 상승 경향
-        currentPrice = Math.max(1000, Math.round(currentPrice * (1 + change)))
-        
-        const currentDate = new Date(startDate)
-        currentDate.setDate(currentDate.getDate() + turn)
-        const dateStr = `${currentDate.getFullYear()}.${String(currentDate.getMonth() + 1).padStart(2, "0")}.${String(currentDate.getDate()).padStart(2, "0")}`
-        
-        const newsTemplates = [
-          "AI 모델 성능 개선",
-          "새로운 AI 기능 출시",
-          "대규모 투자 유치",
-          "주요 기업과 파트너십",
-          "AI 기술 혁신 발표",
-          "사용자 급증",
-          "AI 시장 확대",
-        ]
-        
-        turns.push({
-          turn: turn + 1,
-          date: dateStr,
-          price: currentPrice,
-          news: newsTemplates[Math.floor(Math.random() * newsTemplates.length)],
-        })
-      }
-      
-      stocks.push({
-        id: `ai-stock-${i + 1}`,
-        name: companyName,
-        category: "AI/테크",
-        initialPrice: Math.round(basePrice),
-        turns: turns,
-      })
-    }
-    
-    return stocks
-  }
-
-  // 로봇/자동차 주식 100개 생성
-  const generateRobotAutoStocks = (count: number, startingPrice: number, requiredTurns: number) => {
-    const companies = [
-      "Tesla", "Rivian", "Lucid Motors", "NIO", "XPeng", "BYD", "Boston Dynamics",
-      "ABB Robotics", "FANUC", "KUKA", "Yaskawa", "Universal Robots", "Teradyne",
-      "iRobot", "Intuitive Surgical", "Symbotic", "Sarcos", "Agility Robotics"
-    ]
-    
-    const stocks = []
-    for (let i = 0; i < count; i++) {
-      const companyName = i < companies.length 
-        ? companies[i] 
-        : `RoboAuto-${String(i + 1).padStart(3, "0")}`
-      
-      const basePrice = startingPrice * (0.7 + Math.random() * 0.6)
-      const turns = []
-      let currentPrice = basePrice
-      const startDate = new Date(2024, 0, 1)
-      
-      for (let turn = 0; turn < requiredTurns; turn++) {
-        const change = (Math.random() - 0.5) * 0.06
-        currentPrice = Math.max(1000, Math.round(currentPrice * (1 + change)))
-        
-        const currentDate = new Date(startDate)
-        currentDate.setDate(currentDate.getDate() + turn)
-        const dateStr = `${currentDate.getFullYear()}.${String(currentDate.getMonth() + 1).padStart(2, "0")}.${String(currentDate.getDate()).padStart(2, "0")}`
-        
-        const newsTemplates = [
-          "전기차 판매 증가",
-          "로봇 기술 혁신",
-          "자율주행 개선",
-          "생산 라인 확대",
-          "신규 공장 건설",
-          "배터리 기술 향상",
-          "글로벌 시장 진출",
-        ]
-        
-        turns.push({
-          turn: turn + 1,
-          date: dateStr,
-          price: currentPrice,
-          news: newsTemplates[Math.floor(Math.random() * newsTemplates.length)],
-        })
-      }
-      
-      stocks.push({
-        id: `robot-auto-${i + 1}`,
-        name: companyName,
-        category: "로봇/자동차",
-        initialPrice: Math.round(basePrice),
-        turns: turns,
-      })
-    }
-    
-    return stocks
-  }
 
   // 시나리오 데이터 자동 확장 + 추가 주식 생성
   const scenario = useMemo(() => {
@@ -1174,6 +871,41 @@ export default function GamePlayPage() {
   const initialValue = gameSettings ? gameSettings.initialCash : 1000000
   const profitRate = Number.parseFloat((((totalValue - initialValue) / initialValue) * 100).toFixed(1))
 
+  // 전체 주식 리스트 데이터 (page 레벨로 호이스팅 → useLivePrices 공유)
+  const allStocksData = useMemo(() => {
+    if (!scenario) return []
+    return scenario.stocks.map(stock => {
+      const turnData = stock.turns?.[currentTurn]
+      const currentPrice = turnData?.price || stock.initialPrice || 0
+      const prevPrice = currentTurn > 0
+        ? (stock.turns?.[currentTurn - 1]?.price || stock.initialPrice || 0)
+        : (stock.initialPrice || 0)
+      const change = prevPrice > 0 ? (((currentPrice - prevPrice) / prevPrice) * 100).toFixed(1) : "0.0"
+      return {
+        ...stock,
+        currentPrice,
+        prevPrice,
+        change,
+        isUp: Number(change) >= 0,
+        myHoldings: holdings[stock.id] || 0,
+        myAvg: averagePrices[stock.id] || 0,
+        maxBuyQty: currentPrice > 0 ? Math.floor(cash / currentPrice) : 0,
+        news: (turnData as any)?.news || "시장 정보",
+      }
+    })
+  }, [scenario, currentTurn, holdings, averagePrices, cash])
+
+  // 라이브 가격 (StockListSection + GameHeader 공유)
+  const { livePrices, tickUps } = useLivePrices(allStocksData as any)
+
+  // 라이브 가격 기반 총자산 (GameHeader 표시용)
+  const liveTotalStockValue = allStocksData.reduce((acc, stock) => {
+    const lp = livePrices[stock.id] ?? stock.currentPrice
+    return acc + lp * stock.myHoldings
+  }, 0)
+  const liveTotalValue = Math.round(cash + liveTotalStockValue)
+  const liveProfitRate = Number.parseFloat((((liveTotalValue - initialValue) / initialValue) * 100).toFixed(1))
+
   const currentWeekValue = totalValue
   const weeklyReturn =
     lastWeekValue > 0 ? Number.parseFloat((((currentWeekValue - lastWeekValue) / lastWeekValue) * 100).toFixed(1)) : 0
@@ -1310,66 +1042,17 @@ export default function GamePlayPage() {
     setFavorites((prev) => (prev.includes(stockId) ? prev.filter((id) => id !== stockId) : [...prev, stockId]))
   }
 
-  const DatePopup = () =>
-    showDatePopup && (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300 pointer-events-none">
-        <div className="flex flex-col items-center animate-in zoom-in-50 duration-500">
-          <div className="text-2xl text-gray-300 mb-2 font-medium">Today is</div>
-          <div className="text-6xl md:text-8xl font-bold text-white tracking-tight drop-shadow-2xl">
-            {turnData?.date || ""}
-          </div>
-        </div>
-      </div>
-    )
-
   // 로딩 화면 - 필수 데이터만 체크
   if (!scenario || !selectedStockId || !currentStock) {
     const loadingReason = !scenario ? "시나리오 로드 중" :
                           !selectedStockId ? "주식 선택 중" :
                           !currentStock ? "주식 데이터 로드 중" : "알 수 없음"
-    
-    console.log("⏳ 로딩 중:", {
-      reason: loadingReason,
-      hasScenario: !!scenario,
-      scenarioId,
-      selectedStockId,
-      hasCurrentStock: !!currentStock,
-      currentTurn
-    })
-    
-    return (
-      <div className="min-h-screen bg-[#191919] flex flex-col items-center justify-center text-white">
-        <div className="flex flex-col items-center gap-4 animate-pulse">
-          <div className="w-16 h-16 rounded-full border-4 border-blue-500 border-t-transparent animate-spin"></div>
-          <div className="text-xl font-bold text-gray-300">게임 로딩 중...</div>
-          <div className="text-sm text-gray-500">{loadingReason}</div>
-        </div>
-      </div>
-    )
+    console.log("⏳ 로딩 중:", { reason: loadingReason, scenarioId, selectedStockId, currentTurn })
+    return <LoadingScreen reason={loadingReason} />
   }
 
   if (showResult) {
-    return (
-      <div className="min-h-screen bg-[#191919] flex flex-col items-center justify-center p-6 text-center text-white">
-        <div
-          className={`w-32 h-32 rounded-full flex items-center justify-center text-7xl mb-6 shadow-2xl ${
-            profitRate > 0 ? "bg-red-500/20 animate-bounce" : "bg-blue-500/20"
-          }`}
-        >
-          {profitRate > 0 ? "🏆" : "💪"}
-        </div>
-        <h2 className="text-3xl font-bold mb-2">게임 종료!</h2>
-        <p className="text-gray-400 font-medium mb-8">
-          최종 수익률: <span className={profitRate > 0 ? "text-red-500" : "text-blue-500"}>{profitRate}%</span>
-        </p>
-        <Button
-          className="w-full h-14 bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold rounded-2xl"
-          onClick={() => (window.location.href = "/home")}
-        >
-          홈으로 돌아가기
-        </Button>
-      </div>
-    )
+    return <ResultScreen profitRate={profitRate} onGoHome={() => (window.location.href = "/home")} />
   }
 
   // --- 자유 거래 VIEW (메인 게임 화면) ---
@@ -1377,33 +1060,7 @@ export default function GamePlayPage() {
     // 타이머 프로그레스
     const timerProgress = decisionTimer / DECISION_TIMER_SECONDS
     
-    // 모든 주식 정보 계산
-    const allStocksData = scenario?.stocks.map(stock => {
-      const turnData = stock.turns?.[currentTurn]
-      const currentPrice = turnData?.price || stock.initialPrice || 0
-      const prevPrice = currentTurn > 0 
-        ? (stock.turns?.[currentTurn - 1]?.price || stock.initialPrice || 0) 
-        : (stock.initialPrice || 0)
-      const change = prevPrice > 0 ? (((currentPrice - prevPrice) / prevPrice) * 100).toFixed(1) : "0.0"
-      const isUp = Number(change) >= 0
-      const myHoldings = holdings[stock.id] || 0
-      const myAvg = averagePrices[stock.id] || 0
-      const maxBuyQty = currentPrice > 0 ? Math.floor(cash / currentPrice) : 0
-      
-      return {
-        ...stock,
-        currentPrice,
-        prevPrice,
-        change,
-        isUp,
-        myHoldings,
-        myAvg,
-        maxBuyQty,
-        news: (turnData as any)?.news || "시장 정보",
-      }
-    }) || []
-    
-    // 카테고리별 그룹화
+    // 카테고리별 그룹화 (allStocksData는 useMemo로 컴포넌트 레벨에서 관리)
     const stocksByCategory = allStocksData.reduce((acc, stock) => {
       const category = (stock as any).category || "기타"
       if (!acc[category]) acc[category] = []
@@ -1442,8 +1099,8 @@ export default function GamePlayPage() {
           currentDayName={currentDayName}
           currentDayPhase={currentDayPhase}
           currentWeekNumber={currentWeekNumber}
-          totalValue={totalValue}
-          profitRate={profitRate}
+          totalValue={liveTotalValue}
+          profitRate={liveProfitRate}
           decisionTimer={decisionTimer}
           totalDecisions={totalDecisions}
           remainingDecisions={Math.max(0, totalDays * DECISIONS_PER_DAY - totalDecisions)}
@@ -1461,26 +1118,6 @@ export default function GamePlayPage() {
           onConfirm={() => router.push("/home")}
         />
 
-        {/* 뷰 탭 (현재가 / 평가금) */}
-        {isWaitingForDecision && !showQuickTrade && (
-          <div className="px-4 pt-3 pb-2 flex items-center justify-between border-b border-gray-800/50">
-            <div className="flex bg-gray-800/60 rounded-xl p-0.5">
-              {(["현재가", "평가금"] as const).map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => setStockViewTab(tab)}
-                  className={cn(
-                    "px-3 py-1.5 rounded-lg text-xs font-bold transition-all",
-                    stockViewTab === tab ? "bg-white text-gray-900" : "text-gray-400 hover:text-gray-200"
-                  )}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* 자유 거래 타임 - 주식 리스트 */}
         {isWaitingForDecision && !showQuickTrade && (
           <StockListSection
@@ -1488,277 +1125,25 @@ export default function GamePlayPage() {
             currentTurn={currentTurn}
             favorites={favorites}
             stockViewTab={stockViewTab}
+            livePrices={livePrices}
+            tickUps={tickUps}
+            onChangeViewTab={setStockViewTab}
             onSelectStock={(id) => { setSelectedStockId(id); setViewMode("detail") }}
             onToggleFavorite={toggleFavorite}
             onDecision={handleDecision}
           />
         )}
 
-        {/* 수익 분석 모달 (토스 스타일) */}
+        {/* 수익 분석 모달 */}
         {showProfitAnalysis && (
-          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm">
-            <div className="h-full bg-[#191919] flex flex-col">
-              {/* 헤더 */}
-              <div className="px-5 py-4 flex items-center justify-between border-b border-gray-800">
-                <button onClick={() => setShowProfitAnalysis(false)} className="p-2 -ml-2">
-                  <ArrowLeft className="w-6 h-6" />
-                </button>
-                <h2 className="text-lg font-bold">양도소득세</h2>
-                <div className="w-10" />
-              </div>
-
-              {/* 탭 */}
-              <div className="flex border-b border-gray-800">
-                {["자산", "수익분석"].map((tab) => (
-                  <button
-                    key={tab}
-                    className={cn(
-                      "flex-1 py-4 text-sm font-bold transition-colors",
-                      tab === "수익분석" ? "text-white border-b-2 border-white" : "text-gray-500"
-                    )}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
-
-              {/* 기간 선택 */}
-              <div className="flex gap-2 px-5 py-3 border-b border-gray-800">
-                {["일", "주", "월", "년", "전체"].map((period) => (
-                  <button
-                    key={period}
-                    className={cn(
-                      "px-4 py-2 rounded-full text-sm font-medium transition-colors",
-                      period === "전체" ? "bg-gray-700 text-white" : "bg-gray-800 text-gray-400"
-                    )}
-                  >
-                    {period}
-                  </button>
-                ))}
-              </div>
-
-              {/* 수익 요약 */}
-              <div className="px-5 py-6">
-                <div className="text-center mb-2">
-                  <button className="flex items-center gap-1 mx-auto text-gray-400">
-                    <span className="text-sm">2월 실현수익</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-                <div className={cn(
-                  "text-5xl font-bold text-center mb-2",
-                  profitRate >= 0 ? "text-red-500" : "text-blue-500"
-                )}>
-                  {profitRate >= 0 ? "+" : ""}{((totalValue - (gameSettings?.initialCash || 10000000))).toLocaleString()}원
-                </div>
-                <div className="text-center text-gray-400">
-                  ({profitRate >= 0 ? "+" : ""}{profitRate}%)
-                </div>
-              </div>
-
-              {/* 상세 내역 */}
-              <div className="flex-1 overflow-y-auto px-5 space-y-3">
-                {/* 판매수익 */}
-                <button className="w-full bg-gray-800/50 rounded-2xl p-4 flex items-center justify-between hover:bg-gray-800/80 transition-colors">
-                  <div className="text-left">
-                    <div className="text-sm font-medium text-white mb-1">판매수익</div>
-                    <div className="text-xs text-gray-500">이번 달 {profitRate >= 0 ? "+" : ""}{((totalValue - (gameSettings?.initialCash || 10000000)) * 0.6).toLocaleString()}원</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={cn("text-lg font-bold", profitRate >= 0 ? "text-red-500" : "text-blue-500")}>
-                      {profitRate >= 0 ? "+" : ""}{((totalValue - (gameSettings?.initialCash || 10000000)) * 0.6).toLocaleString()}원
-                    </span>
-                    <ChevronRight className="w-5 h-5 text-gray-500" />
-                  </div>
-                </button>
-
-                {/* 배당금 */}
-                <button className="w-full bg-gray-800/50 rounded-2xl p-4 flex items-center justify-between hover:bg-gray-800/80 transition-colors">
-                  <div className="text-left">
-                    <div className="text-sm font-medium text-white">배당금</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-gray-400">0원</span>
-                    <ChevronRight className="w-5 h-5 text-gray-500" />
-                  </div>
-                </button>
-
-                {/* 대여료 */}
-                <button className="w-full bg-gray-800/50 rounded-2xl p-4 flex items-center justify-between hover:bg-gray-800/80 transition-colors">
-                  <div className="text-left">
-                    <div className="text-sm font-medium text-white">대여료</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-gray-400">0원</span>
-                    <ChevronRight className="w-5 h-5 text-gray-500" />
-                  </div>
-                </button>
-
-                {/* 채권 이자·만기수익 */}
-                <button className="w-full bg-gray-800/50 rounded-2xl p-4 flex items-center justify-between hover:bg-gray-800/80 transition-colors">
-                  <div className="text-left">
-                    <div className="text-sm font-medium text-white">채권 이자·만기수익</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-gray-400">0원</span>
-                    <ChevronRight className="w-5 h-5 text-gray-500" />
-                  </div>
-                </button>
-
-                {/* 개좌이자 */}
-                <button className="w-full bg-gray-800/50 rounded-2xl p-4 flex items-center justify-between hover:bg-gray-800/80 transition-colors">
-                  <div className="text-left">
-                    <div className="text-sm font-medium text-white">개좌이자</div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-gray-400">0원</span>
-                    <ChevronRight className="w-5 h-5 text-gray-500" />
-                  </div>
-                </button>
-              </div>
-
-              {/* 하단 버튼 */}
-              <div className="px-5 py-4 border-t border-gray-800 flex gap-3 pb-safe-bottom">
-                <button className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 rounded-2xl font-bold text-white transition-colors">
-                  일별
-                </button>
-                <button className="flex-1 py-3 bg-gray-800 hover:bg-gray-700 rounded-2xl font-bold text-white transition-colors">
-                  종목별 집계
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* [이전 코드의 나머지 부분은 동일] */}
-        {false && oppStock && isWaitingForDecision && !showQuickTrade && (
-          <div className="flex-1 px-5 py-3 flex flex-col overflow-y-auto">
-            <div className="bg-gradient-to-br from-gray-800/80 to-gray-900/80 border border-gray-700/50 rounded-3xl p-5 flex-1 flex flex-col">
-              {/* 주식 정보 */}
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <div className="text-xl font-bold text-white">PLACEHOLDER</div>
-                  <div className="text-xs text-gray-400 mt-0.5">PLACEHOLDER</div>
-                </div>
-                <div className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full text-xs font-bold">
-                  PLACEHOLDER
-                </div>
-              </div>
-
-              {/* 가격 */}
-              <div className="mb-3">
-                <div className="text-3xl font-black text-white">{oppPrice.toLocaleString()}원</div>
-                <div className={cn("text-sm font-bold mt-0.5 flex items-center gap-1", oppIsUp ? "text-red-500" : "text-blue-500")}>
-                  <span>{oppIsUp ? "▲" : "▼"}</span>
-                  <span>{Math.abs(oppPrice - oppPrevPrice).toLocaleString()}원</span>
-                  <span>({oppIsUp ? "+" : ""}{oppChange}%)</span>
-                </div>
-              </div>
-
-              {/* 미니 차트 */}
-              {oppChartData.length > 1 && (
-                <div className="h-16 mb-3 -mx-1">
-                  <MiniChart 
-                    data={oppChartData}
-                    color={oppIsUp ? "#ef4444" : "#3b82f6"}
-                    isUp={oppIsUp}
-                  />
-                </div>
-              )}
-
-              {/* 뉴스 */}
-              <div className="bg-gray-800/50 rounded-2xl p-3 mb-3">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-sm">📰</span>
-                  <span className="text-[11px] font-bold text-gray-300">오늘의 뉴스</span>
-                </div>
-                <div className="text-sm text-gray-200 leading-relaxed">{oppNews}</div>
-              </div>
-
-              {/* AI 분석 */}
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-2xl p-3 mb-3">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <span className="text-sm">{aiReason.emoji}</span>
-                  <span className="text-[11px] font-bold text-blue-400">AI 분석</span>
-                </div>
-                <div className="text-sm text-blue-200 leading-relaxed">{aiReason.reason}</div>
-              </div>
-
-              {/* 보유 정보 (있을 경우) */}
-              {oppHoldings > 0 && (
-                <div className="bg-gray-800/30 rounded-2xl p-3 mb-3 border border-gray-700/30">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-400">평균 매입가</span>
-                    <span className="text-gray-200 font-bold">{oppAvg.toLocaleString()}원</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm mt-1">
-                    <span className="text-gray-400">평가손익</span>
-                    <span className={cn("font-bold", (oppPrice - oppAvg) >= 0 ? "text-red-500" : "text-blue-500")}>
-                      {(oppPrice - oppAvg) >= 0 ? "+" : ""}{((oppPrice - oppAvg) * oppHoldings).toLocaleString()}원
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* 타이머 */}
-              <div className="mt-auto pt-3">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs text-gray-400">남은 시간</span>
-                  <span className={cn(
-                    "text-xl font-black tabular-nums",
-                    decisionTimer > 20 ? "text-green-400" : 
-                    decisionTimer > 10 ? "text-yellow-400" : "text-red-400 animate-pulse"
-                  )}>
-                    {decisionTimer}초
-                  </span>
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-2.5 overflow-hidden">
-                  <div 
-                    className={cn(
-                      "h-2.5 rounded-full transition-all duration-1000 ease-linear",
-                      decisionTimer > 20 ? "bg-green-500" : 
-                      decisionTimer > 10 ? "bg-yellow-500" : "bg-red-500"
-                    )}
-                    style={{ width: `${timerProgress * 100}%` }} 
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* 액션 버튼 */}
-            <div className="flex gap-3 mt-4 pb-6">
-              <button
-                onClick={() => handleDecision("skip")}
-                className="flex-1 h-14 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-2xl font-bold text-base transition-all active:scale-95"
-              >
-                건너뛰기
-              </button>
-              <button
-                onClick={() => {
-                  if (oppHoldings > 0) {
-                    setShowQuickTrade("sell")
-                    setTradeQuantity(oppHoldings)
-                  }
-                }}
-                disabled={oppHoldings === 0}
-                className="flex-1 h-14 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-800 disabled:text-gray-600 text-white rounded-2xl font-bold text-base transition-all active:scale-95"
-              >
-                매도
-              </button>
-              <button
-                onClick={() => {
-                  if (maxBuyQty > 0) {
-                    setShowQuickTrade("buy")
-                    setTradeQuantity(1)
-                  }
-                }}
-                disabled={maxBuyQty === 0}
-                className="flex-1 h-14 bg-red-500 hover:bg-red-600 disabled:bg-gray-800 disabled:text-gray-600 text-white rounded-2xl font-bold text-base transition-all active:scale-95"
-              >
-                매수
-              </button>
-            </div>
-          </div>
+          <ProfitAnalysisModal
+            scenarioId={scenarioId}
+            currentDay={currentDay}
+            currentPrices={livePrices}
+            holdings={holdings}
+            averagePrices={averagePrices}
+            onClose={() => setShowProfitAnalysis(false)}
+          />
         )}
 
         {/* 대기 중 */}
@@ -1771,166 +1156,6 @@ export default function GamePlayPage() {
           </div>
         )}
 
-        {/* [제거된 섹션] */}
-        {false && showQuickTrade && (
-          <div className="flex-1 px-5 py-3 flex flex-col">
-            <div className="bg-gradient-to-br from-gray-800/90 to-gray-900/90 border border-gray-700/50 rounded-3xl p-5 flex-1 flex flex-col">
-              {/* 타이틀 */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl">{showQuickTrade === "buy" ? "📈" : "📉"}</span>
-                  <div>
-                    <div className="text-lg font-bold text-white">{oppStock.name}</div>
-                    <div className={cn("text-sm font-bold", showQuickTrade === "buy" ? "text-red-400" : "text-blue-400")}>
-                      {showQuickTrade === "buy" ? "매수" : "매도"}
-                    </div>
-                  </div>
-                </div>
-                <button 
-                  onClick={() => setShowQuickTrade(null)}
-                  className="p-2 text-gray-400 hover:text-white transition-colors"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                </button>
-              </div>
-
-              {/* 현재가 */}
-              <div className="bg-gray-800/50 rounded-2xl p-4 mb-4">
-                <div className="text-xs text-gray-400 mb-1">현재가</div>
-                <div className="text-2xl font-black text-white">{oppPrice.toLocaleString()}원</div>
-              </div>
-
-              {/* 수량 선택 */}
-              <div className="mb-4">
-                <div className="text-xs text-gray-400 mb-2">수량</div>
-                <div className="flex items-center justify-center gap-4">
-                  <button 
-                    onClick={() => setTradeQuantity(q => Math.max(1, q - 1))}
-                    className="w-12 h-12 rounded-full bg-gray-700 hover:bg-gray-600 text-white text-xl font-bold transition-all active:scale-90"
-                  >
-                    -
-                  </button>
-                  <div className="w-24 text-center">
-                    <div className="text-3xl font-black text-white">{tradeQuantity}</div>
-                    <div className="text-xs text-gray-500">주</div>
-                  </div>
-                  <button 
-                    onClick={() => {
-                      const max = showQuickTrade === "buy" ? maxBuyQty : oppHoldings
-                      setTradeQuantity(q => Math.min(max, q + 1))
-                    }}
-                    className="w-12 h-12 rounded-full bg-gray-700 hover:bg-gray-600 text-white text-xl font-bold transition-all active:scale-90"
-                  >
-                    +
-                  </button>
-                </div>
-                {/* 빠른 수량 선택 */}
-                <div className="flex gap-2 mt-3 justify-center">
-                  {[1, 5, 10].map(q => {
-                    const max = showQuickTrade === "buy" ? maxBuyQty : oppHoldings
-                    if (q > max) return null
-                    return (
-                      <button 
-                        key={q}
-                        onClick={() => setTradeQuantity(q)}
-                        className={cn(
-                          "px-4 py-1.5 rounded-full text-xs font-bold transition-all",
-                          tradeQuantity === q ? "bg-blue-500 text-white" : "bg-gray-700 text-gray-400"
-                        )}
-                      >
-                        {q}주
-                      </button>
-                    )
-                  })}
-                  <button 
-                    onClick={() => setTradeQuantity(showQuickTrade === "buy" ? maxBuyQty : oppHoldings)}
-                    className={cn(
-                      "px-4 py-1.5 rounded-full text-xs font-bold transition-all",
-                      tradeQuantity === (showQuickTrade === "buy" ? maxBuyQty : oppHoldings) 
-                        ? "bg-blue-500 text-white" : "bg-gray-700 text-gray-400"
-                    )}
-                  >
-                    전량
-                  </button>
-                </div>
-              </div>
-
-              {/* 총 금액 */}
-              <div className="bg-gray-800/50 rounded-2xl p-4 mb-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-400">
-                    {showQuickTrade === "buy" ? "총 매수 금액" : "총 매도 금액"}
-                  </span>
-                  <span className="text-xl font-bold text-white">
-                    {(oppPrice * tradeQuantity).toLocaleString()}원
-                  </span>
-                </div>
-                {showQuickTrade === "buy" && (
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-gray-500">매수 후 잔액</span>
-                    <span className="text-sm text-gray-400">
-                      {(cash - oppPrice * tradeQuantity).toLocaleString()}원
-                    </span>
-                  </div>
-                )}
-                {showQuickTrade === "sell" && oppAvg > 0 && (
-                  <div className="flex items-center justify-between mt-2">
-                    <span className="text-xs text-gray-500">예상 손익</span>
-                    <span className={cn("text-sm font-bold", (oppPrice - oppAvg) * tradeQuantity >= 0 ? "text-red-500" : "text-blue-500")}>
-                      {(oppPrice - oppAvg) * tradeQuantity >= 0 ? "+" : ""}
-                      {((oppPrice - oppAvg) * tradeQuantity).toLocaleString()}원
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* 타이머 (거래 화면에서도 계속 표시) */}
-              <div className="mb-4">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-gray-400">남은 시간</span>
-                  <span className={cn(
-                    "text-base font-bold tabular-nums",
-                    decisionTimer > 20 ? "text-green-400" : 
-                    decisionTimer > 10 ? "text-yellow-400" : "text-red-400 animate-pulse"
-                  )}>
-                    {decisionTimer}초
-                  </span>
-                </div>
-                <div className="w-full bg-gray-700 rounded-full h-1.5">
-                  <div 
-                    className={cn(
-                      "h-1.5 rounded-full transition-all duration-1000",
-                      decisionTimer > 20 ? "bg-green-500" : 
-                      decisionTimer > 10 ? "bg-yellow-500" : "bg-red-500"
-                    )}
-                    style={{ width: `${timerProgress * 100}%` }} 
-                  />
-                </div>
-              </div>
-
-              {/* 확인/취소 버튼 */}
-              <div className="flex gap-3 mt-auto pb-2">
-                <button
-                  onClick={() => setShowQuickTrade(null)}
-                  className="flex-1 h-14 bg-gray-700 hover:bg-gray-600 text-gray-200 rounded-2xl font-bold text-base transition-all active:scale-95"
-                >
-                  취소
-                </button>
-                <button
-                  onClick={() => handleDecision(showQuickTrade, tradeQuantity)}
-                  className={cn(
-                    "flex-[2] h-14 rounded-2xl font-bold text-base text-white transition-all active:scale-95",
-                    showQuickTrade === "buy" 
-                      ? "bg-red-500 hover:bg-red-600" 
-                      : "bg-blue-600 hover:bg-blue-700"
-                  )}
-                >
-                  {showQuickTrade === "buy" ? "매수 확인" : "매도 확인"}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
       </div>
     )
@@ -1943,279 +1168,50 @@ export default function GamePlayPage() {
     const isProfit = Number.parseFloat(myReturn) >= 0
 
     return (
-      <div className="min-h-screen bg-[#191919] text-white flex flex-col pb-24">
-        <DatePopup />
-
-        {/* 거래 완료 피드백 토스트 */}
-        {feedback && (
-          <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[150] animate-in slide-in-from-top duration-300">
-            <div
-              className={cn(
-                "px-6 py-4 rounded-2xl shadow-2xl border-2 backdrop-blur-md flex items-center gap-3 min-w-[280px]",
-                feedback.type === "success"
-                  ? "bg-green-500/20 border-green-500 text-green-100"
-                  : feedback.type === "error"
-                    ? "bg-red-500/20 border-red-500 text-red-100"
-                    : "bg-blue-500/20 border-blue-500 text-blue-100",
-              )}
-            >
-              <div className="text-3xl">
-                {feedback.type === "success" ? "✅" : feedback.type === "error" ? "❌" : "ℹ️"}
-              </div>
-              <div className="flex-1">
-                <div className="font-bold text-lg">{feedback.text}</div>
-                <div className="text-sm opacity-80">거래가 완료되었습니다</div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <WeeklyReportModal
-          isOpen={showWeeklyReport}
-          onClose={handleCloseReport}
-          weekNumber={currentWeekNumber}
-          weeklyReturn={weeklyReturn}
-          totalReturn={profitRate}
-          chartData={weeklyHistory.slice(-(DAYS_PER_WEEK * DECISIONS_PER_DAY))} // Show last 1주간
-        />
-
-        {/* Header */}
-        <div className="px-4 py-3 sticky top-0 bg-[#191919]/95 backdrop-blur-sm z-10 border-b border-gray-800">
-          <div className="flex items-center justify-between mb-2">
-            <button onClick={() => setViewMode("list")} className="p-1">
-              <ArrowLeft className="w-6 h-6 text-gray-300" />
-            </button>
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setHintLevel(2)
-                  setShowHintModal(true)
-                }}
-                className="px-3 py-1.5 bg-yellow-500/10 border border-yellow-500/30 rounded-xl hover:bg-yellow-500/20 transition-all active:scale-95 flex items-center gap-1"
-              >
-                <span className="text-sm">💡</span>
-                <span className="text-xs font-bold text-yellow-400">심층분석</span>
-              </button>
-              <Heart
-                className={cn(
-                  "w-6 h-6 transition-colors cursor-pointer",
-                  favorites.includes(selectedStockId) ? "text-red-500 fill-current" : "text-gray-400",
-                )}
-                onClick={() => toggleFavorite(selectedStockId)}
-              />
-              <Bell className="w-6 h-6 text-gray-400" />
-              <MoreHorizontal className="w-6 h-6 text-gray-400" />
-            </div>
-          </div>
-          
-          {/* 현재 날짜 및 주차 정보 */}
-          <div className="flex items-center justify-center gap-2 pb-2">
-            <span className="text-xs text-blue-400 font-bold bg-blue-500/10 px-2 py-0.5 rounded-full">
-              {currentDayNumber}일차 · {currentWeekNumber}주차
-            </span>
-            <span className="text-xs text-gray-500">
-              {`${currentDayName} (${currentDayPhase})`}
-            </span>
-            {isPlaying && (
-              <span className="flex items-center gap-1 text-xs text-green-400 animate-pulse">
-                <span className="w-2 h-2 bg-green-400 rounded-full" />
-                진행 중
-              </span>
-            )}
-          </div>
-        </div>
-
-        <div className="flex-1 overflow-y-auto">
-          {/* Price Info */}
-          <div className="px-5 pt-2 pb-4">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="font-bold text-xl text-white">{currentStock.name}</div>
-              <div className="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center">
-                <Search className="w-3 h-3 text-gray-400" />
-              </div>
-            </div>
-            <div className="text-4xl font-bold mb-2">{currentPrice.toLocaleString()}원</div>
-            <div className={cn("text-sm font-medium flex items-center gap-1", isUp ? "text-red-500" : "text-blue-500")}>
-              어제보다 {isUp ? "+" : ""}
-              {Math.abs(currentPrice - prevPrice).toLocaleString()}원 ({change}%)
-            </div>
-          </div>
-
-          <div className="flex px-5 border-b border-gray-800 mb-6">
-            {["차트", "호가", "내 주식", "종목정보", "커뮤니티"].map((tab) => (
-              <button
-                key={tab}
-                className={cn(
-                  "pb-3 mr-6 text-sm font-bold relative transition-colors",
-                  tab === "차트" ? "text-white" : "text-gray-500",
-                )}
-              >
-                {tab}
-                {tab === "차트" && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white" />}
-              </button>
-            ))}
-          </div>
-
-          {/* Chart */}
-          <div className="h-[360px] w-full mb-4 relative bg-gray-900 rounded-xl overflow-hidden">
-            <StockChart 
-              data={chartData} 
-              height={360} 
-              color={isUp ? "red" : "blue"} 
-              showXAxis={true}
-              chartPeriod={chartPeriod}
-            />
-          </div>
-
-          <div className="px-5 mb-8 flex items-center justify-between">
-            <div className="flex-1 flex justify-between bg-gray-800/30 rounded-lg p-1 mr-4">
-              {["1일", "1주", "3달", "1년"].map((period, idx) => {
-                const periodMap: { [key: string]: string } = { "1일": "1D", "1주": "1W", "3달": "1M", "1년": "1Y" }
-                const mappedPeriod = periodMap[period]
-                const isActive = chartPeriod === mappedPeriod
-                return (
-                  <button
-                    key={period}
-                    onClick={() => setChartPeriod(mappedPeriod as any)}
-                    className={cn(
-                      "flex-1 py-1.5 text-sm font-medium rounded-md transition-all text-center",
-                      isActive ? "bg-gray-700 text-white shadow-sm" : "text-gray-500 hover:text-gray-300",
-                    )}
-                  >
-                    {period}
-                  </button>
-                )
-              })}
-            </div>
-            <button className="w-9 h-9 rounded-lg bg-gray-800/30 flex items-center justify-center text-gray-400">
-              <CandlestickChart className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* My Investment Card - 간소화 */}
-          {currentHoldings > 0 && (
-            <div className="px-5 mb-6">
-              <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-2 border-blue-500/30 rounded-3xl p-5">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">💼</span>
-                    <h3 className="font-bold text-white text-base">내 주식 정보</h3>
-                  </div>
-                  <span className="text-xs bg-blue-500/20 text-blue-300 px-2.5 py-1 rounded-full font-bold">{currentHoldings}주</span>
-                </div>
-
-                {/* 평가손익 & 수익률 */}
-                <div className="grid grid-cols-2 gap-3 mb-4">
-                  <div className="bg-gray-900/40 rounded-2xl p-4">
-                    <div className="text-xs text-gray-400 mb-1">평가손익</div>
-                    <div className={cn("text-2xl font-bold", isProfit ? "text-red-500" : "text-blue-500")}>
-                      {isProfit ? "+" : ""}
-                      {((currentPrice - myAvg) * currentHoldings).toLocaleString()}
-                      <span className="text-sm ml-0.5">원</span>
-                    </div>
-                  </div>
-                  <div className="bg-gray-900/40 rounded-2xl p-4">
-                    <div className="text-xs text-gray-400 mb-1">수익률</div>
-                    <div className={cn("text-2xl font-bold", isProfit ? "text-red-500" : "text-blue-500")}>
-                      {isProfit ? "+" : ""}
-                      {myReturn}%
-                    </div>
-                  </div>
-                </div>
-
-                {/* 현재 평가금액 */}
-                <div className="bg-gray-800/30 rounded-xl p-3.5 mb-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-400">현재 평가금액</span>
-                    <span className="text-xl font-bold text-white">{(currentPrice * currentHoldings).toLocaleString()}원</span>
-                  </div>
-                </div>
-
-                {/* 가격 비교 - 작게 */}
-                <div className="flex items-center justify-between text-xs px-1">
-                  <div className="text-gray-400">
-                    <span>평균 매입가 </span>
-                    <span className="text-gray-300 font-medium">{myAvg.toLocaleString()}원</span>
-                  </div>
-                  <div className="text-gray-400">
-                    <span>현재가 </span>
-                    <span className="text-white font-medium">{currentPrice.toLocaleString()}원</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {pendingOrders.filter((o) => o.stockId === selectedStockId).length > 0 && (
-            <div className="px-5 mb-6">
-              <h3 className="font-bold text-gray-200 mb-3">미체결 주문</h3>
-              <div className="space-y-3">
-                {pendingOrders
-                  .filter((o) => o.stockId === selectedStockId)
-                  .map((order, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-gray-800/30 rounded-2xl p-4 border border-gray-800 flex justify-between items-center"
-                    >
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span
-                            className={cn(
-                              "text-xs font-bold px-1.5 py-0.5 rounded",
-                              order.type === "buy" ? "bg-red-500/20 text-red-500" : "bg-blue-500/20 text-blue-500",
-                            )}
-                          >
-                            {order.type === "buy" ? "구매" : "판매"}
-                          </span>
-                          <span className="text-sm font-bold text-gray-300">
-                            {order.condition === "ge" ? "이상" : "이하"} 조건
-                          </span>
-                        </div>
-                        <div className="text-lg font-bold text-white">
-                          {typeof order.targetPrice === "number" && order.targetPrice < 100 // Assuming percentage if small number, though logic in trade page uses raw numbers for percent too. Let's check context.
-                            ? `${order.targetPrice > 0 ? "+" : ""}${order.targetPrice}% 도달 시`
-                            : `${order.targetPrice.toLocaleString()}원 도달 시`}
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => {
-                          const newOrders = [...pendingOrders]
-                          const realIdx = pendingOrders.findIndex((o) => o === order)
-                          if (realIdx > -1) {
-                            newOrders.splice(realIdx, 1)
-                            setPendingOrders(newOrders)
-                          }
-                        }}
-                        className="text-xs bg-gray-700 text-gray-400 px-3 py-1.5 rounded-lg hover:bg-gray-600 transition-colors"
-                      >
-                        취소
-                      </button>
-                    </div>
-                  ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className="fixed bottom-0 left-0 right-0 bg-[#191919] border-t border-gray-800 p-4 pb-6 z-20">
-          <div className="flex gap-3">
-            <button
-              onClick={() => handleAction("sell")}
-              disabled={currentHoldings === 0}
-              className="flex-1 h-14 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-800 disabled:text-gray-600 text-white rounded-2xl font-bold text-lg transition-colors"
-            >
-              판매하기
-            </button>
-            <button
-              onClick={() => handleAction("buy")}
-              disabled={cash < currentPrice}
-              className="flex-1 h-14 bg-red-500 hover:bg-red-600 disabled:bg-gray-800 disabled:text-gray-600 text-white rounded-2xl font-bold text-lg transition-colors"
-            >
-              구매하기
-            </button>
-          </div>
-        </div>
-      </div>
+      <DetailView
+        stockName={currentStock.name}
+        currentPrice={currentPrice}
+        prevPrice={prevPrice}
+        change={change}
+        isUp={isUp}
+        currentHoldings={currentHoldings}
+        myAvg={myAvg}
+        myReturn={myReturn}
+        isProfit={isProfit}
+        chartData={chartData}
+        chartPeriod={chartPeriod}
+        onChartPeriodChange={setChartPeriod}
+        cash={cash}
+        selectedStockId={selectedStockId}
+        favorites={favorites}
+        onToggleFavorite={toggleFavorite}
+        showDatePopup={showDatePopup}
+        turnDate={turnData?.date || ""}
+        currentDayNumber={currentDayNumber}
+        currentWeekNumber={currentWeekNumber}
+        currentDayName={currentDayName}
+        currentDayPhase={currentDayPhase}
+        isPlaying={isPlaying}
+        showWeeklyReport={showWeeklyReport}
+        weeklyReturn={weeklyReturn}
+        profitRate={profitRate}
+        weeklyHistory={weeklyHistory}
+        onCloseReport={handleCloseReport}
+        feedback={feedback}
+        pendingOrders={pendingOrders}
+        onCancelOrder={(order) => {
+          const idx = pendingOrders.findIndex((o) => o === order)
+          if (idx > -1) {
+            const next = [...pendingOrders]
+            next.splice(idx, 1)
+            setPendingOrders(next)
+          }
+        }}
+        onBack={() => setViewMode("list")}
+        onBuy={() => handleAction("buy")}
+        onSell={() => handleAction("sell")}
+        onShowHint={() => { setHintLevel(2); setShowHintModal(true) }}
+      />
     )
   }
 

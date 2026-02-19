@@ -13,6 +13,7 @@ const STORAGE_KEYS = {
   CHARACTER: "character_data",
   GAME_SETTINGS: "game_settings",
   GAME_SESSION_PREFIX: "game_session_",
+  TRADE_HISTORY_PREFIX: "trade_history_",
 } as const
 
 // 타입 정의
@@ -390,6 +391,25 @@ export const storage = {
     } catch (error) {
       console.error("게임 세션 전체 삭제 오류:", error)
     }
+  },
+
+  // ===== 거래 내역 관련 =====
+
+  getTradeHistory(scenarioId: string): import("@/app/practice/stock/[id]/types").TradeRecord[] {
+    const key = `${STORAGE_KEYS.TRADE_HISTORY_PREFIX}${scenarioId}`
+    return getStorageItem<import("@/app/practice/stock/[id]/types").TradeRecord[]>(key) || []
+  },
+
+  addTradeRecord(scenarioId: string, record: import("@/app/practice/stock/[id]/types").TradeRecord): void {
+    const key = `${STORAGE_KEYS.TRADE_HISTORY_PREFIX}${scenarioId}`
+    const history = this.getTradeHistory(scenarioId)
+    history.push(record)
+    setStorageItem(key, history)
+  },
+
+  clearTradeHistory(scenarioId: string): void {
+    const key = `${STORAGE_KEYS.TRADE_HISTORY_PREFIX}${scenarioId}`
+    removeStorageItem(key)
   },
 
   // ===== 전체 데이터 관리 =====

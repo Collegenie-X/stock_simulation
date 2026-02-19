@@ -1,145 +1,28 @@
 "use client"
 
-import { Heart, ChevronRight } from "lucide-react"
+import { ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LABELS } from "../config"
-import { MiniChart } from "./MiniChart"
+import { StockRow } from "./StockRow"
 import type { StockListSectionProps, StockListItem } from "../types"
 
-// 주식 미니 차트 데이터 생성 헬퍼
-function buildChartData(stock: StockListItem, currentTurn: number) {
-  const historyNeeded = 30
-  const sampleRate = 2
-  const rawData: { price: number; index: number }[] = []
-
-  if (currentTurn < historyNeeded) {
-    for (let i = historyNeeded - currentTurn; i > 0; i--) {
-      rawData.push({ price: stock.initialPrice, index: rawData.length })
-    }
-  }
-
-  const startIdx = Math.max(0, currentTurn - historyNeeded + 1)
-  for (let i = startIdx; i <= currentTurn; i++) {
-    const p = stock.turns?.[i]?.price || stock.initialPrice
-    rawData.push({ price: p, index: rawData.length })
-  }
-
-  return rawData.filter((_, idx) => idx % sampleRate === 0)
-}
-
-// ── 개별 주식 행 ──────────────────────────────────────────────
-interface StockRowProps {
-  stock: StockListItem
-  currentTurn: number
-  stockViewTab: "현재가" | "평가금"
-  isFavorite: boolean
-  onSelect: () => void
-  onToggleFavorite: () => void
-}
-
-const StockRow = ({
-  stock,
-  currentTurn,
-  stockViewTab,
-  isFavorite,
-  onSelect,
-  onToggleFavorite,
-}: StockRowProps) => {
-  const chartData = buildChartData(stock, currentTurn)
-  const profit = Math.round((stock.currentPrice - stock.myAvg) * stock.myHoldings)
-  const profitRateNum =
-    stock.myAvg > 0 ? ((profit / (stock.myAvg * stock.myHoldings)) * 100).toFixed(1) : "0.0"
-  const isProfit = profit >= 0
-
-  return (
-    <div className="flex items-center gap-3 py-2.5">
-      <button
-        onClick={onSelect}
-        className="flex-1 flex items-center gap-3 active:opacity-70 transition-opacity"
-      >
-        <div className="shrink-0">
-          <MiniChart
-            data={chartData}
-            color={stock.isUp ? "#ef4444" : "#3b82f6"}
-            isUp={stock.isUp}
-          />
-        </div>
-        <div className="flex-1 min-w-0 text-left">
-          <div className="font-bold text-white text-sm truncate">{stock.name}</div>
-          {stock.myHoldings > 0 ? (
-            stockViewTab === "현재가" ? (
-              <div className="text-xs text-gray-500">
-                내 평균 {Math.round(stock.myAvg).toLocaleString()}원
-              </div>
-            ) : (
-              <div className="text-xs text-gray-500">{stock.myHoldings}주</div>
-            )
-          ) : (
-            <div className="text-xs text-gray-500 truncate">{stock.news}</div>
-          )}
-        </div>
-
-        {/* 오른쪽 가격/수익 정보 */}
-        {stock.myHoldings > 0 && stockViewTab === "평가금" ? (
-          <div className="text-right shrink-0">
-            <div className="text-sm font-bold text-white">
-              {Math.round(stock.currentPrice * stock.myHoldings).toLocaleString()}원
-            </div>
-            <div className={cn("text-xs font-bold", isProfit ? "text-red-500" : "text-blue-500")}>
-              {isProfit ? "+" : ""}
-              {profit.toLocaleString()}원 ({isProfit ? "+" : ""}
-              {profitRateNum}%)
-            </div>
-          </div>
-        ) : (
-          <div className="text-right shrink-0">
-            <div className="text-sm font-bold text-white">
-              {Math.round(stock.currentPrice).toLocaleString()}원
-            </div>
-            <div className={cn("text-xs font-bold", stock.isUp ? "text-red-500" : "text-blue-500")}>
-              {stock.isUp ? "+" : ""}
-              {stock.change}%
-            </div>
-          </div>
-        )}
-      </button>
-
-      {/* 하트 버튼 */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation()
-          onToggleFavorite()
-        }}
-        className="shrink-0 p-1 active:scale-90 transition-transform"
-      >
-        <Heart
-          className={cn(
-            "w-5 h-5",
-            isFavorite ? "text-red-500 fill-red-500" : "text-gray-600"
-          )}
-        />
-      </button>
-    </div>
-  )
-}
-
-// ── 메인 스톡 리스트 섹션 ──────────────────────────────────────
 export const StockListSection = ({
   allStocksData,
   currentTurn,
   favorites,
   stockViewTab,
+  livePrices,
+  tickUps,
+  onChangeViewTab,
   onSelectStock,
   onToggleFavorite,
   onDecision,
 }: StockListSectionProps) => {
-  // 섹션 분리
+  // 섹션별 데이터 분리
   const myStocks = allStocksData.filter((s) => s.myHoldings > 0)
   const watchlistStocks = allStocksData.filter(
     (s) => favorites.includes(s.id) && s.myHoldings === 0
   )
-
-  // 전체 주식 카테고리별 그룹
   const stocksByCategory = allStocksData.reduce(
     (acc, stock) => {
       const category = (stock as any).category || "기타"
@@ -150,14 +33,55 @@ export const StockListSection = ({
     {} as Record<string, StockListItem[]>
   )
 
+  // 내 주식 헤더: 라이브 가격 기반 총수익 계산
+  const totalLiveProfit = myStocks.reduce((sum, s) => {
+    const lp = livePrices[s.id] ?? s.currentPrice
+    return sum + Math.round((lp - s.myAvg) * s.myHoldings)
+  }, 0)
+  const totalCost = myStocks.reduce(
+    (sum, s) => sum + Math.round(s.myAvg * s.myHoldings), 0
+  )
+  const totalProfitRate =
+    totalCost > 0 ? ((totalLiveProfit / totalCost) * 100).toFixed(1) : "0.0"
+  const isTotalProfit = totalLiveProfit >= 0
+
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      {/* 주식 리스트 스크롤 영역 */}
       <div className="flex-1 overflow-y-auto px-5 py-3 pb-24 space-y-4">
-        {/* 내 주식 섹션 */}
+
+        {/* ── 내 주식 ── */}
         {myStocks.length > 0 && (
           <div>
-            <h3 className="text-xs font-bold text-gray-400 mb-2">{LABELS.sections.myStocks}</h3>
+            {/* 헤더 행 1: 레이블 + 총수익 */}
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold text-gray-400">{LABELS.sections.myStocks}</h3>
+              <span className={cn(
+                "text-[11px] font-bold",
+                isTotalProfit ? "text-red-400" : "text-blue-400"
+              )}>
+                {isTotalProfit ? "+" : ""}{totalLiveProfit.toLocaleString()}원
+                {" "}({isTotalProfit ? "+" : ""}{totalProfitRate}%)
+              </span>
+            </div>
+            {/* 헤더 행 2: 현재가/평가금 탭 (오른쪽 정렬, 작게) */}
+            <div className="flex justify-end mt-1 mb-2">
+              <div className="flex bg-gray-800/50 rounded-lg p-0.5 gap-0.5">
+                {(["현재가", "평가금"] as const).map(tab => (
+                  <button
+                    key={tab}
+                    onClick={() => onChangeViewTab(tab)}
+                    className={cn(
+                      "px-2 py-0.5 rounded-md text-[10px] font-bold transition-all",
+                      stockViewTab === tab
+                        ? "bg-gray-600 text-white"
+                        : "text-gray-500 hover:text-gray-300"
+                    )}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="space-y-0">
               {myStocks.map((stock) => (
                 <StockRow
@@ -165,6 +89,9 @@ export const StockListSection = ({
                   stock={stock}
                   currentTurn={currentTurn}
                   stockViewTab={stockViewTab}
+                  showInvestmentInfo
+                  livePrice={livePrices[stock.id] ?? stock.currentPrice}
+                  tickUp={tickUps[stock.id] ?? true}
                   isFavorite={favorites.includes(stock.id)}
                   onSelect={() => onSelectStock(stock.id)}
                   onToggleFavorite={() => onToggleFavorite(stock.id)}
@@ -174,10 +101,12 @@ export const StockListSection = ({
           </div>
         )}
 
-        {/* 관심 주식 섹션 */}
+        {/* ── 관심 주식 ── */}
         {watchlistStocks.length > 0 && (
           <div>
-            <h3 className="text-xs font-bold text-gray-400 mb-2">{LABELS.sections.watchlist}</h3>
+            <h3 className="text-xs font-bold text-gray-400 mb-2">
+              {LABELS.sections.watchlist}
+            </h3>
             <div className="space-y-0">
               {watchlistStocks.map((stock) => (
                 <StockRow
@@ -185,7 +114,9 @@ export const StockListSection = ({
                   stock={stock}
                   currentTurn={currentTurn}
                   stockViewTab={stockViewTab}
-                  isFavorite={true}
+                  livePrice={livePrices[stock.id] ?? stock.currentPrice}
+                  tickUp={tickUps[stock.id] ?? true}
+                  isFavorite
                   onSelect={() => onSelectStock(stock.id)}
                   onToggleFavorite={() => onToggleFavorite(stock.id)}
                 />
@@ -194,12 +125,16 @@ export const StockListSection = ({
           </div>
         )}
 
-        {/* 전체 주식 섹션 - 카테고리별 */}
+        {/* ── 전체 주식 (카테고리별) ── */}
         <div>
-          <h3 className="text-xs font-bold text-gray-400 mb-2">{LABELS.sections.allStocks}</h3>
+          <h3 className="text-xs font-bold text-gray-400 mb-2">
+            {LABELS.sections.allStocks}
+          </h3>
           {Object.entries(stocksByCategory).map(([category, stocks]) => (
             <div key={category} className="mb-3">
-              <div className="text-[11px] font-bold text-gray-500 mb-1.5 ml-0.5">{category}</div>
+              <div className="text-[11px] font-bold text-gray-500 mb-1.5 ml-0.5">
+                {category}
+              </div>
               <div className="space-y-0">
                 {stocks.map((stock) => (
                   <StockRow
@@ -207,6 +142,8 @@ export const StockListSection = ({
                     stock={stock}
                     currentTurn={currentTurn}
                     stockViewTab={stockViewTab}
+                    livePrice={livePrices[stock.id] ?? stock.currentPrice}
+                    tickUp={tickUps[stock.id] ?? true}
                     isFavorite={favorites.includes(stock.id)}
                     onSelect={() => onSelectStock(stock.id)}
                     onToggleFavorite={() => onToggleFavorite(stock.id)}
@@ -218,7 +155,7 @@ export const StockListSection = ({
         </div>
       </div>
 
-      {/* 다음 시간 버튼 - 하단 고정 */}
+      {/* ── 다음 시간 버튼 (하단 고정) ── */}
       <div className="fixed bottom-0 left-0 right-0 px-5 py-3 bg-[#191919]/95 backdrop-blur-lg border-t border-gray-700/50 pb-safe-bottom z-10">
         <button
           onClick={() => onDecision("skip")}

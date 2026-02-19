@@ -66,7 +66,7 @@ export const LABELS = {
 
   // 주식 상세 정보
   stockDetail: {
-    myStockInfo: "내 주식 정보",
+    myStockInfo: "내 주식",
     evalProfit: "평가손익",
     profitRate: "수익률",
     evalAmount: "현재 평가금액",
@@ -74,6 +74,15 @@ export const LABELS = {
     currentPrice: "현재가",
     pendingOrders: "미체결 주문",
     cancelOrder: "취소",
+    // 내 주식 카드
+    avgCalcButton: "물타기 계산기",
+    avgPerShare: "1주 평균",
+    holdingQty: "보유 수량",
+    totalAmount: "총 금액",
+    feeTaxIncluded: "수수료·세금 포함",
+    tradingFee: "거래 수수료",
+    feeEstimate: "0원 예상",
+    sellTax: "팔 때 낼 세금",
   },
 
   // 일일 요약
@@ -97,14 +106,23 @@ export const LABELS = {
 
   // 수익 분석
   profitAnalysis: {
-    title: "양도소득세",
-    tabs: ["자산", "수익분석"],
-    periods: ["일", "주", "월", "년", "전체"],
+    title: "수익 분석",
+    periods: ["일", "주", "월"] as const,
     realizedProfit: "실현수익",
     sellProfit: "판매수익",
-    dividend: "배당금",
-    rentalFee: "대여료",
-    bondInterest: "채권 이자·만기수익",
+    totalTrades: "총 거래",
+    buyCount: "매수",
+    sellCount: "매도",
+    profitLabel: "수익",
+    lossLabel: "손실",
+    noTradeHistory: "거래 내역이 없습니다",
+    tradeRatioTitle: "종목별 거래 비율",
+    tradeHistoryTitle: "거래 내역",
+    dailyViewLabel: "일별",
+    weeklyViewLabel: "주별",
+    monthlyViewLabel: "월별",
+    prevPeriodLabel: "이전",
+    nextPeriodLabel: "다음",
   },
 
   // 주간 리포트

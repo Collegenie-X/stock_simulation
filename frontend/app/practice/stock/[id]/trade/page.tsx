@@ -232,6 +232,19 @@ export default function TradePage() {
           newAvgPrices
         })
         
+        const tradeRecordBuy = {
+          id: `${Date.now()}-buy-${selectedStockId}`,
+          stockId: selectedStockId,
+          stockName: stock.name,
+          action: "buy" as const,
+          price: currentPrice,
+          quantity,
+          totalAmount: quantity * currentPrice,
+          date: stock.turns[currentTurn]?.date || new Date().toISOString().split("T")[0],
+          turn: currentTurn,
+          day: session.currentDay || 1,
+        }
+        storage.addTradeRecord(scenarioId, tradeRecordBuy)
         newSession.feedback = { text: `${stock.name} ${quantity}주 구매 완료!`, type: "success" }
       } else {
         // 판매 로직
@@ -244,7 +257,11 @@ export default function TradePage() {
           return
         }
 
+        const avgBuyPrice = newAvgPrices[selectedStockId] || currentPrice
         const revenue = quantity * currentPrice
+        const tradeProfit = (currentPrice - avgBuyPrice) * quantity
+        const tradeProfitRate = avgBuyPrice > 0 ? ((currentPrice - avgBuyPrice) / avgBuyPrice) * 100 : 0
+
         newCash += revenue
         newHoldings[selectedStockId] = oldQty - quantity
 
@@ -263,7 +280,23 @@ export default function TradePage() {
           newHoldings, 
           newAvgPrices 
         })
-        
+
+        const tradeRecordSell = {
+          id: `${Date.now()}-sell-${selectedStockId}`,
+          stockId: selectedStockId,
+          stockName: stock.name,
+          action: "sell" as const,
+          price: currentPrice,
+          quantity,
+          totalAmount: revenue,
+          avgBuyPrice,
+          profit: Math.round(tradeProfit),
+          profitRate: Math.round(tradeProfitRate * 10) / 10,
+          date: stock.turns[currentTurn]?.date || new Date().toISOString().split("T")[0],
+          turn: currentTurn,
+          day: session.currentDay || 1,
+        }
+        storage.addTradeRecord(scenarioId, tradeRecordSell)
         newSession.feedback = { text: `${stock.name} ${quantity}주 판매 완료!`, type: "success" }
       }
     } else {

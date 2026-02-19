@@ -45,6 +45,24 @@ export interface PendingOrder {
   quantity: number
 }
 
+export interface TradeRecord {
+  id: string
+  stockId: string
+  stockName: string
+  action: "buy" | "sell"
+  price: number
+  quantity: number
+  totalAmount: number
+  avgBuyPrice?: number
+  profit?: number
+  profitRate?: number
+  date: string
+  turn: number
+  day: number
+}
+
+export type ProfitPeriod = "일" | "주" | "월"
+
 export interface CardFeedbackData {
   type: "buy" | "sell" | "skip" | "timeout"
   emoji: string
@@ -140,6 +158,10 @@ export interface StockListSectionProps {
   currentTurn: number
   favorites: string[]
   stockViewTab: StockViewTab
+  /** 라이브 가격 맵 (page 레벨에서 관리 → GameHeader와 공유) */
+  livePrices: Record<string, number>
+  tickUps: Record<string, boolean>
+  onChangeViewTab: (tab: StockViewTab) => void
   onSelectStock: (stockId: string) => void
   onToggleFavorite: (stockId: string) => void
   onDecision: (action: DecisionAction) => void
