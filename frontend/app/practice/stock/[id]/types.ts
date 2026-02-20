@@ -141,6 +141,12 @@ export interface GameHeaderProps {
   // 자산 정보
   totalValue: number
   profitRate: number
+  // AI 대결 정보
+  aiName: string
+  aiEmoji: string
+  aiProfitRate: number
+  aiTopStocks: string[]
+  nextReportDay: number
   // 타이머
   decisionTimer: number
   totalDecisions: number
@@ -161,6 +167,10 @@ export interface StockListSectionProps {
   /** 라이브 가격 맵 (page 레벨에서 관리 → GameHeader와 공유) */
   livePrices: Record<string, number>
   tickUps: Record<string, boolean>
+  /** AI 보유 종목 (stockId → 수량) */
+  aiHoldings: Record<string, number>
+  aiName: string
+  aiEmoji: string
   onChangeViewTab: (tab: StockViewTab) => void
   onSelectStock: (stockId: string) => void
   onToggleFavorite: (stockId: string) => void

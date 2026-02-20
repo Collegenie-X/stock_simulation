@@ -6,6 +6,7 @@ export const DECISIONS_PER_DAY = 3
 export const DECISION_TIMER_SECONDS = 30
 export const DAYS_PER_WEEK = 7
 export const TURNS_PER_DECISION = 1
+export const AI_REPORT_INTERVAL = 3
 
 export const DAY_PHASES = ["☀️ 오전", "🍚 점심", "🌙 저녁"] as const
 export const DAY_NAMES = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"] as const
@@ -90,7 +91,10 @@ export const LABELS = {
     dayEnd: "일차 종료",
     totalAsset: "총 자산",
     profitRate: "수익률",
+    tradeVolume: "거래량",
+    profitAmount: "수익금",
     movingToNext: "다음 날로 이동 중...",
+    analysisTitle: "📝 오늘의 분석",
   },
 
   // 로딩

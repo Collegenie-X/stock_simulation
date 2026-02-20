@@ -1,6 +1,6 @@
 "use client"
 
-import { Heart } from "lucide-react"
+import { Heart, Bot } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { MiniChart } from "./MiniChart"
 import { buildChartData } from "./utils/stockBreath"
@@ -13,8 +13,9 @@ export interface StockRowProps {
   isFavorite: boolean
   livePrice: number
   tickUp: boolean
-  /** true: 내 주식 섹션 — 평균가/주수 표시. false: 시장 정보(전일가) 표시 */
   showInvestmentInfo?: boolean
+  /** AI도 이 주식을 보유 중인지 */
+  isAIHolding?: boolean
   onSelect: () => void
   onToggleFavorite: () => void
 }
@@ -27,19 +28,17 @@ export const StockRow = ({
   livePrice,
   tickUp,
   showInvestmentInfo = false,
+  isAIHolding = false,
   onSelect,
   onToggleFavorite,
 }: StockRowProps) => {
   const chartData = buildChartData(stock, currentTurn)
 
-  // 전일 종가 대비 등락률 (livePrice 기준 → 라이브로 미세 변동)
-  // 전일가 대비이므로 방향(+/-)이 자주 바뀌지 않음
   const liveDailyChange =
     stock.prevPrice > 0 ? ((livePrice - stock.prevPrice) / stock.prevPrice) * 100 : 0
   const liveDailyChangePct = Math.abs(liveDailyChange).toFixed(1)
   const liveDailyIsUp = liveDailyChange >= 0
 
-  // 평가금 탭: 라이브 가격 기준 수익률
   const liveProfit = stock.myAvg > 0
     ? ((livePrice - stock.myAvg) / stock.myAvg) * 100
     : 0
@@ -53,17 +52,31 @@ export const StockRow = ({
         className="flex-1 flex items-center gap-3 active:opacity-70 transition-opacity"
       >
         {/* 미니차트 */}
-        <div className="shrink-0">
+        <div className="shrink-0 relative">
           <MiniChart
             data={chartData}
             color={stock.isUp ? "#ef4444" : "#3b82f6"}
             isUp={stock.isUp}
           />
+          {/* AI 보유 뱃지 */}
+          {isAIHolding && (
+            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-purple-500 flex items-center justify-center border border-[#191919]">
+              <Bot className="w-2 h-2 text-white" />
+            </div>
+          )}
         </div>
 
         {/* 이름 + 서브정보 */}
         <div className="flex-1 min-w-0 text-left">
-          <div className="font-bold text-white text-sm truncate">{stock.name}</div>
+          <div className="flex items-center gap-1">
+            <span className="font-bold text-white text-sm truncate">{stock.name}</span>
+            {isAIHolding && (
+              <span className="text-[8px] font-bold text-purple-400 bg-purple-500/15 px-1 py-px rounded shrink-0 flex items-center gap-0.5">
+                <Bot className="w-2 h-2" />
+                AI
+              </span>
+            )}
+          </div>
           {showInvestmentInfo && stock.myHoldings > 0 ? (
             stockViewTab === "현재가" ? (
               <div className="text-xs text-gray-500">

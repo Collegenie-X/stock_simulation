@@ -1,6 +1,7 @@
 "use client"
 
-import { ArrowLeft, Heart, Bell, MoreHorizontal, Search } from "lucide-react"
+import { useMemo } from "react"
+import { ArrowLeft, Heart, Bell, MoreHorizontal, Search, TrendingUp, TrendingDown, Newspaper } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LABELS, CHART_PERIOD_MAP } from "../config"
 import { StockChart } from "./StockChart"
@@ -73,6 +74,13 @@ export interface DetailViewProps {
   pendingOrders: PendingOrder[]
   onCancelOrder: (order: PendingOrder) => void
 
+  // 종목 뉴스/이벤트 (전일 기반 - 뉴스는 한발 늦게 도착)
+  stockNews?: string
+  stockCategory?: string
+  prevDayChange?: number
+  prevDayIsUp?: boolean
+  prevDayNews?: string
+
   // 네비게이션/액션
   onBack: () => void
   onBuy: () => void
@@ -113,6 +121,11 @@ export const DetailView = ({
   feedback,
   pendingOrders,
   onCancelOrder,
+  stockNews = "",
+  stockCategory = "",
+  prevDayChange,
+  prevDayIsUp,
+  prevDayNews = "",
   onBack,
   onBuy,
   onSell,
@@ -122,6 +135,19 @@ export const DetailView = ({
   const totalStockValue = currentHoldings > 0 ? Math.round(currentPrice * currentHoldings) : 0
   const estimatedTax = Math.round(totalStockValue * 0.002)
   const myPendingOrders = pendingOrders.filter((o) => o.stockId === selectedStockId)
+
+  const dailyEvents = useMemo(() => {
+    return generateDailyEvents({
+      currentIsUp: isUp,
+      currentChange: Number(change),
+      stockNews,
+      stockCategory,
+      stockName,
+      prevDayChange,
+      prevDayIsUp,
+      prevDayNews,
+    })
+  }, [isUp, change, stockNews, stockCategory, stockName, prevDayChange, prevDayIsUp, prevDayNews])
 
   return (
     <div className="min-h-screen bg-[#191919] text-white flex flex-col">
@@ -203,7 +229,7 @@ export const DetailView = ({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto pb-24">
         {/* 가격 정보 */}
         <div className="px-5 pt-2 pb-4">
           <div className="flex items-center gap-2 mb-1">
@@ -247,7 +273,7 @@ export const DetailView = ({
         </div>
 
         {/* 차트 기간 선택 */}
-        <div className="px-5 mb-8">
+        <div className="px-5 mb-4">
           <div className="flex justify-between bg-gray-800/30 rounded-lg p-1">
             {(LABELS.chartPeriods as readonly string[]).map((period) => {
               const mappedPeriod = CHART_PERIOD_MAP[period] as "1D" | "1W" | "1M" | "1Y"
@@ -267,6 +293,62 @@ export const DetailView = ({
             })}
           </div>
         </div>
+
+        {/* 오늘의 이벤트/뉴스 */}
+        {dailyEvents.length > 0 && (
+          <div className="px-5 mb-6">
+            <div className="bg-[#1e1e1e] rounded-2xl overflow-hidden border border-gray-800/40">
+              <div className="flex items-center gap-2 px-4 pt-4 pb-2">
+                <Newspaper className="w-4 h-4 text-yellow-500" />
+                <span className="text-xs font-bold text-gray-300">시장 뉴스</span>
+                <span className={cn(
+                  "text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-auto",
+                  isUp ? "bg-red-500/15 text-red-400" : "bg-blue-500/15 text-blue-400"
+                )}>
+                  {isUp ? "상승세" : "하락세"}
+                </span>
+              </div>
+              <div className="px-4 pb-4 space-y-0">
+                {dailyEvents.map((evt, idx) => (
+                  <div key={idx} className="flex items-start gap-2.5 py-2.5 border-b border-gray-800/30 last:border-0">
+                    <div className={cn(
+                      "w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5",
+                      evt.type === "positive" ? "bg-red-500/15" : evt.type === "negative" ? "bg-blue-500/15" : "bg-gray-700/50"
+                    )}>
+                      {evt.type === "positive"
+                        ? <TrendingUp className="w-3 h-3 text-red-400" />
+                        : evt.type === "negative"
+                        ? <TrendingDown className="w-3 h-3 text-blue-400" />
+                        : <span className="text-[10px]">{evt.emoji}</span>
+                      }
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-[12px] text-gray-200 leading-relaxed">{evt.headline}</p>
+                      </div>
+                      {evt.detail && (
+                        <p className="text-[10px] text-gray-500 mt-0.5">{evt.detail}</p>
+                      )}
+                      {evt.isDelayed && (
+                        <span className="inline-block mt-1 text-[9px] text-yellow-600 bg-yellow-500/10 px-1.5 py-0.5 rounded">
+                          어제 발표 · 주가 이미 반영
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[9px] text-gray-600 shrink-0 mt-1">{evt.time}</span>
+                  </div>
+                ))}
+              </div>
+              {prevDayChange !== undefined && (
+                <div className="px-4 pb-3 pt-1 border-t border-gray-800/30">
+                  <p className="text-[10px] text-gray-600 italic text-center">
+                    뉴스가 보도될 때쯤 주가는 이미 움직인 뒤입니다
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* 내 주식 정보 카드 */}
         {currentHoldings > 0 && (
@@ -401,4 +483,149 @@ export const DetailView = ({
       </div>
     </div>
   )
+}
+
+// ── 이벤트 생성 (JSON 데이터 기반) ───────────────────────
+import eventsData from "@/data/stock-market-events.json"
+
+interface DailyEvent {
+  type: "positive" | "negative" | "neutral"
+  emoji: string
+  headline: string
+  detail?: string
+  time: string
+  isDelayed?: boolean
+}
+
+const { categoryMapping, times: TIMES, positive: POSITIVE_POOL, negative: NEGATIVE_POOL, volumeAlert } = eventsData
+
+function resolveCategory(category: string): string {
+  for (const [key, keywords] of Object.entries(categoryMapping)) {
+    if (keywords.some((kw) => category.includes(kw))) return key
+  }
+  return "기본"
+}
+
+interface EventParams {
+  currentIsUp: boolean
+  currentChange: number
+  stockNews: string
+  stockCategory: string
+  stockName: string
+  prevDayChange?: number
+  prevDayIsUp?: boolean
+  prevDayNews?: string
+}
+
+function generateDailyEvents(params: EventParams): DailyEvent[] {
+  const {
+    currentIsUp, currentChange, stockNews, stockCategory, stockName,
+    prevDayChange, prevDayIsUp, prevDayNews,
+  } = params
+
+  const cat = resolveCategory(stockCategory)
+  const absChange = Math.abs(currentChange)
+  const events: DailyEvent[] = []
+
+  const hasPrevData = prevDayChange !== undefined && prevDayIsUp !== undefined
+  const prevWasUp = prevDayIsUp ?? currentIsUp
+  const prevAbsChange = Math.abs(prevDayChange ?? currentChange)
+
+  // 1) 전일 기반 뉴스 (한발 늦은 뉴스) — 전일 움직임에 대한 보도
+  if (hasPrevData) {
+    const pool = prevWasUp
+      ? (POSITIVE_POOL as Record<string, { headlines: string[]; details: string[] }>)
+      : (NEGATIVE_POOL as Record<string, { headlines: string[]; details: string[] }>)
+    const data = pool[cat] || pool["기본"]
+    const seed = stockName.length + Math.round((prevDayChange ?? 0) * 100)
+    const idx = Math.abs(seed) % data.headlines.length
+
+    events.push({
+      type: prevWasUp ? "positive" : "negative",
+      emoji: prevWasUp ? "📈" : "📉",
+      headline: data.headlines[idx],
+      detail: data.details[idx],
+      time: TIMES[0],
+      isDelayed: true,
+    })
+
+    // 전일 뉴스 데이터가 있으면 포함
+    if (prevDayNews) {
+      events.push({
+        type: "neutral",
+        emoji: "📋",
+        headline: prevDayNews,
+        time: TIMES[1],
+        isDelayed: true,
+      })
+    }
+
+    // 오늘 방향이 전일과 반대면 "반전 경고" 추가
+    if (prevWasUp !== currentIsUp) {
+      events.push({
+        type: currentIsUp ? "positive" : "negative",
+        emoji: "🔄",
+        headline: currentIsUp
+          ? `${stockName}, 어제 하락 분위기에서 반등 성공`
+          : `${stockName}, 호재 뉴스에도 불구하고 차익실현 매물 출회`,
+        detail: currentIsUp
+          ? "과매도 구간 진입 후 기술적 반등 관측"
+          : "소식 발표 후 이미 오른 주가에 매도세 집중",
+        time: TIMES[2],
+      })
+    }
+
+    // 전일 변동폭이 컸으면 거래량 뉴스
+    if (prevAbsChange > 3) {
+      events.push({
+        type: "neutral",
+        emoji: "🔔",
+        headline: volumeAlert.headline
+          .replace("{stockName}", stockName)
+          .replace("{volume}", String(Math.round(prevAbsChange * 30))),
+        detail: prevAbsChange > 5 ? volumeAlert.detailHigh : volumeAlert.detailNormal,
+        time: TIMES[3],
+        isDelayed: true,
+      })
+    }
+  } else {
+    // 첫날: 전일 데이터 없으면 현재 기준으로 표시
+    const pool = currentIsUp
+      ? (POSITIVE_POOL as Record<string, { headlines: string[]; details: string[] }>)
+      : (NEGATIVE_POOL as Record<string, { headlines: string[]; details: string[] }>)
+    const data = pool[cat] || pool["기본"]
+    const seed = stockName.length + Math.round(currentChange * 100)
+    const idx = Math.abs(seed) % data.headlines.length
+
+    events.push({
+      type: currentIsUp ? "positive" : "negative",
+      emoji: currentIsUp ? "📈" : "📉",
+      headline: data.headlines[idx],
+      detail: data.details[idx],
+      time: TIMES[0],
+    })
+
+    if (stockNews) {
+      events.push({
+        type: "neutral",
+        emoji: "📋",
+        headline: stockNews,
+        time: TIMES[1],
+      })
+    }
+
+    if (absChange > 3) {
+      events.push({
+        type: "neutral",
+        emoji: "🔔",
+        headline: volumeAlert.headline
+          .replace("{stockName}", stockName)
+          .replace("{volume}", String(Math.round(absChange * 30))),
+        detail: absChange > 5 ? volumeAlert.detailHigh : volumeAlert.detailNormal,
+        time: TIMES[3],
+      })
+    }
+  }
+
+  return events
 }

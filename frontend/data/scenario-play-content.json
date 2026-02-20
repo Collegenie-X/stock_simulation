@@ -1,0 +1,79 @@
+{
+  "game": {
+    "initialCash": 1000000,
+    "turnsPerScenario": 4,
+    "stockName": "테마주",
+    "initialPrice": 50000,
+    "chartPointsPerTurn": 18
+  },
+  "ui": {
+    "phaseLabels": ["1막: 도입", "2막: 전개", "3막: 위기", "4막: 결말"],
+    "phaseEmoji": ["🌅", "🔥", "⚡", "🏁"],
+    "actionLabels": {
+      "buy": "매수",
+      "sell": "매도",
+      "hold": "넘기기"
+    },
+    "portfolioLabels": {
+      "totalAsset": "총 자산",
+      "profitRate": "수익률",
+      "cash": "현금",
+      "holdings": "보유",
+      "avgPrice": "평단가"
+    },
+    "resultLabels": {
+      "title": "시나리오 결과",
+      "totalAsset": "최종 자산",
+      "grade": "등급",
+      "aiBeat": "AI 이긴 수",
+      "totalTrades": "총 거래",
+      "holdCount": "관망",
+      "replay": "다시 플레이",
+      "backToDetail": "시나리오 상세"
+    }
+  },
+  "feedback": {
+    "correct": {
+      "titles": ["완벽한 판단!", "훌륭합니다!", "프로 투자자!", "정확한 타이밍!"],
+      "messages": [
+        "시장의 흐름을 정확히 읽었습니다.",
+        "위기 대처 능력이 뛰어납니다!",
+        "냉정한 판단이 수익을 만듭니다.",
+        "다른 투자자들이 놓친 기회를 잡았어요."
+      ],
+      "emoji": "✨"
+    },
+    "good": {
+      "titles": ["괜찮은 선택!", "나쁘지 않아요!", "안전한 판단!"],
+      "messages": [
+        "리스크를 관리하는 좋은 자세입니다.",
+        "신중한 접근이 장기적으로 유리합니다.",
+        "무리하지 않는 것도 실력입니다."
+      ],
+      "emoji": "👍"
+    },
+    "bad": {
+      "titles": ["아쉬운 선택...", "주의가 필요해요!", "위험한 판단!"],
+      "messages": [
+        "감정에 휘둘리지 않도록 주의하세요.",
+        "차트의 신호를 다시 살펴보세요.",
+        "다음번에는 더 신중하게 결정해보세요.",
+        "FOMO에 빠지지 않았는지 점검하세요."
+      ],
+      "emoji": "😰"
+    }
+  },
+  "grades": {
+    "S": { "label": "S", "title": "전설적 투자자", "color": "text-yellow-400", "bgColor": "from-yellow-500/20 to-amber-500/20", "minRate": 5, "emoji": "🏆" },
+    "A": { "label": "A", "title": "숙련된 투자자", "color": "text-green-400", "bgColor": "from-green-500/20 to-emerald-500/20", "minRate": 0, "emoji": "⭐" },
+    "B": { "label": "B", "title": "견습 투자자", "color": "text-blue-400", "bgColor": "from-blue-500/20 to-cyan-500/20", "minRate": -5, "emoji": "📘" },
+    "C": { "label": "C", "title": "초보 투자자", "color": "text-orange-400", "bgColor": "from-orange-500/20 to-red-500/20", "minRate": -10, "emoji": "📙" },
+    "D": { "label": "D", "title": "학습이 필요해요", "color": "text-red-400", "bgColor": "from-red-500/20 to-pink-500/20", "minRate": -999, "emoji": "📕" }
+  },
+  "sentiment": {
+    "positive": { "color": "text-red-400", "bg": "bg-red-500/10", "border": "border-red-500/20", "label": "호재", "icon": "🔥" },
+    "negative": { "color": "text-blue-400", "bg": "bg-blue-500/10", "border": "border-blue-500/20", "label": "악재", "icon": "💧" },
+    "neutral":  { "color": "text-gray-400", "bg": "bg-gray-500/10", "border": "border-gray-500/20", "label": "중립", "icon": "⚡" },
+    "shock":    { "color": "text-purple-400", "bg": "bg-purple-500/10", "border": "border-purple-500/20", "label": "충격", "icon": "💥" }
+  }
+}

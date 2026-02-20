@@ -1,10 +1,13 @@
 "use client"
 
-import { ChevronRight } from "lucide-react"
+import { useState } from "react"
+import { ChevronRight, ChevronDown, ChevronUp, Bot } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LABELS } from "../config"
 import { StockRow } from "./StockRow"
 import type { StockListSectionProps, StockListItem } from "../types"
+
+const AI_DEFAULT_VISIBLE = 2
 
 export const StockListSection = ({
   allStocksData,
@@ -13,6 +16,9 @@ export const StockListSection = ({
   stockViewTab,
   livePrices,
   tickUps,
+  aiHoldings,
+  aiName,
+  aiEmoji,
   onChangeViewTab,
   onSelectStock,
   onToggleFavorite,
@@ -31,6 +37,11 @@ export const StockListSection = ({
       return acc
     },
     {} as Record<string, StockListItem[]>
+  )
+
+  // AI가 보유한 주식 (사용자가 보유하지 않은 것만 별도 표시)
+  const aiOnlyStocks = allStocksData.filter(
+    (s) => (aiHoldings[s.id] || 0) > 0 && s.myHoldings === 0
   )
 
   // 내 주식 헤더: 라이브 가격 기반 총수익 계산
@@ -93,12 +104,29 @@ export const StockListSection = ({
                   livePrice={livePrices[stock.id] ?? stock.currentPrice}
                   tickUp={tickUps[stock.id] ?? true}
                   isFavorite={favorites.includes(stock.id)}
+                  isAIHolding={(aiHoldings[stock.id] || 0) > 0}
                   onSelect={() => onSelectStock(stock.id)}
                   onToggleFavorite={() => onToggleFavorite(stock.id)}
                 />
               ))}
             </div>
           </div>
+        )}
+
+        {/* ── AI 포트폴리오 (접기/펼치기) ── */}
+        {aiOnlyStocks.length > 0 && (
+          <AIHoldingsSection
+            stocks={aiOnlyStocks}
+            aiName={aiName}
+            currentTurn={currentTurn}
+            stockViewTab={stockViewTab}
+            livePrices={livePrices}
+            tickUps={tickUps}
+            favorites={favorites}
+            aiHoldings={aiHoldings}
+            onSelectStock={onSelectStock}
+            onToggleFavorite={onToggleFavorite}
+          />
         )}
 
         {/* ── 관심 주식 ── */}
@@ -117,6 +145,7 @@ export const StockListSection = ({
                   livePrice={livePrices[stock.id] ?? stock.currentPrice}
                   tickUp={tickUps[stock.id] ?? true}
                   isFavorite
+                  isAIHolding={(aiHoldings[stock.id] || 0) > 0}
                   onSelect={() => onSelectStock(stock.id)}
                   onToggleFavorite={() => onToggleFavorite(stock.id)}
                 />
@@ -145,6 +174,7 @@ export const StockListSection = ({
                     livePrice={livePrices[stock.id] ?? stock.currentPrice}
                     tickUp={tickUps[stock.id] ?? true}
                     isFavorite={favorites.includes(stock.id)}
+                    isAIHolding={(aiHoldings[stock.id] || 0) > 0}
                     onSelect={() => onSelectStock(stock.id)}
                     onToggleFavorite={() => onToggleFavorite(stock.id)}
                   />
@@ -167,6 +197,82 @@ export const StockListSection = ({
           </span>
         </button>
       </div>
+    </div>
+  )
+}
+
+// ── AI 보유 종목 접기/펼치기 서브 컴포넌트 ──────────────────
+function AIHoldingsSection({
+  stocks,
+  aiName,
+  currentTurn,
+  stockViewTab,
+  livePrices,
+  tickUps,
+  favorites,
+  aiHoldings,
+  onSelectStock,
+  onToggleFavorite,
+}: {
+  stocks: StockListItem[]
+  aiName: string
+  currentTurn: number
+  stockViewTab: "현재가" | "평가금"
+  livePrices: Record<string, number>
+  tickUps: Record<string, boolean>
+  favorites: string[]
+  aiHoldings: Record<string, number>
+  onSelectStock: (id: string) => void
+  onToggleFavorite: (id: string) => void
+}) {
+  const [expanded, setExpanded] = useState(false)
+  const visibleStocks = expanded ? stocks : stocks.slice(0, AI_DEFAULT_VISIBLE)
+  const hasMore = stocks.length > AI_DEFAULT_VISIBLE
+
+  return (
+    <div>
+      {/* 헤더 */}
+      <div className="flex items-center gap-1.5 mb-2">
+        <div className="w-4 h-4 rounded-full bg-purple-500/20 flex items-center justify-center">
+          <Bot className="w-2.5 h-2.5 text-purple-400" />
+        </div>
+        <h3 className="text-xs font-bold text-purple-400">🤖 {aiName} 보유 종목</h3>
+        <span className="text-[10px] text-gray-500 font-bold ml-auto">
+          {stocks.length}종목
+        </span>
+      </div>
+
+      {/* 종목 리스트 */}
+      <div className="space-y-0">
+        {visibleStocks.map((stock) => (
+          <StockRow
+            key={stock.id}
+            stock={stock}
+            currentTurn={currentTurn}
+            stockViewTab={stockViewTab}
+            livePrice={livePrices[stock.id] ?? stock.currentPrice}
+            tickUp={tickUps[stock.id] ?? true}
+            isFavorite={favorites.includes(stock.id)}
+            isAIHolding
+            onSelect={() => onSelectStock(stock.id)}
+            onToggleFavorite={() => onToggleFavorite(stock.id)}
+          />
+        ))}
+      </div>
+
+      {/* 더보기 / 접기 버튼 */}
+      {hasMore && (
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="w-full flex items-center justify-center gap-1 py-2 text-[11px] font-bold text-purple-400/70 hover:text-purple-400 transition-colors"
+        >
+          {expanded ? (
+            <>접기 <ChevronUp className="w-3.5 h-3.5" /></>
+          ) : (
+            <>+{stocks.length - AI_DEFAULT_VISIBLE}종목 더보기 <ChevronDown className="w-3.5 h-3.5" /></>
+          )}
+        </button>
+      )}
     </div>
   )
 }

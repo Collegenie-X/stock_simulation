@@ -26,8 +26,9 @@ import {
   DetailView,
 } from "./components"
 import { useLivePrices } from "./components/hooks/useLivePrices"
+import { useAICompetitor } from "./components/hooks/useAICompetitor"
 import { generateHistory, generateAIStocks, generateRobotAutoStocks, CHARACTER_REACTIONS } from "./utils/stockDataUtils"
-import { EXCHANGE_RATE, DECISIONS_PER_DAY, DECISION_TIMER_SECONDS, DAYS_PER_WEEK, TURNS_PER_DECISION, DAY_PHASES, DAY_NAMES, LABELS, SPEED_MODE_TURNS } from "./config"
+import { EXCHANGE_RATE, DECISIONS_PER_DAY, DECISION_TIMER_SECONDS, DAYS_PER_WEEK, TURNS_PER_DECISION, DAY_PHASES, DAY_NAMES, LABELS, SPEED_MODE_TURNS, AI_REPORT_INTERVAL } from "./config"
 
 export default function GamePlayPage() {
   const params = useParams()
@@ -106,6 +107,7 @@ export default function GamePlayPage() {
     priceChange?: string
   } | null>(null)
   const [showDaySummary, setShowDaySummary] = useState(false)
+  const [pendingNextDay, setPendingNextDay] = useState<number | null>(null)
   const [totalDecisions, setTotalDecisions] = useState(0)
   const [showQuickTrade, setShowQuickTrade] = useState<"buy" | "sell" | null>(null)
   const [tradeQuantity, setTradeQuantity] = useState(1)
@@ -596,12 +598,13 @@ export default function GamePlayPage() {
         return
       }
 
-      // 하루 요약 표시 (2초간)
-      setShowDaySummary(true)
-      setTimeout(() => {
-        setShowDaySummary(false)
+      // 3일 간격으로 AI 대결 분석 리포트 표시 (수동 닫기)
+      if (currentDay % AI_REPORT_INTERVAL === 0) {
+        setShowDaySummary(true)
+        setPendingNextDay(nextDay)
+      } else {
+        // 리포트 없는 날: 바로 다음 날로 진행
         setCurrentDay(nextDay)
-        // 새 날 투자 기회 생성
         if (scenario && scenario.stocks.length > 0) {
           const stockIds = scenario.stocks.map(s => s.id)
           const shuffled = [...stockIds].sort(() => Math.random() - 0.5)
@@ -616,7 +619,7 @@ export default function GamePlayPage() {
           setIsWaitingForDecision(true)
           setSelectedStockId(daily[0])
         }
-      }, 2000)
+      }
     }
   }, [currentPhaseInDay, currentDay, dailyStockIds, scenario, currentTurn])
 
@@ -860,6 +863,19 @@ export default function GamePlayPage() {
   const change = currentPrice && prevPrice ? (((currentPrice - prevPrice) / prevPrice) * 100).toFixed(1) : "0.0"
   const isUp = Number.parseFloat(change) >= 0
 
+  const prevDayData = useMemo(() => {
+    if (!currentStock || currentTurn < 2) return undefined
+    const prev1 = currentStock.turns[currentTurn - 1]?.price || 0
+    const prev2 = currentStock.turns[currentTurn - 2]?.price || currentStock.initialPrice
+    if (!prev1 || !prev2) return undefined
+    const prevChange = ((prev1 - prev2) / prev2) * 100
+    return {
+      change: Number(prevChange.toFixed(1)),
+      isUp: prevChange >= 0,
+      news: (currentStock.turns[currentTurn - 1] as any)?.news || "",
+    }
+  }, [currentStock, currentTurn])
+
   const totalStockValue =
     scenario?.stocks.reduce((acc, stock) => {
       const stockPrice = stock.turns[currentTurn]?.price || 0
@@ -898,6 +914,17 @@ export default function GamePlayPage() {
   // 라이브 가격 (StockListSection + GameHeader 공유)
   const { livePrices, tickUps } = useLivePrices(allStocksData as any)
 
+  // AI 대결 시스템
+  const { aiCompetitor, simulateDayTrades, calcTotalValue: calcAITotalValue, matchedStyle } = useAICompetitor(initialValue)
+
+  // 하루 요약 표시 시 AI 시뮬레이션 자동 실행
+  useEffect(() => {
+    if (showDaySummary && scenario) {
+      simulateDayTrades(scenario.stocks as any, currentTurn, holdings, cash)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showDaySummary])
+
   // 라이브 가격 기반 총자산 (GameHeader 표시용)
   const liveTotalStockValue = allStocksData.reduce((acc, stock) => {
     const lp = livePrices[stock.id] ?? stock.currentPrice
@@ -914,9 +941,30 @@ export default function GamePlayPage() {
     setLastWeekValue(currentWeekValue)
     setShowWeeklyReport(false)
     setIsPlaying(true)
-    // 주간 리포트 후 새로운 날 시작
     generateDailyStocks()
   }
+
+  // 하루 요약 수동 닫기 → 다음 날 시작
+  const handleDaySummaryContinue = useCallback(() => {
+    setShowDaySummary(false)
+    const nextDay = pendingNextDay ?? currentDay + 1
+    setPendingNextDay(null)
+    setCurrentDay(nextDay)
+    if (scenario && scenario.stocks.length > 0) {
+      const stockIds = scenario.stocks.map(s => s.id)
+      const shuffled = [...stockIds].sort(() => Math.random() - 0.5)
+      const daily = shuffled.slice(0, Math.min(DECISIONS_PER_DAY, shuffled.length))
+      while (daily.length < DECISIONS_PER_DAY) {
+        daily.push(stockIds[Math.floor(Math.random() * stockIds.length)])
+      }
+      setDailyStockIds(daily)
+      setCurrentPhaseInDay(0)
+      setDecisionTimer(DECISION_TIMER_SECONDS)
+      setIsTimerPaused(false)
+      setIsWaitingForDecision(true)
+      setSelectedStockId(daily[0])
+    }
+  }, [pendingNextDay, currentDay, scenario])
 
   // 자유 거래 핸들러 (매수/매도/건너뛰기)
   const handleDecision = useCallback((action: "buy" | "sell" | "skip", qty: number = 1, targetStockId?: string) => {
@@ -1079,7 +1127,21 @@ export default function GamePlayPage() {
           currentDay={currentDay}
           currentDayName={currentDayName}
           totalValue={totalValue}
+          initialValue={initialValue}
           profitRate={profitRate}
+          totalDecisions={totalDecisions}
+          holdingsCount={Object.keys(holdings).filter(k => holdings[k] > 0).length}
+          aiName={aiCompetitor.name}
+          aiEmoji={aiCompetitor.emoji}
+          aiStyle={aiCompetitor.style}
+          aiDescription={aiCompetitor.description}
+          aiMotto={aiCompetitor.motto}
+          aiTotalValue={scenario ? calcAITotalValue(scenario.stocks as any, currentTurn) : initialValue}
+          aiProfitRate={scenario ? Number(((calcAITotalValue(scenario.stocks as any, currentTurn) - initialValue) / initialValue * 100).toFixed(1)) : 0}
+          aiTodayActions={aiCompetitor.todayActions}
+          aiHoldingsCount={Object.keys(aiCompetitor.holdings).filter(k => aiCompetitor.holdings[k] > 0).length}
+          aiTotalTrades={aiCompetitor.totalTrades}
+          onContinue={handleDaySummaryContinue}
         />
 
         {/* 주간 리포트 모달 */}
@@ -1101,6 +1163,17 @@ export default function GamePlayPage() {
           currentWeekNumber={currentWeekNumber}
           totalValue={liveTotalValue}
           profitRate={liveProfitRate}
+          aiName={aiCompetitor.name}
+          aiEmoji={aiCompetitor.emoji}
+          aiProfitRate={scenario ? Number(((calcAITotalValue(scenario.stocks as any, currentTurn) - initialValue) / initialValue * 100).toFixed(1)) : 0}
+          aiTopStocks={
+            scenario
+              ? Object.keys(aiCompetitor.holdings)
+                  .filter(k => aiCompetitor.holdings[k] > 0)
+                  .map(sid => scenario.stocks.find(s => s.id === sid)?.name || sid)
+              : []
+          }
+          nextReportDay={Math.ceil(currentDay / AI_REPORT_INTERVAL) * AI_REPORT_INTERVAL}
           decisionTimer={decisionTimer}
           totalDecisions={totalDecisions}
           remainingDecisions={Math.max(0, totalDays * DECISIONS_PER_DAY - totalDecisions)}
@@ -1127,6 +1200,9 @@ export default function GamePlayPage() {
             stockViewTab={stockViewTab}
             livePrices={livePrices}
             tickUps={tickUps}
+            aiHoldings={aiCompetitor.holdings}
+            aiName={aiCompetitor.name}
+            aiEmoji={aiCompetitor.emoji}
             onChangeViewTab={setStockViewTab}
             onSelectStock={(id) => { setSelectedStockId(id); setViewMode("detail") }}
             onToggleFavorite={toggleFavorite}
@@ -1142,6 +1218,24 @@ export default function GamePlayPage() {
             currentPrices={livePrices}
             holdings={holdings}
             averagePrices={averagePrices}
+            aiName={aiCompetitor.name}
+            aiEmoji={aiCompetitor.emoji}
+            aiStyle={aiCompetitor.style}
+            aiMotto={aiCompetitor.motto}
+            aiTotalValue={scenario ? calcAITotalValue(scenario.stocks as any, currentTurn) : initialValue}
+            aiProfitRate={scenario ? Number(((calcAITotalValue(scenario.stocks as any, currentTurn) - initialValue) / initialValue * 100).toFixed(1)) : 0}
+            aiHoldings={aiCompetitor.holdings}
+            aiAvgPrices={aiCompetitor.avgPrices}
+            aiTodayActions={aiCompetitor.todayActions}
+            aiTotalTrades={aiCompetitor.totalTrades}
+            userTotalValue={liveTotalValue}
+            userProfitRate={liveProfitRate}
+            initialValue={initialValue}
+            allStockNames={
+              scenario
+                ? Object.fromEntries(scenario.stocks.map(s => [s.id, s.name]))
+                : {}
+            }
             onClose={() => setShowProfitAnalysis(false)}
           />
         )}
@@ -1199,6 +1293,11 @@ export default function GamePlayPage() {
         onCloseReport={handleCloseReport}
         feedback={feedback}
         pendingOrders={pendingOrders}
+        stockNews={(turnData as any)?.news || ""}
+        stockCategory={(currentStock as any)?.category || ""}
+        prevDayChange={prevDayData?.change}
+        prevDayIsUp={prevDayData?.isUp}
+        prevDayNews={prevDayData?.news}
         onCancelOrder={(order) => {
           const idx = pendingOrders.findIndex((o) => o === order)
           if (idx > -1) {

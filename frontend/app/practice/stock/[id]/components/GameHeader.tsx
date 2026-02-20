@@ -1,6 +1,6 @@
 "use client"
 
-import { Pause, Play, ChevronRight } from "lucide-react"
+import { Pause, Play, ChevronRight, Bot, Swords } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LABELS, DAY_PHASES, DECISIONS_PER_DAY } from "../config"
 import type { GameHeaderProps } from "../types"
@@ -13,6 +13,11 @@ export const GameHeader = ({
   currentWeekNumber,
   totalValue,
   profitRate,
+  aiName,
+  aiEmoji,
+  aiProfitRate,
+  aiTopStocks,
+  nextReportDay,
   decisionTimer,
   totalDecisions,
   remainingDecisions,
@@ -22,10 +27,12 @@ export const GameHeader = ({
   onExitClick,
   onProfitClick,
 }: GameHeaderProps) => {
-  const timerProgress = decisionTimer / 30 // DECISION_TIMER_SECONDS
+  const timerProgress = decisionTimer / 30
 
-  // 현재 페이즈 인덱스 계산 (totalDecisions 기반)
   const currentPhaseInDay = (totalDecisions - 1) % DECISIONS_PER_DAY
+
+  const userWinning = profitRate >= aiProfitRate
+  const daysUntilReport = nextReportDay - currentDay
 
   return (
     <>
@@ -121,8 +128,9 @@ export const GameHeader = ({
         </div>
       )}
 
-      {/* 축약 헤더 - 총 자산 + 종료 버튼 */}
+      {/* 축약 헤더 - 총 자산 + AI 대결 + 종료 */}
       <div className="px-4 py-2.5 bg-[#191919]/95 border-b border-gray-800/50">
+        {/* 1행: 총 자산 + 종료 */}
         <div className="flex items-center justify-between">
           <button
             onClick={onProfitClick}
@@ -155,7 +163,86 @@ export const GameHeader = ({
           </button>
         </div>
 
-        {/* 전체 진행도 바 */}
+        {/* 2행: AI vs 나 대결 배너 — 원금 대비 수익률만 비교 */}
+        <div className="mt-2 bg-gray-800/60 rounded-xl border border-gray-700/40 overflow-hidden">
+          {/* 수익률 비교 바 */}
+          <div className="flex items-center px-3 py-2">
+            {/* 나 */}
+            <div className="flex items-center gap-1.5 flex-1 min-w-0">
+              <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 border border-blue-500/30">
+                <span className="text-xs">👤</span>
+              </div>
+              <div className="min-w-0">
+                <div className="text-[9px] text-gray-500 font-bold leading-none mb-0.5">나</div>
+                <div className={cn(
+                  "text-sm font-extrabold tabular-nums leading-none",
+                  profitRate >= 0 ? "text-red-400" : "text-blue-400"
+                )}>
+                  {profitRate >= 0 ? "+" : ""}{profitRate}%
+                </div>
+              </div>
+            </div>
+
+            {/* VS 아이콘 + 승패 */}
+            <div className="shrink-0 flex flex-col items-center mx-2">
+              <Swords className="w-3.5 h-3.5 text-yellow-500/70" />
+              <span className={cn(
+                "text-[8px] font-black mt-0.5",
+                userWinning ? "text-blue-400" : "text-purple-400"
+              )}>
+                {userWinning ? "승" : "패"}
+              </span>
+            </div>
+
+            {/* AI */}
+            <div className="flex items-center gap-1.5 flex-1 min-w-0 justify-end">
+              <div className="min-w-0 text-right">
+                <div className="text-[9px] text-gray-500 font-bold leading-none mb-0.5">
+                  🤖 {aiName}
+                </div>
+                <div className={cn(
+                  "text-sm font-extrabold tabular-nums leading-none",
+                  aiProfitRate >= 0 ? "text-red-400" : "text-blue-400"
+                )}>
+                  {aiProfitRate >= 0 ? "+" : ""}{aiProfitRate.toFixed(1)}%
+                </div>
+              </div>
+              <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0 border border-purple-500/30">
+                <Bot className="w-3.5 h-3.5 text-purple-400" />
+              </div>
+            </div>
+          </div>
+
+          {/* AI 보유 종목 미리보기 */}
+          {aiTopStocks.length > 0 && (
+            <div className="px-3 py-1.5 bg-gray-900/50 border-t border-gray-700/30 flex items-center gap-1.5">
+              <Bot className="w-3 h-3 text-purple-400/60 shrink-0" />
+              <span className="text-[9px] text-gray-500 shrink-0">AI 보유:</span>
+              <div className="flex items-center gap-1 flex-1 min-w-0 overflow-hidden">
+                {aiTopStocks.slice(0, 3).map((name, idx) => (
+                  <span
+                    key={idx}
+                    className="text-[9px] font-bold text-purple-300/80 bg-purple-500/10 px-1.5 py-0.5 rounded truncate shrink-0"
+                  >
+                    {name}
+                  </span>
+                ))}
+                {aiTopStocks.length > 3 && (
+                  <span className="text-[9px] text-gray-500 shrink-0">
+                    +{aiTopStocks.length - 3}
+                  </span>
+                )}
+              </div>
+              {daysUntilReport > 0 && (
+                <span className="text-[8px] text-gray-600 font-bold shrink-0 tabular-nums">
+                  분석 {daysUntilReport}일 후
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* 3행: 전체 진행도 바 */}
         <div className="mt-2">
           <div className="w-full bg-gray-700 rounded-full h-1">
             <div

@@ -31,6 +31,14 @@ export default function AnalysisIntroPage() {
     },
   ]
 
+  const abilityChecks = [
+    { icon: "🎲", label: "리스크 감수도", description: "위험을 감당하는 성향" },
+    { icon: "📊", label: "분석력", description: "데이터 기반 판단 능력" },
+    { icon: "🧘", label: "감정 통제", description: "패닉/탐욕 통제 능력" },
+    { icon: "⚡", label: "대처 능력", description: "돌발 상황 대응력" },
+    { icon: "🔍", label: "정보 판별", description: "뉴스/루머 판별 능력" },
+  ]
+
   const investorTypes = [
     { level: 1, type: "안정 추구형", icon: "🛡️", color: "from-blue-500/20 to-blue-600/20 border-blue-500/30" },
     { level: 2, type: "신중한 투자자", icon: "🎯", color: "from-green-500/20 to-green-600/20 border-green-500/30" },
@@ -64,7 +72,7 @@ export default function AnalysisIntroPage() {
             <br />
             성공적인 투자를 시작하세요
           </h1>
-          <p className="text-lg text-gray-400">단 8가지 질문으로 당신의 투자 DNA를 분석합니다</p>
+          <p className="text-lg text-gray-400">12가지 심층 질문으로 당신의 투자 DNA를 분석합니다</p>
         </div>
 
         {/* Benefits */}
@@ -89,6 +97,32 @@ export default function AnalysisIntroPage() {
               </div>
             )
           })}
+        </div>
+
+        {/* 5대 능력 체크 */}
+        <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-3xl p-6 border border-blue-500/20">
+          <div className="text-center mb-5">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-500 rounded-2xl mb-3">
+              <Brain className="w-8 h-8 text-white" />
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2">5대 투자 능력 체크</h2>
+            <p className="text-sm text-gray-400">12문항으로 5가지 핵심 역량을 진단합니다</p>
+          </div>
+
+          <div className="space-y-2">
+            {abilityChecks.map((check, index) => (
+              <div
+                key={index}
+                className="bg-white/5 rounded-xl p-3 border border-white/10 flex items-center gap-3"
+              >
+                <div className="text-2xl">{check.icon}</div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-white">{check.label}</p>
+                  <p className="text-xs text-gray-400">{check.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* 8 Types Preview */}
@@ -129,8 +163,8 @@ export default function AnalysisIntroPage() {
                 1
               </div>
               <div>
-                <p className="font-semibold text-white">8가지 질문에 답하기</p>
-                <p className="text-sm text-gray-400">정답은 없어요. 솔직하게 답해주세요</p>
+                <p className="font-semibold text-white">12가지 질문에 답하기</p>
+                <p className="text-sm text-gray-400">이론 7문항 + 실전 차트 5문항, 솔직하게 답해주세요</p>
               </div>
             </div>
             <div className="flex items-start gap-3">
@@ -158,7 +192,7 @@ export default function AnalysisIntroPage() {
         <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 rounded-2xl p-4 border border-green-500/30">
           <div className="flex items-center justify-center gap-2 text-green-400">
             <CheckCircle2 className="w-5 h-5" />
-            <span className="font-semibold">소요 시간: 약 2-3분</span>
+            <span className="font-semibold">소요 시간: 약 3-5분</span>
           </div>
         </div>
       </div>

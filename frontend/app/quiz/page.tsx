@@ -85,6 +85,42 @@ const questions = [
       { text: "전문가 수준으로 분석한다", score: { balanced: 1, aggressive: 2 } },
     ],
   },
+  {
+    id: 9,
+    question: "시장이 3일 연속 급락! 당신의 반응은?",
+    options: [
+      { text: "잠을 못 자고 계속 주가 확인", score: { safe: 3 } },
+      { text: "미리 정한 계획대로 차분하게 행동", score: { balanced: 3 } },
+      { text: "저가 매수 기회라고 생각한다", score: { aggressive: 3 } },
+    ],
+  },
+  {
+    id: 10,
+    question: "SNS에서 '확실한 정보'라며 종목을 추천하면?",
+    options: [
+      { text: "무시한다 (출처 불명은 위험)", score: { safe: 3 } },
+      { text: "직접 분석 후 판단한다", score: { balanced: 3 } },
+      { text: "일단 소액이라도 매수해본다", score: { aggressive: 3 } },
+    ],
+  },
+  {
+    id: 11,
+    question: "보유 종목이 갑자기 -5% 갭하락으로 시작! 어떻게?",
+    options: [
+      { text: "바로 매도한다", score: { safe: 3 } },
+      { text: "30분 관망 후 지지선 확인한다", score: { balanced: 3 } },
+      { text: "저가 매수 기회로 추가 매수한다", score: { aggressive: 3 } },
+    ],
+  },
+  {
+    id: 12,
+    question: "매수 후 +20% 수익 중! 수익 실현을 어떻게?",
+    options: [
+      { text: "전량 매도하고 확실하게 수익 확보", score: { safe: 3 } },
+      { text: "분할 매도 (절반 먼저)", score: { balanced: 3 } },
+      { text: "더 오를 것 같아 계속 보유", score: { aggressive: 3 } },
+    ],
+  },
 ]
 
 export default function QuizPage() {

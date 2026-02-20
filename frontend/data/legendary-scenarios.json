@@ -1,0 +1,1981 @@
+{
+  "scenarios": [
+    {
+      "id": "legend-1",
+      "order": 1,
+      "title": "급등주의 유혹",
+      "subtitle": "RSI 과열 구간 대응",
+      "emoji": "🔥",
+      "category": "과열 대응",
+      "difficulty": 2,
+      "difficultyLabel": "초급",
+      "gradientFrom": "from-orange-500",
+      "gradientTo": "to-red-500",
+      "description": "3일 연속 상한가를 기록한 종목이 눈앞에 있습니다. SNS에서는 '100만원 넣으면 200만원' 이라는 글이 떠돌고, 주변 사람들도 매수했다고 합니다. RSI는 이미 85를 넘었고, 거래량도 평소의 10배... 지금 들어가야 할까요?",
+      "keyLesson": "FOMO(놓칠까봐 두려운 심리)를 극복하고, 과열 신호를 읽는 능력",
+      "survivalTip": "RSI 70 이상은 과매수 구간. 급등 후에는 반드시 조정이 온다.",
+      "tags": [
+        "FOMO",
+        "RSI",
+        "과매수",
+        "단기매매"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "연속 상한가",
+          "description": "3일 연속 상한가! SNS 화제",
+          "priceChange": "+15%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 2,
+          "title": "거래량 폭발",
+          "description": "거래량 20배 증가, 개미 몰려옴",
+          "priceChange": "+8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 3,
+          "title": "증권사 리포트",
+          "description": "목표가 상향 리포트 발행",
+          "priceChange": "+5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "첫 조정 신호",
+          "description": "장중 -5% 후 회복, 윗꼬리 양봉",
+          "priceChange": "-2%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 5,
+          "title": "세력 매도 시작",
+          "description": "대량 매도 주문 포착, 거래량 감소",
+          "priceChange": "-8%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 6,
+          "title": "패닉 매도",
+          "description": "하한가 근접, 개미 투매",
+          "priceChange": "-15%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 7,
+          "title": "반등 시도",
+          "description": "기술적 반등 +3%, 데드캣 바운스?",
+          "priceChange": "+3%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 8,
+          "title": "추가 하락",
+          "description": "기관/외국인 동반 매도",
+          "priceChange": "-10%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 9,
+          "title": "바닥 탐색",
+          "description": "거래량 급감, 관심 이탈",
+          "priceChange": "-3%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 10,
+          "title": "안정화",
+          "description": "새로운 지지선 형성, 횡보 시작",
+          "priceChange": "+1%",
+          "sentiment": "neutral"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s1-1",
+          "title": "관망 전략",
+          "emoji": "👀",
+          "description": "과열 신호를 확인하고 진입하지 않는 전략",
+          "steps": [
+            "RSI 85 이상 확인 → 매수 금지",
+            "SNS 과열 감지 → 냉정 유지",
+            "조정 후 지지선에서 소량 매수 검토"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "0% ~ +5%",
+          "difficulty": 1
+        },
+        {
+          "id": "s1-2",
+          "title": "단타 전략",
+          "emoji": "⚡",
+          "description": "단기 모멘텀을 활용하되 빠른 손절",
+          "steps": [
+            "1~2턴에 소량 매수",
+            "RSI 90 도달 시 즉시 전량 매도",
+            "+5% 이상 수익 시 분할 매도"
+          ],
+          "risk": "높음",
+          "expectedReturn": "-10% ~ +15%",
+          "difficulty": 3
+        },
+        {
+          "id": "s1-3",
+          "title": "역발상 공매도",
+          "emoji": "🔻",
+          "description": "과열 후 하락에 베팅하는 전략",
+          "steps": [
+            "3~4턴에서 하락 신호 확인",
+            "조정 시작 시 인버스 ETF 매수",
+            "바닥권에서 정리"
+          ],
+          "risk": "높음",
+          "expectedReturn": "-5% ~ +20%",
+          "difficulty": 4
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~3턴: 관망 (RSI 과열 확인)",
+            "4턴: 소량 관찰 매수 (10%)",
+            "6턴: 추가 하락에 손절 (-3%)",
+            "9턴: 바닥 확인 후 재진입"
+          ],
+          "result": "최종 -1.5% 소폭 손실이지만 원금 보존",
+          "returnRate": "-1.5%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 모멘텀 매수 (30%)",
+            "3턴: 추가 매수 (20%)",
+            "4턴: 위험 감지 → 50% 매도",
+            "5턴: 전량 매도 (손절)"
+          ],
+          "result": "빠른 진입과 탈출로 +4.2% 수익 확보",
+          "returnRate": "+4.2%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1턴: 소량 매수 (10%)",
+            "2턴: +8% 수익 → 50% 매도",
+            "3턴: 잔여 보유 관망",
+            "5턴: 전량 매도"
+          ],
+          "result": "분할 매도로 +6.8% 안정적 수익",
+          "returnRate": "+6.8%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 72,
+        "avgSurvivalRate": 85,
+        "bestStrategy": "관망 전략"
+      }
+    },
+    {
+      "id": "legend-2",
+      "order": 2,
+      "title": "실적 발표의 함정",
+      "subtitle": "선반영 vs 후반영 판단",
+      "emoji": "📊",
+      "category": "실적 분석",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-blue-500",
+      "gradientTo": "to-indigo-600",
+      "description": "대형 IT기업의 분기 실적 발표가 내일입니다. 컨센서스 대비 영업이익 30% 상회 예상이 나돌고 있습니다. 이미 주가는 2주간 15% 올랐습니다. '어닝 서프라이즈'를 기대하고 매수할까요, 이미 선반영이라 매도할까요?",
+      "keyLesson": "기대감과 실제 반응의 차이, '소문에 사서 뉴스에 파는' 원리 이해",
+      "survivalTip": "실적 발표 전 과도한 기대 매수는 위험. 발표 후 시장 반응을 확인하라.",
+      "tags": [
+        "실적발표",
+        "어닝서프라이즈",
+        "선반영",
+        "기대감"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "실적 기대감",
+          "description": "컨센서스 상회 루머, 주가 상승",
+          "priceChange": "+3%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 2,
+          "title": "사전 매수 러시",
+          "description": "기관 대량 매수 포착",
+          "priceChange": "+5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 3,
+          "title": "실적 발표!",
+          "description": "영업이익 35% 상회! 깜짝 실적!",
+          "priceChange": "+2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "차익 실현",
+          "description": "호실적에도 대량 매도 출회",
+          "priceChange": "-7%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 5,
+          "title": "외국인 매도",
+          "description": "외국인 3일 연속 순매도 전환",
+          "priceChange": "-4%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 6,
+          "title": "가이던스 실망",
+          "description": "다음 분기 가이던스 보수적 제시",
+          "priceChange": "-5%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 7,
+          "title": "공매도 증가",
+          "description": "공매도 잔고 급증, 약세 전환",
+          "priceChange": "-3%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 8,
+          "title": "지지선 테스트",
+          "description": "60일선 지지 테스트 중",
+          "priceChange": "-1%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 9,
+          "title": "반등 신호",
+          "description": "기관 재매수 시작, 거래량 증가",
+          "priceChange": "+4%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 10,
+          "title": "새 균형",
+          "description": "적정가 찾기 완료, 안정화",
+          "priceChange": "+2%",
+          "sentiment": "neutral"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s2-1",
+          "title": "발표 전 매도 전략",
+          "emoji": "🏃",
+          "description": "선반영 구간에서 차익 실현",
+          "steps": [
+            "1~2턴 보유 중이면 실적 발표 전 매도",
+            "뉴스에 팔기 → 재진입 기회 대기",
+            "8~9턴 지지선 확인 후 재매수"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "+5% ~ +10%",
+          "difficulty": 2
+        },
+        {
+          "id": "s2-2",
+          "title": "실적 후 매수 전략",
+          "emoji": "🎯",
+          "description": "과도한 하락 후 저점 매수",
+          "steps": [
+            "실적 발표 전 관망",
+            "4~6턴 하락 구간에서 분할 매수",
+            "9~10턴 반등에서 수익 실현"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+3% ~ +12%",
+          "difficulty": 3
+        },
+        {
+          "id": "s2-3",
+          "title": "이벤트 드리븐 전략",
+          "emoji": "📈",
+          "description": "실적 발표 직후 방향 판단 후 빠르게 따라가기",
+          "steps": [
+            "발표 직후 시장 반응 관찰 (30분)",
+            "반응이 긍정이면 즉시 매수",
+            "부정이면 공매도 또는 관망"
+          ],
+          "risk": "높음",
+          "expectedReturn": "-8% ~ +15%",
+          "difficulty": 4
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1턴: 보유 물량 70% 매도",
+            "3턴: 실적 발표 후 관망",
+            "8턴: 지지선 확인 후 30% 재매수",
+            "10턴: 안정화 확인 → 추가 매수"
+          ],
+          "result": "선매도 + 저점 재매수로 +7.3% 달성",
+          "returnRate": "+7.3%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 실적 기대 추가 매수",
+            "3턴: 실적 발표 후 홀딩",
+            "4턴: -7% 하락에 물타기",
+            "6턴: 손절 결정 (-12%)"
+          ],
+          "result": "물타기 실패로 -12% 큰 손실",
+          "returnRate": "-12%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "2턴: 50% 매도 (차익실현)",
+            "3턴: 실적 확인 후 잔여 보유",
+            "5턴: 나머지 매도",
+            "9턴: 반등 시 재진입"
+          ],
+          "result": "단계적 대응으로 +4.1% 수익",
+          "returnRate": "+4.1%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 58,
+        "avgSurvivalRate": 70,
+        "bestStrategy": "발표 전 매도 전략"
+      }
+    },
+    {
+      "id": "legend-3",
+      "order": 3,
+      "title": "하락장의 선택",
+      "subtitle": "손절 vs 물타기 결정",
+      "emoji": "📉",
+      "category": "위기 관리",
+      "difficulty": 4,
+      "difficultyLabel": "고급",
+      "gradientFrom": "from-red-600",
+      "gradientTo": "to-rose-700",
+      "description": "보유 중인 주식이 악재로 3일간 -20% 폭락했습니다. 평균 매입가 대비 -15% 손실 중입니다. 추가 하락할 수도 있지만, 이미 많이 빠졌다는 의견도 있습니다. 손절하고 빠져나올까요, 물타기로 평단을 낮출까요?",
+      "keyLesson": "감정적 의사결정 배제, 손절과 물타기의 올바른 판단 기준",
+      "survivalTip": "하락 이유가 일시적이면 물타기, 구조적이면 손절. 감정이 아닌 데이터로 판단하라.",
+      "tags": [
+        "손절",
+        "물타기",
+        "하락장",
+        "멘탈관리"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "악재 발생",
+          "description": "대규모 회계 이슈 뉴스 보도",
+          "priceChange": "-10%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 2,
+          "title": "패닉 매도",
+          "description": "기관 일제 매도, 거래 정지 후 재개",
+          "priceChange": "-8%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 3,
+          "title": "추가 악재",
+          "description": "검찰 수사 착수 보도",
+          "priceChange": "-7%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 4,
+          "title": "반등 시도",
+          "description": "저가 매수세 유입, 기술적 반등",
+          "priceChange": "+5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 5,
+          "title": "데드캣 바운스",
+          "description": "반등 후 재하락, 매수세 약화",
+          "priceChange": "-4%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 6,
+          "title": "회사 해명",
+          "description": "경영진 긴급 기자회견, 해명 시도",
+          "priceChange": "+3%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 7,
+          "title": "시장 안정화",
+          "description": "공매도 금지 조치, 변동성 감소",
+          "priceChange": "+2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "바닥 확인",
+          "description": "거래량 바닥, 관심도 최저",
+          "priceChange": "-1%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 9,
+          "title": "리스크 해소",
+          "description": "수사 무혐의 결론, 호재 반영",
+          "priceChange": "+8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 10,
+          "title": "V자 반등",
+          "description": "외국인 매수 복귀, 급반등",
+          "priceChange": "+12%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s3-1",
+          "title": "즉시 손절 전략",
+          "emoji": "✂️",
+          "description": "빠른 손절로 원금을 보존하는 전략",
+          "steps": [
+            "1턴: 악재 확인 즉시 전량 매도",
+            "2~8턴: 관망하며 상황 파악",
+            "9턴: 리스크 해소 확인 후 재진입"
+          ],
+          "risk": "보통",
+          "expectedReturn": "-10% ~ +5%",
+          "difficulty": 2
+        },
+        {
+          "id": "s3-2",
+          "title": "분할 물타기 전략",
+          "emoji": "💧",
+          "description": "단계적 추가 매수로 평단 낮추기",
+          "steps": [
+            "2턴: 20% 추가 매수 (1차 물타기)",
+            "5턴: 20% 추가 매수 (2차 물타기)",
+            "9~10턴: 반등 시 분할 매도로 손실 복구"
+          ],
+          "risk": "높음",
+          "expectedReturn": "-25% ~ +15%",
+          "difficulty": 4
+        },
+        {
+          "id": "s3-3",
+          "title": "부분 손절 + 관망",
+          "emoji": "🔄",
+          "description": "절반 손절 후 나머지로 반등 대기",
+          "steps": [
+            "1턴: 50% 손절 (손실 확정)",
+            "4턴: 반등 확인 시 잔여 보유 유지",
+            "9~10턴: 반등 구간에서 나머지 매도"
+          ],
+          "risk": "보통",
+          "expectedReturn": "-8% ~ +8%",
+          "difficulty": 3
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1턴: 즉시 전량 손절 (-10%)",
+            "2~8턴: 완전 관망",
+            "9턴: 무혐의 확인 후 소량 재매수",
+            "10턴: 추가 매수"
+          ],
+          "result": "빠른 손절로 손실 최소화 → 재진입 +8%",
+          "returnRate": "-2%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 홀딩 (믿음)",
+            "2턴: 물타기 40%",
+            "4턴: 반등에 추가 매수",
+            "10턴: V자 반등으로 대박"
+          ],
+          "result": "물타기 + 반등으로 +18% 대박 (but 위험했음)",
+          "returnRate": "+18%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1턴: 50% 손절",
+            "3턴: 나머지 보유 관망",
+            "6턴: 해명 후 소량 추가 매수",
+            "10턴: 반등에서 정리"
+          ],
+          "result": "리스크 관리하며 +3.5% 소폭 수익",
+          "returnRate": "+3.5%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 42,
+        "avgSurvivalRate": 55,
+        "bestStrategy": "부분 손절 + 관망"
+      }
+    },
+    {
+      "id": "legend-4",
+      "order": 4,
+      "title": "분할 매수 마스터",
+      "subtitle": "평균 단가 관리 훈련",
+      "emoji": "📈",
+      "category": "매수 전략",
+      "difficulty": 2,
+      "difficultyLabel": "초급",
+      "gradientFrom": "from-emerald-500",
+      "gradientTo": "to-teal-600",
+      "description": "우량주가 지속적으로 하락하고 있습니다. 펀더멘털은 좋지만, 시장 전체가 약세입니다. 한번에 올인할까요, 분할 매수로 리스크를 줄일까요? 10턴에 걸쳐 최적의 분할 매수 타이밍을 찾아보세요.",
+      "keyLesson": "분할 매수의 힘과 타이밍, 인내심의 가치",
+      "survivalTip": "한번에 올인하지 말고, 3~5단계로 나눠 매수하면 평균 단가가 유리해진다.",
+      "tags": [
+        "분할매수",
+        "평균단가",
+        "우량주",
+        "장기투자"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "시장 약세",
+          "description": "코스피 3% 하락, 우량주도 동반 하락",
+          "priceChange": "-3%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 2,
+          "title": "추가 하락",
+          "description": "미국 시장 급락 여파",
+          "priceChange": "-5%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 3,
+          "title": "횡보 구간",
+          "description": "매도세 약화, 거래량 감소",
+          "priceChange": "-1%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 4,
+          "title": "반등 시도",
+          "description": "기관 소폭 매수 시작",
+          "priceChange": "+2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 5,
+          "title": "재하락",
+          "description": "대외 불확실성 확대",
+          "priceChange": "-4%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 6,
+          "title": "바닥 근접",
+          "description": "52주 신저가 근접, 가치투자자 유입",
+          "priceChange": "-2%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 7,
+          "title": "정책 지원",
+          "description": "정부 증시 안정 대책 발표",
+          "priceChange": "+3%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "본격 반등",
+          "description": "외국인 순매수 전환, 거래량 증가",
+          "priceChange": "+5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 9,
+          "title": "상승 추세",
+          "description": "20일선 돌파, 기술적 매수 신호",
+          "priceChange": "+4%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 10,
+          "title": "회복 완료",
+          "description": "원래 가격 근처 도달",
+          "priceChange": "+3%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s4-1",
+          "title": "균등 분할 매수",
+          "emoji": "📊",
+          "description": "매 턴마다 동일 금액 투자 (DCA)",
+          "steps": [
+            "매 턴 10%씩 균등 매수",
+            "시장 상황 무관하게 기계적 투입",
+            "10턴 후 결과 비교"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "+2% ~ +8%",
+          "difficulty": 1
+        },
+        {
+          "id": "s4-2",
+          "title": "피라미드 매수",
+          "emoji": "🔺",
+          "description": "하락할수록 더 많이 매수",
+          "steps": [
+            "1~3턴: 소량 매수 (각 5%)",
+            "4~6턴: 중간 매수 (각 10%)",
+            "바닥 확인 후: 대량 매수 (20~30%)"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+5% ~ +15%",
+          "difficulty": 3
+        },
+        {
+          "id": "s4-3",
+          "title": "기술적 분할 매수",
+          "emoji": "🎯",
+          "description": "기술적 지표 기반 매수 타이밍",
+          "steps": [
+            "지지선 터치 시에만 매수",
+            "RSI 30 이하에서 매수 비중 확대",
+            "이동평균선 돌파 시 추가 매수"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+8% ~ +20%",
+          "difficulty": 4
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1턴: 10% 매수",
+            "3턴: 10% 매수",
+            "5턴: 15% 매수",
+            "6턴: 20% 매수 (바닥 확인)"
+          ],
+          "result": "분할 매수로 평단 낮춤 → 최종 +9.2%",
+          "returnRate": "+9.2%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 50% 올인 매수",
+            "5턴: 나머지 50% 물타기",
+            "8턴: 반등에 홀딩",
+            "10턴: 전량 매도"
+          ],
+          "result": "초반 올인으로 평단 높음 → +2.1%",
+          "returnRate": "+2.1%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "2턴: 20% 매수",
+            "5턴: 30% 매수 (신저가)",
+            "7턴: 20% 매수 (정책 호재)",
+            "9턴: 나머지 매수"
+          ],
+          "result": "핵심 타이밍에 집중 → +11.5%",
+          "returnRate": "+11.5%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 78,
+        "avgSurvivalRate": 92,
+        "bestStrategy": "피라미드 매수"
+      }
+    },
+    {
+      "id": "legend-5",
+      "order": 5,
+      "title": "조건부 주문 훈련",
+      "subtitle": "지연 정보 대응 능력",
+      "emoji": "⚡",
+      "category": "주문 전략",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-yellow-500",
+      "gradientTo": "to-amber-600",
+      "description": "주식 시장은 빠르게 움직이고, 당신은 항상 모니터 앞에 있을 수 없습니다. 조건부 주문(예약 매수/매도)을 활용하여 자동으로 대응하는 방법을 배워보세요. 지정가, 시장가, 손절 주문을 적절히 조합해야 합니다.",
+      "keyLesson": "조건부 주문의 종류와 활용, 감정 개입 없는 자동화 매매의 힘",
+      "survivalTip": "미리 시나리오를 설정하고 조건부 주문을 걸어두면 감정적 판단을 피할 수 있다.",
+      "tags": [
+        "조건부주문",
+        "자동매매",
+        "손절주문",
+        "지정가"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "장 시작 전",
+          "description": "해외 시장 급등, 갭 상승 예상",
+          "priceChange": "+4%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 2,
+          "title": "갭 상승 후 하락",
+          "description": "고가 매수자 물량, 장중 하락",
+          "priceChange": "-3%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 3,
+          "title": "뉴스 이벤트",
+          "description": "장중 돌발 뉴스 → 급등",
+          "priceChange": "+6%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "후장 매도",
+          "description": "차익 실현 매물 쏟아짐",
+          "priceChange": "-4%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 5,
+          "title": "장 마감 직전",
+          "description": "외국인 대량 매수, 마감 급등",
+          "priceChange": "+3%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "야간 뉴스",
+          "description": "미국 시장 급락 뉴스",
+          "priceChange": "-5%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 7,
+          "title": "갭 하락 오픈",
+          "description": "전일 종가 대비 -3% 시작",
+          "priceChange": "-3%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 8,
+          "title": "V자 반등",
+          "description": "저가 매수세 유입으로 급반등",
+          "priceChange": "+7%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 9,
+          "title": "횡보 안정",
+          "description": "변동성 감소, 방향성 탐색",
+          "priceChange": "+1%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 10,
+          "title": "추세 확정",
+          "description": "상승 추세 확인, 거래량 동반 상승",
+          "priceChange": "+3%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s5-1",
+          "title": "손절 + 익절 세트",
+          "emoji": "🎯",
+          "description": "매수와 동시에 손절/익절 라인 설정",
+          "steps": [
+            "매수 시 -5% 손절 주문 설정",
+            "동시에 +10% 익절 주문 설정",
+            "감정 개입 없이 자동 실행"
+          ],
+          "risk": "보통",
+          "expectedReturn": "-5% ~ +10%",
+          "difficulty": 2
+        },
+        {
+          "id": "s5-2",
+          "title": "트레일링 스탑",
+          "emoji": "📏",
+          "description": "상승 따라 손절선을 올리는 전략",
+          "steps": [
+            "초기 -5% 손절 설정",
+            "가격 상승 시 손절선도 상향",
+            "최고점 대비 -3%에서 자동 매도"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "+3% ~ +15%",
+          "difficulty": 3
+        },
+        {
+          "id": "s5-3",
+          "title": "분할 조건부 주문",
+          "emoji": "🪜",
+          "description": "여러 가격대에 분할 주문 배치",
+          "steps": [
+            "현재가 -3%, -5%, -8%에 분할 매수 주문",
+            "현재가 +5%, +10%, +15%에 분할 매도 주문",
+            "시장이 어디로 움직이든 대응 가능"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "+2% ~ +12%",
+          "difficulty": 2
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1턴: 매수 + 손절(-5%) 동시 설정",
+            "3턴: 급등에 50% 익절 주문 발동",
+            "6턴: 손절 주문으로 자동 매도",
+            "8턴: 재진입 조건부 주문 설정"
+          ],
+          "result": "자동화 주문으로 감정 배제 → +6.5%",
+          "returnRate": "+6.5%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 전량 시장가 매수",
+            "3턴: 급등에 흥분 → 추가 매수",
+            "6턴: 손절 미설정 → 급락에 패닉",
+            "8턴: 반등에 안도 매도"
+          ],
+          "result": "감정적 대응으로 기회 놓침 → +1.2%",
+          "returnRate": "+1.2%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1턴: 분할 매수 주문 설정",
+            "4턴: 하락 시 추가 매수 발동",
+            "7턴: 트레일링 스탑 설정",
+            "10턴: 추세 확인 후 정리"
+          ],
+          "result": "체계적 조건부 주문 → +8.8%",
+          "returnRate": "+8.8%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 65,
+        "avgSurvivalRate": 80,
+        "bestStrategy": "트레일링 스탑"
+      }
+    },
+    {
+      "id": "legend-6",
+      "order": 6,
+      "title": "작전세력의 그림자",
+      "subtitle": "거래량 급증 함정 식별",
+      "emoji": "🕵️",
+      "category": "함정 탐지",
+      "difficulty": 4,
+      "difficultyLabel": "고급",
+      "gradientFrom": "from-purple-600",
+      "gradientTo": "to-violet-700",
+      "description": "소형주의 거래량이 갑자기 10배 폭발했습니다. 카카오톡 단톡방에서 '확실한 정보'라며 매수를 유도하고 있고, 실제로 주가도 오르고 있습니다. 하지만 뭔가 이상합니다... 작전세력의 '펌핑 앤 덤핑'일까요?",
+      "keyLesson": "비정상적 거래 패턴 인식, 정보 비대칭 상황에서의 판단",
+      "survivalTip": "출처 불명의 정보에 현혹되지 마라. 비정상 거래량은 위험 신호다.",
+      "tags": [
+        "작전세력",
+        "펌핑덤핑",
+        "소형주",
+        "거래량"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "거래량 폭발",
+          "description": "평소 대비 10배 거래량, 원인 불명",
+          "priceChange": "+8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 2,
+          "title": "루머 확산",
+          "description": "단톡방에서 '대박 종목' 공유 확산",
+          "priceChange": "+12%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 3,
+          "title": "연론 보도",
+          "description": "일부 매체에서 긍정 기사 게재",
+          "priceChange": "+6%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "최고가 갱신",
+          "description": "52주 신고가 경신, 개미 대거 유입",
+          "priceChange": "+10%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 5,
+          "title": "이상 신호",
+          "description": "내부자 지분 변동 공시 포착",
+          "priceChange": "-2%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 6,
+          "title": "세력 매도 시작",
+          "description": "대량 매도 블록 출현, 호가창 변화",
+          "priceChange": "-15%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 7,
+          "title": "패닉 매도",
+          "description": "하한가, 매도 물량 쇄도",
+          "priceChange": "-20%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 8,
+          "title": "거래 정지",
+          "description": "이상 거래 조사, 거래 일시 정지",
+          "priceChange": "0%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 9,
+          "title": "재개 후 추가 하락",
+          "description": "거래 재개, 추가 10% 하락",
+          "priceChange": "-10%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 10,
+          "title": "실체 드러남",
+          "description": "작전세력 적발, 주가 원위치 복귀",
+          "priceChange": "-5%",
+          "sentiment": "negative"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s6-1",
+          "title": "완전 회피 전략",
+          "emoji": "🚫",
+          "description": "비정상 패턴 감지 시 접근하지 않기",
+          "steps": [
+            "거래량 급변 + 출처 불명 루머 = 위험 신호",
+            "절대 매수하지 않고 관망",
+            "교훈만 얻고 다음 기회 대기"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        },
+        {
+          "id": "s6-2",
+          "title": "초단기 스캘핑",
+          "emoji": "🏎️",
+          "description": "초기 상승분만 먹고 빠르게 탈출",
+          "steps": [
+            "1턴: 소량 매수 (5%)",
+            "2턴: +12% 시점에서 전량 매도",
+            "이후 절대 재진입 금지"
+          ],
+          "risk": "높음",
+          "expectedReturn": "-5% ~ +20%",
+          "difficulty": 5
+        },
+        {
+          "id": "s6-3",
+          "title": "역매매 전략",
+          "emoji": "🔄",
+          "description": "작전세력 매도 타이밍에 인버스 대응",
+          "steps": [
+            "1~4턴: 관망하며 작전 패턴 분석",
+            "5턴: 이상 신호 포착 → 인버스 베팅",
+            "6~7턴: 하락에서 수익 실현"
+          ],
+          "risk": "높음",
+          "expectedReturn": "-10% ~ +25%",
+          "difficulty": 5
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "전체: 완전 회피",
+            "비정상 거래량 감지 → 매수 금지",
+            "단톡방 정보 무시",
+            "다른 우량주로 관심 전환"
+          ],
+          "result": "0% 수익이지만 원금 100% 보존",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 루머 믿고 대량 매수 (40%)",
+            "3턴: 추가 매수 (20%)",
+            "6턴: 급락에 패닉 → 손절 시도",
+            "7턴: 하한가에 매도 불가능"
+          ],
+          "result": "작전세력 피해자 → -35% 대손실",
+          "returnRate": "-35%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1턴: 비정상 패턴 의심 → 소량 매수 (5%)",
+            "2턴: 급등에 전량 매도 (+12%)",
+            "이후: 완전 관망",
+            "교훈: 소량으로도 수익 가능"
+          ],
+          "result": "소량 빠른 매도로 +0.6% (원금 대비)",
+          "returnRate": "+0.6%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 35,
+        "avgSurvivalRate": 45,
+        "bestStrategy": "완전 회피 전략"
+      }
+    },
+    {
+      "id": "legend-7",
+      "order": 7,
+      "title": "금리 인상 쇼크",
+      "subtitle": "매크로 이벤트 서바이벌",
+      "emoji": "🏦",
+      "category": "매크로 대응",
+      "difficulty": 5,
+      "difficultyLabel": "최고급",
+      "gradientFrom": "from-slate-600",
+      "gradientTo": "to-zinc-700",
+      "description": "연준이 예상을 뒤엎고 빅스텝(0.5%p) 금리 인상을 결정했습니다. 시장 전체가 패닉에 빠지고, 성장주는 폭락, 가치주는 혼조세를 보이고 있습니다. 포트폴리오 전체를 재조정해야 하는 상황... 어떻게 대처하시겠습니까?",
+      "keyLesson": "매크로 이벤트의 파급력 이해, 포트폴리오 리밸런싱 능력",
+      "survivalTip": "금리 인상기에는 성장주 → 가치주/배당주로 포트폴리오 재편이 핵심.",
+      "tags": [
+        "금리",
+        "매크로",
+        "포트폴리오",
+        "리밸런싱"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "금리 인상 발표",
+          "description": "연준 빅스텝 0.5%p 인상 결정",
+          "priceChange": "-6%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 2,
+          "title": "시장 패닉",
+          "description": "나스닥 -4%, 코스피 -3%",
+          "priceChange": "-5%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 3,
+          "title": "성장주 폭락",
+          "description": "테크주 일제히 -10% 이상 하락",
+          "priceChange": "-8%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 4,
+          "title": "안전자산 강세",
+          "description": "달러 강세, 금값 상승",
+          "priceChange": "-2%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 5,
+          "title": "가치주 반등",
+          "description": "은행주, 보험주 반등 시작",
+          "priceChange": "+3%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "시장 적응",
+          "description": "금리 인상 소화 중, 변동성 감소",
+          "priceChange": "+1%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 7,
+          "title": "연준 발언",
+          "description": "추가 인상 가능성 시사",
+          "priceChange": "-4%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 8,
+          "title": "경기 지표",
+          "description": "고용 데이터 양호, 경기침체 우려 완화",
+          "priceChange": "+3%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 9,
+          "title": "섹터 순환",
+          "description": "성장주 → 가치주 대전환 본격화",
+          "priceChange": "+2%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 10,
+          "title": "새 균형점",
+          "description": "시장 새로운 밸류에이션 형성",
+          "priceChange": "+1%",
+          "sentiment": "neutral"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s7-1",
+          "title": "현금 확보 전략",
+          "emoji": "💰",
+          "description": "전체 매도 후 현금 보유",
+          "steps": [
+            "1턴: 성장주 전량 매도",
+            "1~4턴: 현금 100% 보유",
+            "5턴 이후: 가치주/배당주 신규 매수"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "-3% ~ +5%",
+          "difficulty": 2
+        },
+        {
+          "id": "s7-2",
+          "title": "섹터 로테이션",
+          "emoji": "🔄",
+          "description": "성장주 → 가치주로 포트폴리오 전환",
+          "steps": [
+            "1턴: 성장주 50% 매도",
+            "2턴: 나머지 성장주 매도",
+            "5턴: 은행주/보험주 매수 시작",
+            "9턴: 가치주 포트폴리오 완성"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+2% ~ +10%",
+          "difficulty": 4
+        },
+        {
+          "id": "s7-3",
+          "title": "역발상 성장주 매수",
+          "emoji": "🎰",
+          "description": "폭락한 성장주를 저가에 매수",
+          "steps": [
+            "1~3턴: 관망 (폭락 관찰)",
+            "3턴: 성장주 -25% 구간에서 분할 매수",
+            "8~10턴: 반등 시 수익 실현"
+          ],
+          "risk": "높음",
+          "expectedReturn": "-15% ~ +20%",
+          "difficulty": 5
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1턴: 전량 매도 + 현금 확보",
+            "4턴: 방어적 배당주 매수 시작",
+            "8턴: 경기 양호 확인 → 추가 매수",
+            "10턴: 가치주 포트폴리오 완성"
+          ],
+          "result": "빠른 대피 + 섹터 전환 → +3.8%",
+          "returnRate": "+3.8%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 성장주 홀딩 (버티기)",
+            "3턴: 폭락에 추가 매수",
+            "7턴: 추가 하락에 손절",
+            "9턴: 너무 늦은 재진입"
+          ],
+          "result": "타이밍 잘못으로 -18% 대손실",
+          "returnRate": "-18%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1턴: 성장주 50% 축소",
+            "3턴: 나머지 성장주 → 가치주 전환",
+            "5턴: 은행주 매수",
+            "10턴: 밸런스 재조정"
+          ],
+          "result": "단계적 섹터 로테이션 → +5.2%",
+          "returnRate": "+5.2%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 28,
+        "avgSurvivalRate": 40,
+        "bestStrategy": "섹터 로테이션"
+      }
+    },
+    {
+      "id": "legend-8",
+      "order": 8,
+      "title": "테마주 광풍",
+      "subtitle": "FOMO 관리와 냉정한 판단",
+      "emoji": "🌪️",
+      "category": "심리 관리",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-pink-500",
+      "gradientTo": "to-rose-600",
+      "description": "AI 관련 테마주가 시장을 뜨겁게 달구고 있습니다. 관련주들이 줄줄이 상한가를 기록하고, 뉴스는 온통 AI 이야기뿐입니다. 내 포트폴리오만 소외된 느낌... FOMO에 휩쓸릴 것인가, 냉정함을 지킬 것인가?",
+      "keyLesson": "테마주 투자의 위험성, FOMO 극복, 본질 가치 판단 능력",
+      "survivalTip": "모든 테마에는 수명이 있다. 광풍의 끝자락에 들어가면 피해자가 된다.",
+      "tags": [
+        "테마주",
+        "FOMO",
+        "AI관련주",
+        "심리관리"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "AI 테마 시작",
+          "description": "ChatGPT 관련 뉴스로 AI주 급등",
+          "priceChange": "+10%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 2,
+          "title": "관련주 확대",
+          "description": "AI 반도체, 서버, 소프트웨어 동반 상승",
+          "priceChange": "+8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 3,
+          "title": "2차 확산",
+          "description": "AI + 로봇, AI + 바이오 등 연관 테마 확산",
+          "priceChange": "+12%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "과열 경고",
+          "description": "증권사 과열 경고, 일부 종목 투자 유의",
+          "priceChange": "+3%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 5,
+          "title": "고점 형성",
+          "description": "테마주 최고점 기록, 거래량 감소 시작",
+          "priceChange": "+1%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 6,
+          "title": "차익 실현",
+          "description": "초기 투자자 대량 차익 실현",
+          "priceChange": "-8%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 7,
+          "title": "현실 점검",
+          "description": "실제 매출 없는 종목들 급락",
+          "priceChange": "-12%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 8,
+          "title": "테마 소멸",
+          "description": "시장 관심 다른 테마로 이동",
+          "priceChange": "-7%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 9,
+          "title": "옥석 가리기",
+          "description": "실체 있는 기업만 반등 시작",
+          "priceChange": "+4%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 10,
+          "title": "본질 회귀",
+          "description": "펀더멘털 기반 재평가 진행",
+          "priceChange": "+2%",
+          "sentiment": "neutral"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s8-1",
+          "title": "본질 가치 투자",
+          "emoji": "💎",
+          "description": "실체 있는 AI 기업만 선별 투자",
+          "steps": [
+            "테마주 중 실제 매출이 있는 기업만 선별",
+            "1~2턴에 소량 매수",
+            "7턴 이후 옥석 가리기에서 추가 매수"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+5% ~ +15%",
+          "difficulty": 3
+        },
+        {
+          "id": "s8-2",
+          "title": "완전 회피",
+          "emoji": "🧘",
+          "description": "테마주에 휩쓸리지 않고 기존 전략 유지",
+          "steps": [
+            "FOMO 인식하고 냉정하게 관망",
+            "기존 포트폴리오 유지",
+            "테마 소멸 후 저가 매수 기회 탐색"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "0% ~ +5%",
+          "difficulty": 2
+        },
+        {
+          "id": "s8-3",
+          "title": "모멘텀 라이딩",
+          "emoji": "🏄",
+          "description": "초기 상승에 올라타고 신호 감지 시 탈출",
+          "steps": [
+            "1턴: 모멘텀 초기 진입 (20%)",
+            "4턴: 과열 경고 → 50% 매도",
+            "5턴: 전량 매도 (나머지)"
+          ],
+          "risk": "높음",
+          "expectedReturn": "-10% ~ +25%",
+          "difficulty": 4
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "전체: 테마주 완전 회피",
+            "기존 우량주 포트폴리오 유지",
+            "9턴: 실체 있는 AI 기업 소량 매수",
+            "장기 보유 관점 접근"
+          ],
+          "result": "FOMO 극복, 기존 포트 +2.1% 유지",
+          "returnRate": "+2.1%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: AI 테마 올인 매수",
+            "3턴: 2차 확산에 추가 매수",
+            "6턴: 차익실현 못하고 보유",
+            "8턴: 테마 소멸에 대손실"
+          ],
+          "result": "FOMO 휩쓸려 → -22% 대손실",
+          "returnRate": "-22%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1턴: 소량 매수 (10%)",
+            "3턴: 추가 매수 (10%)",
+            "4턴: 과열 경고에 전량 매도",
+            "9턴: 옥석 가리기 후 재진입"
+          ],
+          "result": "적절한 진입/탈출 → +8.3%",
+          "returnRate": "+8.3%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 50,
+        "avgSurvivalRate": 62,
+        "bestStrategy": "본질 가치 투자"
+      }
+    },
+    {
+      "id": "legend-9",
+      "order": 9,
+      "title": "블랙스완 이벤트",
+      "subtitle": "급락 시 생존 전략",
+      "emoji": "🦢",
+      "category": "극한 생존",
+      "difficulty": 5,
+      "difficultyLabel": "최고급",
+      "gradientFrom": "from-gray-800",
+      "gradientTo": "to-black",
+      "description": "아무도 예상하지 못한 글로벌 위기가 발생했습니다. 코스피가 하루만에 -8% 폭락하고, 서킷 브레이커가 발동됐습니다. 공포 지수(VIX)는 80을 돌파했고, 모든 자산이 동시에 하락하고 있습니다. 이 극한 상황에서 살아남을 수 있습니까?",
+      "keyLesson": "극한 위기 상황에서의 냉정한 판단력, 공포 속 기회 발견",
+      "survivalTip": "블랙스완은 투자 인생에서 반드시 만난다. 현금 비중과 분산투자가 생존의 열쇠.",
+      "tags": [
+        "블랙스완",
+        "서킷브레이커",
+        "공포",
+        "생존전략"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "블랙스완 발생",
+          "description": "글로벌 위기 발생, 서킷브레이커 발동",
+          "priceChange": "-8%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 2,
+          "title": "패닉 확산",
+          "description": "글로벌 동시 폭락, VIX 80 돌파",
+          "priceChange": "-10%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 3,
+          "title": "서킷브레이커 재발동",
+          "description": "2차 서킷브레이커, 거래 중단",
+          "priceChange": "-7%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 4,
+          "title": "정부 긴급대응",
+          "description": "긴급 금융안정 조치 발표",
+          "priceChange": "+5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 5,
+          "title": "불확실성 지속",
+          "description": "위기 규모 파악 중, 추가 하락 우려",
+          "priceChange": "-4%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 6,
+          "title": "중앙은행 개입",
+          "description": "긴급 금리 인하 + 양적완화 발표",
+          "priceChange": "+8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "변동성 극대화",
+          "description": "장중 ±5% 등락, 방향성 불투명",
+          "priceChange": "+2%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 8,
+          "title": "바닥 신호",
+          "description": "공포 지수 하락, 저가 매수세 유입",
+          "priceChange": "+6%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 9,
+          "title": "회복 시작",
+          "description": "주요국 공조 효과, 시장 안정화",
+          "priceChange": "+7%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 10,
+          "title": "V자 반등",
+          "description": "유동성 효과로 급격한 V자 반등",
+          "priceChange": "+10%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s9-1",
+          "title": "현금 보존 전략",
+          "emoji": "🏰",
+          "description": "위기 시 현금이 왕이다",
+          "steps": [
+            "1턴: 가능한 모든 것 매도",
+            "2~5턴: 현금 100% 보유",
+            "8턴: 바닥 확인 후 분할 매수 시작"
+          ],
+          "risk": "보통",
+          "expectedReturn": "-5% ~ +10%",
+          "difficulty": 3
+        },
+        {
+          "id": "s9-2",
+          "title": "공포 매수 전략",
+          "emoji": "🦁",
+          "description": "남들이 공포에 팔 때 사는 전략",
+          "steps": [
+            "1~3턴: 하락을 지켜보며 현금 확보",
+            "3턴: 서킷브레이커 후 1차 매수 (30%)",
+            "5턴: 추가 매수 (30%)",
+            "나머지는 8턴 이후 투입"
+          ],
+          "risk": "높음",
+          "expectedReturn": "-20% ~ +40%",
+          "difficulty": 5
+        },
+        {
+          "id": "s9-3",
+          "title": "헤지 + 분할 전략",
+          "emoji": "🛡️",
+          "description": "인버스 ETF로 헤지하면서 분할 매수",
+          "steps": [
+            "1턴: 인버스 ETF 매수 (포트폴리오 보호)",
+            "4턴: 정부 대응 확인 → 인버스 매도",
+            "6턴: 중앙은행 개입 → 주식 매수 시작",
+            "8~10턴: 분할 매수 + 수익 실현"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+5% ~ +25%",
+          "difficulty": 4
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1턴: 전량 매도 (패닉이 아닌 계획)",
+            "2~6턴: 현금 보유 + 뉴스 모니터링",
+            "8턴: 소량 분할 매수 시작",
+            "10턴: 추가 매수 (V자 반등 확인)"
+          ],
+          "result": "원금 보존 후 저점 매수 → +5.5%",
+          "returnRate": "+5.5%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 홀딩 (버티기)",
+            "3턴: 서킷브레이커에 추가 매수",
+            "5턴: 추가 하락에 패닉 손절",
+            "9턴: 뒤늦은 재진입"
+          ],
+          "result": "감정적 판단 → -25% 대손실",
+          "returnRate": "-25%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1턴: 50% 매도 + 인버스 ETF 매수",
+            "4턴: 인버스 매도 (수익 실현)",
+            "6턴: 주식 분할 매수 시작",
+            "9~10턴: V자 반등에 수익 실현"
+          ],
+          "result": "헤지 + 저점 매수 → +15.8%",
+          "returnRate": "+15.8%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 22,
+        "avgSurvivalRate": 35,
+        "bestStrategy": "헤지 + 분할 전략"
+      }
+    },
+    {
+      "id": "legend-10",
+      "order": 10,
+      "title": "배당주의 역습",
+      "subtitle": "장기 vs 단기 전략 대결",
+      "emoji": "💰",
+      "category": "배당 전략",
+      "difficulty": 2,
+      "difficultyLabel": "초급",
+      "gradientFrom": "from-amber-500",
+      "gradientTo": "to-yellow-600",
+      "description": "고배당주가 눈에 들어옵니다. 배당 수익률 5%의 안정적인 종목이지만, 옆의 성장주는 한 달에 30% 올랐습니다. 배당주는 지루한 투자일까요? 10턴 동안 배당주의 진짜 가치를 체험해 보세요.",
+      "keyLesson": "배당 투자의 복리 효과, 안정적 수익의 힘",
+      "survivalTip": "배당주는 화려하지 않지만 안정적이다. 장기적으로 복리 효과가 쌓인다.",
+      "tags": [
+        "배당주",
+        "장기투자",
+        "복리",
+        "안정성"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "배당 공시",
+          "description": "연간 배당 5% 확정 공시",
+          "priceChange": "+2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 2,
+          "title": "성장주 급등",
+          "description": "옆 종목 성장주 +15% 급등 (부러움)",
+          "priceChange": "+1%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 3,
+          "title": "시장 하락",
+          "description": "시장 전체 하락, 배당주 방어력 발휘",
+          "priceChange": "-2%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 4,
+          "title": "배당락일",
+          "description": "배당 지급 후 주가 조정",
+          "priceChange": "-3%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 5,
+          "title": "배당금 입금",
+          "description": "배당금 5% 입금 완료! 재투자?",
+          "priceChange": "+1%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "성장주 폭락",
+          "description": "옆 성장주 -20% 폭락 (역전)",
+          "priceChange": "+2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "안정 수익",
+          "description": "배당주 꾸준한 상승 지속",
+          "priceChange": "+2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "배당 증가",
+          "description": "다음 분기 배당 10% 인상 발표",
+          "priceChange": "+4%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 9,
+          "title": "가치 재평가",
+          "description": "기관 리포트 목표가 상향",
+          "priceChange": "+3%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 10,
+          "title": "복리의 마법",
+          "description": "배당 재투자 복리 효과 체감",
+          "priceChange": "+2%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s10-1",
+          "title": "배당 재투자 전략 (DRIP)",
+          "emoji": "🔄",
+          "description": "받은 배당금으로 추가 매수",
+          "steps": [
+            "1턴: 배당주 매수",
+            "5턴: 배당금으로 추가 매수",
+            "이후: 복리 효과 극대화"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "+8% ~ +15%",
+          "difficulty": 1
+        },
+        {
+          "id": "s10-2",
+          "title": "배당 + 성장 혼합",
+          "emoji": "⚡",
+          "description": "배당주와 성장주를 적절히 혼합",
+          "steps": [
+            "60% 배당주 + 40% 성장주 배분",
+            "성장주 하락 시 배당주 비중 확대",
+            "성장주 반등 시 리밸런싱"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+5% ~ +20%",
+          "difficulty": 3
+        },
+        {
+          "id": "s10-3",
+          "title": "배당락 매매 전략",
+          "emoji": "📅",
+          "description": "배당락 전후 타이밍 매매",
+          "steps": [
+            "배당 기준일 전 매수",
+            "배당 수령 확정 후 매도",
+            "배당락 하락 후 재매수"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+3% ~ +10%",
+          "difficulty": 2
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1턴: 전체 자금 배당주 매수",
+            "5턴: 배당금 전액 재투자",
+            "6턴: 성장주 폭락에도 흔들리지 않음",
+            "10턴: 복리 효과 +12.3%"
+          ],
+          "result": "꾸준한 배당 재투자 → +12.3% (배당 포함)",
+          "returnRate": "+12.3%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 배당주 무시, 성장주 올인",
+            "2턴: +15% 수익에 환호",
+            "6턴: -20% 폭락에 패닉",
+            "10턴: 최종 -8%"
+          ],
+          "result": "성장주 올인 → 최종 -8% 손실",
+          "returnRate": "-8%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1턴: 50% 배당주 + 50% 성장주",
+            "5턴: 배당금 배당주에 재투자",
+            "6턴: 성장주 축소, 배당주 확대",
+            "10턴: 리밸런싱 완료"
+          ],
+          "result": "혼합 전략으로 안정적 +7.5%",
+          "returnRate": "+7.5%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 82,
+        "avgSurvivalRate": 95,
+        "bestStrategy": "배당 재투자 전략 (DRIP)"
+      }
+    }
+  ],
+  "difficultyConfig": {
+    "1": {
+      "label": "입문",
+      "color": "text-green-400",
+      "bgColor": "bg-green-500/20",
+      "borderColor": "border-green-500/30"
+    },
+    "2": {
+      "label": "초급",
+      "color": "text-emerald-400",
+      "bgColor": "bg-emerald-500/20",
+      "borderColor": "border-emerald-500/30"
+    },
+    "3": {
+      "label": "중급",
+      "color": "text-yellow-400",
+      "bgColor": "bg-yellow-500/20",
+      "borderColor": "border-yellow-500/30"
+    },
+    "4": {
+      "label": "고급",
+      "color": "text-orange-400",
+      "bgColor": "bg-orange-500/20",
+      "borderColor": "border-orange-500/30"
+    },
+    "5": {
+      "label": "최고급",
+      "color": "text-red-400",
+      "bgColor": "bg-red-500/20",
+      "borderColor": "border-red-500/30"
+    }
+  },
+  "categoryColors": {
+    "과열 대응": "from-orange-500/20 to-red-500/20",
+    "실적 분석": "from-blue-500/20 to-indigo-500/20",
+    "위기 관리": "from-red-500/20 to-rose-500/20",
+    "매수 전략": "from-emerald-500/20 to-teal-500/20",
+    "주문 전략": "from-yellow-500/20 to-amber-500/20",
+    "함정 탐지": "from-purple-500/20 to-violet-500/20",
+    "매크로 대응": "from-slate-500/20 to-zinc-500/20",
+    "심리 관리": "from-pink-500/20 to-rose-500/20",
+    "극한 생존": "from-gray-700/30 to-gray-900/30",
+    "배당 전략": "from-amber-500/20 to-yellow-500/20"
+  },
+  "learningProcessSteps": [
+    {
+      "step": 1,
+      "emoji": "🧬",
+      "title": "성향 파악",
+      "description": "나의 투자 DNA를 진단하고 성향을 발견합니다"
+    },
+    {
+      "step": 2,
+      "emoji": "🎮",
+      "title": "실전 시뮬레이션",
+      "description": "실제 데이터 기반 10턴 시나리오에서 감각을 키웁니다"
+    },
+    {
+      "step": 3,
+      "emoji": "🤖",
+      "title": "AI 성향 대결",
+      "description": "나와 같은 성향의 AI는 어떻게 대처했는지 비교합니다"
+    },
+    {
+      "step": 4,
+      "emoji": "📊",
+      "title": "비교 분석 학습",
+      "description": "다른 성향의 AI와 수익률을 비교하며 시야를 넓힙니다"
+    }
+  ],
+  "investorDNAMap": {
+    "conservative": {
+      "label": "안정형",
+      "emoji": "🛡️",
+      "color": "text-green-400",
+      "bgGradient": "from-green-600 to-green-700",
+      "borderColor": "border-green-500/30",
+      "description": "원금 보존을 최우선으로, 확실한 기회에만 진입하는 신중한 투자자",
+      "traits": [
+        "손절 철저",
+        "분할 매수",
+        "리스크 관리 우선"
+      ],
+      "matchedCharacter": "차트 지킴이 수호"
+    },
+    "aggressive": {
+      "label": "공격형",
+      "emoji": "⚡",
+      "color": "text-red-400",
+      "bgGradient": "from-red-500 to-red-600",
+      "borderColor": "border-red-500/30",
+      "description": "높은 수익을 위해 리스크를 감수하며 대담하게 진입하는 투자자",
+      "traits": [
+        "모멘텀 추종",
+        "집중 투자",
+        "빠른 판단"
+      ],
+      "matchedCharacter": "번개 트레이더 준호"
+    },
+    "balanced": {
+      "label": "균형형",
+      "emoji": "⚖️",
+      "color": "text-blue-400",
+      "bgGradient": "from-blue-500 to-blue-600",
+      "borderColor": "border-blue-500/30",
+      "description": "리스크와 수익의 균형을 맞추며 상황에 따라 유연하게 대응하는 투자자",
+      "traits": [
+        "상황 분석",
+        "유연한 대응",
+        "분산 투자"
+      ],
+      "matchedCharacter": "파도 라이더 민지"
+    }
+  }
+}

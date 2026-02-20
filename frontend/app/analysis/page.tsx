@@ -10,20 +10,64 @@ import { cn } from "@/lib/utils"
 /**
  * 투자 성향 분석 페이지
  * - 다크 테마 모바일 최적화
- * - 8가지 질문으로 투자 성향 분석
+ * - 12가지 질문으로 투자 DNA 심층 분석
+ *   (이론 7문항 + 실전 차트 5문항)
+ * - 5가지 능력 지표: 리스크 감수, 분석력, 감정 통제, 대처 능력, 정보 판별
  */
 
-const analysisData = {
+type AbilityKey = "riskTolerance" | "analysis" | "emotionControl" | "coping" | "infoJudgment"
+
+interface TheoryOption {
+  text: string
+  score: number
+  type: string
+  emoji: string
+  best?: boolean
+  abilities: Partial<Record<AbilityKey, number>>
+}
+
+interface ChartOption {
+  text: string
+  emotion: string
+  result: string
+  score: number
+  emoji: string
+  best?: boolean
+  abilities: Partial<Record<AbilityKey, number>>
+}
+
+interface TheoryQuestion {
+  id: number
+  category: string
+  question: string
+  options: TheoryOption[]
+}
+
+interface ChartQuestion {
+  id: number
+  title: string
+  stock: string
+  situation: string
+  currentPrice: number
+  change?: string
+  volume?: string
+  news?: string
+  aiWarning?: string
+  question: string
+  options: ChartOption[]
+}
+
+const analysisData: { theory: TheoryQuestion[]; chart: ChartQuestion[] } = {
   theory: [
     {
       id: 1,
       category: "risk_tolerance",
       question: "보유 주식이 -10% 하락했습니다. 어떻게 하시겠습니까?",
       options: [
-        { text: "즉시 손절한다", score: 10, type: "리스크 회피형", emoji: "😰" },
-        { text: "추가 매수를 고려한다", score: 30, type: "공격형", emoji: "💪" },
-        { text: "분석 후 결정한다 ⭐", score: 20, type: "신중형", emoji: "🤔", best: true },
-        { text: "그냥 기다린다", score: 15, type: "장기 투자형", emoji: "😌" },
+        { text: "즉시 손절한다", score: 10, type: "리스크 회피형", emoji: "😰", abilities: { riskTolerance: 10, emotionControl: 15 } },
+        { text: "추가 매수를 고려한다", score: 30, type: "공격형", emoji: "💪", abilities: { riskTolerance: 35, coping: 20 } },
+        { text: "분석 후 결정한다 ⭐", score: 20, type: "신중형", emoji: "🤔", best: true, abilities: { riskTolerance: 20, analysis: 30, emotionControl: 25 } },
+        { text: "그냥 기다린다", score: 15, type: "장기 투자형", emoji: "😌", abilities: { riskTolerance: 15, emotionControl: 10 } },
       ],
     },
     {
@@ -31,10 +75,10 @@ const analysisData = {
       category: "analysis_style",
       question: "투자 결정을 내릴 때 가장 중요한 요소는?",
       options: [
-        { text: "빠른 직감 (감각형)", score: 10, type: "분석력", emoji: "⚡" },
-        { text: "차트 패턴 분석 (기술적) ⭐", score: 30, type: "분석력", emoji: "📊", best: true },
-        { text: "뉴스와 재무제표 (기본적)", score: 25, type: "분석력", emoji: "📰" },
-        { text: "전문가 의견 (추종형)", score: 15, type: "분석력", emoji: "👨‍🏫" },
+        { text: "빠른 직감 (감각형)", score: 10, type: "분석력", emoji: "⚡", abilities: { analysis: 10, coping: 15 } },
+        { text: "차트 패턴 분석 (기술적) ⭐", score: 30, type: "분석력", emoji: "📊", best: true, abilities: { analysis: 35, infoJudgment: 20 } },
+        { text: "뉴스와 재무제표 (기본적)", score: 25, type: "분석력", emoji: "📰", abilities: { analysis: 25, infoJudgment: 25 } },
+        { text: "전문가 의견 (추종형)", score: 15, type: "분석력", emoji: "👨‍🏫", abilities: { analysis: 15, infoJudgment: 10 } },
       ],
     },
     {
@@ -42,10 +86,10 @@ const analysisData = {
       category: "period",
       question: "선호하는 투자 기간은?",
       options: [
-        { text: "당일~1주 (단타형)", score: 30, type: "거래빈도", emoji: "🏃" },
-        { text: "1주~1개월 (스윙형) ⭐", score: 20, type: "거래빈도", emoji: "🏄", best: true },
-        { text: "1개월~3개월 (중기형)", score: 15, type: "거래빈도", emoji: "🚶" },
-        { text: "3개월 이상 (장기형)", score: 10, type: "거래빈도", emoji: "🧘" },
+        { text: "당일~1주 (단타형)", score: 30, type: "거래빈도", emoji: "🏃", abilities: { riskTolerance: 30, coping: 25 } },
+        { text: "1주~1개월 (스윙형) ⭐", score: 20, type: "거래빈도", emoji: "🏄", best: true, abilities: { riskTolerance: 20, analysis: 20 } },
+        { text: "1개월~3개월 (중기형)", score: 15, type: "거래빈도", emoji: "🚶", abilities: { riskTolerance: 15, emotionControl: 20 } },
+        { text: "3개월 이상 (장기형)", score: 10, type: "거래빈도", emoji: "🧘", abilities: { emotionControl: 30, riskTolerance: 10 } },
       ],
     },
     {
@@ -53,10 +97,10 @@ const analysisData = {
       category: "return_risk",
       question: "예상 수익률과 리스크 선호는?",
       options: [
-        { text: "연 5~10% / 낮은 리스크", score: 10, type: "리스크", emoji: "🛡️" },
-        { text: "연 10~30% / 중간 리스크 ⭐", score: 20, type: "리스크", emoji: "⚖️", best: true },
-        { text: "연 30~100% / 높은 리스크", score: 30, type: "리스크", emoji: "🎲" },
-        { text: "연 100%+ / 매우 높은 리스크", score: 40, type: "리스크", emoji: "🚀" },
+        { text: "연 5~10% / 낮은 리스크", score: 10, type: "리스크", emoji: "🛡️", abilities: { riskTolerance: 10, emotionControl: 25 } },
+        { text: "연 10~30% / 중간 리스크 ⭐", score: 20, type: "리스크", emoji: "⚖️", best: true, abilities: { riskTolerance: 20, analysis: 20 } },
+        { text: "연 30~100% / 높은 리스크", score: 30, type: "리스크", emoji: "🎲", abilities: { riskTolerance: 30, coping: 15 } },
+        { text: "연 100%+ / 매우 높은 리스크", score: 40, type: "리스크", emoji: "🚀", abilities: { riskTolerance: 40, emotionControl: 5 } },
       ],
     },
     {
@@ -64,16 +108,38 @@ const analysisData = {
       category: "failure_response",
       question: "투자 실패 시 어떻게 대응하나요?",
       options: [
-        { text: "바로 분석해서 원인 찾기 ⭐", score: 30, type: "학습력", emoji: "🔍", best: true },
-        { text: "잠시 쉬었다가 다시", score: 20, type: "학습력", emoji: "☕" },
-        { text: "전략을 완전히 바꾼다", score: 15, type: "학습력", emoji: "🔄" },
-        { text: "더 신중하게 움직인다", score: 25, type: "학습력", emoji: "🐢" },
+        { text: "바로 분석해서 원인 찾기 ⭐", score: 30, type: "학습력", emoji: "🔍", best: true, abilities: { coping: 35, analysis: 25 } },
+        { text: "잠시 쉬었다가 다시", score: 20, type: "학습력", emoji: "☕", abilities: { emotionControl: 25, coping: 15 } },
+        { text: "전략을 완전히 바꾼다", score: 15, type: "학습력", emoji: "🔄", abilities: { coping: 20, emotionControl: 10 } },
+        { text: "더 신중하게 움직인다", score: 25, type: "학습력", emoji: "🐢", abilities: { emotionControl: 20, coping: 25 } },
+      ],
+    },
+    {
+      id: 6,
+      category: "emotion_control",
+      question: "시장이 3일 연속 급락! 포트폴리오 -15%. 당신의 행동은?",
+      options: [
+        { text: "잠을 못 자고 계속 주가 확인", score: 10, type: "감정통제", emoji: "😰", abilities: { emotionControl: 5, coping: 10 } },
+        { text: "미리 정한 손절 라인대로 실행 ⭐", score: 30, type: "감정통제", emoji: "🎯", best: true, abilities: { emotionControl: 35, coping: 30 } },
+        { text: "뉴스와 커뮤니티를 계속 탐색", score: 15, type: "감정통제", emoji: "📱", abilities: { emotionControl: 10, infoJudgment: 15 } },
+        { text: "앱을 끄고 일상에 집중한다", score: 20, type: "감정통제", emoji: "🧘", abilities: { emotionControl: 25, coping: 10 } },
+      ],
+    },
+    {
+      id: 7,
+      category: "info_judgment",
+      question: "SNS에서 '확실한 내부 정보'라며 특정 종목 추천! 당신의 반응은?",
+      options: [
+        { text: "빨리 매수 (기회를 놓칠까 봐)", score: 5, type: "정보판별", emoji: "🏃", abilities: { infoJudgment: 5, emotionControl: 5 } },
+        { text: "재무제표·차트 직접 분석 후 판단 ⭐", score: 30, type: "정보판별", emoji: "🔍", best: true, abilities: { infoJudgment: 35, analysis: 25 } },
+        { text: "주변 지인에게 물어본다", score: 15, type: "정보판별", emoji: "💬", abilities: { infoJudgment: 15, emotionControl: 15 } },
+        { text: "무시한다 (출처 불명은 위험)", score: 25, type: "정보판별", emoji: "🚫", abilities: { infoJudgment: 30, emotionControl: 25 } },
       ],
     },
   ],
   chart: [
     {
-      id: 6,
+      id: 8,
       title: "급등주 포착",
       stock: "에코프로",
       situation: "3일간 +25% 급등 후 현재 시점",
@@ -83,28 +149,28 @@ const analysisData = {
       news: "정부 2차전지 지원 발표",
       question: "당신의 선택은?",
       options: [
-        { text: "지금 즉시 매수!", emotion: "욕심 80%", result: "-15%", score: 10, emoji: "🤑" },
-        { text: "조정 올 때까지 대기 ⭐", emotion: "이성 70%", result: "+8%", score: 30, emoji: "🧠", best: true },
-        { text: "절반만 매수", emotion: "균형 50%", result: "+2%", score: 20, emoji: "⚖️" },
-        { text: "매수 안 함", emotion: "두려움 80%", result: "0%", score: 15, emoji: "😨" },
+        { text: "지금 즉시 매수!", emotion: "욕심 80%", result: "-15%", score: 10, emoji: "🤑", abilities: { emotionControl: 5, infoJudgment: 10 } },
+        { text: "조정 올 때까지 대기 ⭐", emotion: "이성 70%", result: "+8%", score: 30, emoji: "🧠", best: true, abilities: { emotionControl: 30, analysis: 25 } },
+        { text: "절반만 매수", emotion: "균형 50%", result: "+2%", score: 20, emoji: "⚖️", abilities: { emotionControl: 20, coping: 20 } },
+        { text: "매수 안 함", emotion: "두려움 80%", result: "0%", score: 15, emoji: "😨", abilities: { emotionControl: 15, riskTolerance: 5 } },
       ],
     },
     {
-      id: 7,
+      id: 9,
       title: "하락장 대응",
       stock: "삼성바이오",
       situation: "850,000원에 매수 후 현재 -8% 손실",
       currentPrice: 782000,
       question: "당신의 감정과 선택은?",
       options: [
-        { text: "즉시 손절!", emotion: "공포 90%", result: "-8%", score: 10, emoji: "😱" },
-        { text: "물타기", emotion: "억울함 60%", result: "-15%", score: 5, emoji: "😤" },
-        { text: "기다리며 분석 ⭐", emotion: "침착 70%", result: "+3%", score: 30, emoji: "😌", best: true },
-        { text: "그냥 기다림", emotion: "무기력 60%", result: "-18%", score: 15, emoji: "😐" },
+        { text: "즉시 손절!", emotion: "공포 90%", result: "-8%", score: 10, emoji: "😱", abilities: { emotionControl: 10, coping: 10 } },
+        { text: "물타기", emotion: "억울함 60%", result: "-15%", score: 5, emoji: "😤", abilities: { emotionControl: 5, coping: 5 } },
+        { text: "기다리며 분석 ⭐", emotion: "침착 70%", result: "+3%", score: 30, emoji: "😌", best: true, abilities: { emotionControl: 30, analysis: 25, coping: 30 } },
+        { text: "그냥 기다림", emotion: "무기력 60%", result: "-18%", score: 15, emoji: "😐", abilities: { emotionControl: 10, coping: 5 } },
       ],
     },
     {
-      id: 8,
+      id: 10,
       title: "B파 함정 회피",
       stock: "셀트리온",
       situation: "하락 후 반등 시작, B파 의심 구간",
@@ -114,19 +180,92 @@ const analysisData = {
       aiWarning: "거래량 부족. B파 함정 가능성 80%",
       question: "당신의 감정과 선택은?",
       options: [
-        { text: "매수! (반등 기회)", emotion: "탐욕 80%", result: "-12%", score: 5, emoji: "🤑" },
-        { text: "저항선 돌파 확인 후", emotion: "신중 60%", result: "0%", score: 25, emoji: "🤔" },
-        { text: "진입 안 함 ⭐", emotion: "이성 90%", result: "0%", score: 30, emoji: "🧠", best: true },
-        { text: "소량만 매수", emotion: "반신반의", result: "-12%", score: 15, emoji: "😅" },
+        { text: "매수! (반등 기회)", emotion: "탐욕 80%", result: "-12%", score: 5, emoji: "🤑", abilities: { infoJudgment: 5, emotionControl: 5 } },
+        { text: "저항선 돌파 확인 후", emotion: "신중 60%", result: "0%", score: 25, emoji: "🤔", abilities: { analysis: 25, infoJudgment: 20 } },
+        { text: "진입 안 함 ⭐", emotion: "이성 90%", result: "0%", score: 30, emoji: "🧠", best: true, abilities: { infoJudgment: 35, emotionControl: 30 } },
+        { text: "소량만 매수", emotion: "반신반의", result: "-12%", score: 15, emoji: "😅", abilities: { coping: 15, emotionControl: 10 } },
+      ],
+    },
+    {
+      id: 11,
+      title: "갭하락 긴급 대응",
+      stock: "카카오",
+      situation: "미국 기술주 급락 여파, 장 시작 -5% 갭하락",
+      currentPrice: 47500,
+      change: "-5%",
+      volume: "+250%",
+      news: "미국 나스닥 -3.2% 급락 영향",
+      question: "장 시작 직후, 당신의 선택은?",
+      options: [
+        { text: "패닉 매도! 더 빠지기 전에", emotion: "공포 90%", result: "-5%", score: 10, emoji: "😱", abilities: { emotionControl: 5, coping: 5 } },
+        { text: "30분 관망 후 지지선 확인 ⭐", emotion: "침착 80%", result: "+2%", score: 30, emoji: "🧠", best: true, abilities: { emotionControl: 30, analysis: 30, coping: 35 } },
+        { text: "저가 매수 기회! 바로 매수", emotion: "탐욕 70%", result: "-3%", score: 15, emoji: "🤑", abilities: { riskTolerance: 30, coping: 15 } },
+        { text: "손절 라인 설정 후 보유 유지", emotion: "계획적 70%", result: "+1%", score: 25, emoji: "📋", abilities: { coping: 25, emotionControl: 25 } },
+      ],
+    },
+    {
+      id: 12,
+      title: "수익 실현 타이밍",
+      stock: "현대차",
+      situation: "매수 후 +20% 수익 중, 목표가 근접",
+      currentPrice: 264000,
+      change: "+20%",
+      volume: "+50%",
+      news: "글로벌 EV 시장 확대 전망",
+      question: "수익 실현을 어떻게 하시겠습니까?",
+      options: [
+        { text: "전량 매도! 수익 확보가 최우선", emotion: "만족 60%", result: "+20%", score: 20, emoji: "💰", abilities: { emotionControl: 20, coping: 15 } },
+        { text: "분할 매도 (50% 먼저) ⭐", emotion: "이성 70%", result: "+25%", score: 30, emoji: "📊", best: true, abilities: { analysis: 25, coping: 30, emotionControl: 25 } },
+        { text: "더 오를 것 같아 전량 홀딩", emotion: "욕심 80%", result: "-10%", score: 10, emoji: "🎰", abilities: { emotionControl: 5, infoJudgment: 10 } },
+        { text: "트레일링 스탑 걸고 보유", emotion: "계획적 70%", result: "+15%", score: 25, emoji: "📈", abilities: { coping: 25, analysis: 20, emotionControl: 20 } },
       ],
     },
   ],
+}
+
+const ABILITY_LABELS: Record<AbilityKey, { label: string; emoji: string; gradient: string }> = {
+  riskTolerance: { label: "리스크 감수", emoji: "🎲", gradient: "from-red-500 to-orange-500" },
+  analysis: { label: "분석력", emoji: "📊", gradient: "from-blue-500 to-cyan-500" },
+  emotionControl: { label: "감정 통제", emoji: "🧘", gradient: "from-green-500 to-emerald-500" },
+  coping: { label: "대처 능력", emoji: "⚡", gradient: "from-yellow-500 to-orange-500" },
+  infoJudgment: { label: "정보 판별", emoji: "🔍", gradient: "from-purple-500 to-violet-500" },
+}
+
+function computeAbilities(allQuestions: (TheoryQuestion | ChartQuestion)[], chosenIndices: number[]) {
+  const totals: Record<AbilityKey, number> = {
+    riskTolerance: 0,
+    analysis: 0,
+    emotionControl: 0,
+    coping: 0,
+    infoJudgment: 0,
+  }
+  const counts: Record<AbilityKey, number> = { ...totals }
+
+  chosenIndices.forEach((optIdx, qIdx) => {
+    const q = allQuestions[qIdx]
+    const opt = q.options[optIdx] as TheoryOption | ChartOption
+    if (opt.abilities) {
+      for (const [key, val] of Object.entries(opt.abilities)) {
+        const k = key as AbilityKey
+        totals[k] += val!
+        counts[k] += 1
+      }
+    }
+  })
+
+  const result: Record<AbilityKey, number> = { ...totals }
+  for (const key of Object.keys(result) as AbilityKey[]) {
+    const maxPossible = counts[key] > 0 ? counts[key] * 35 : 1
+    result[key] = Math.min(Math.round((totals[key] / maxPossible) * 100), 100)
+  }
+  return result
 }
 
 export default function AnalysisPage() {
   const router = useRouter()
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<number[]>([])
+  const [chosenIndices, setChosenIndices] = useState<number[]>([])
   const [selectedOption, setSelectedOption] = useState<number | null>(null)
   const [showFeedback, setShowFeedback] = useState(false)
   const [totalScore, setTotalScore] = useState(0)
@@ -139,12 +278,13 @@ export default function AnalysisPage() {
 
   const handleAnswer = (optionIndex: number) => {
     const option = currentQuestion.options[optionIndex]
-    const score = (option as any).score
+    const score = (option as TheoryOption | ChartOption).score
 
     setSelectedOption(optionIndex)
     setShowFeedback(true)
     setTotalScore(totalScore + score)
     setAnswers([...answers, score])
+    setChosenIndices([...chosenIndices, optionIndex])
 
     setTimeout(() => {
       if (currentIndex < allQuestions.length - 1) {
@@ -157,15 +297,17 @@ export default function AnalysisPage() {
         if (avgScore < 15) investorType = "보수적 안정형 투자자"
         else if (avgScore > 25) investorType = "공격적 도전형 투자자"
 
+        const finalChoices = [...chosenIndices, optionIndex]
+        const abilities = computeAbilities(allQuestions, finalChoices)
+
         storage.saveUserProfile({
           investorType,
           analysisScore: avgScore,
+          abilities,
           completedAt: new Date().toISOString(),
         })
         storage.setOnboardingComplete()
         storage.setGuideComplete()
-
-        console.log("[v0] Analysis complete, profile saved:", storage.getUserProfile())
 
         setTimeout(() => {
           setShowResult(true)
@@ -177,78 +319,105 @@ export default function AnalysisPage() {
   // 결과 화면
   if (showResult) {
     const avgScore = Math.round(totalScore / allQuestions.length)
+    const abilities = computeAbilities(allQuestions, chosenIndices)
 
     let investorType = "신중한 기술적 분석가"
     let description = "차트 분석 능력이 우수하며, 이성적인 판단이 가능합니다."
     let emoji = "📊"
+    let tips: string[] = ["기술적 분석 학습을 깊이 있게 진행하세요", "감정보다 데이터에 기반한 결정을 유지하세요"]
 
     if (avgScore < 15) {
       investorType = "보수적 안정형 투자자"
-      description = "리스크를 최소화하며 안정적인 투자를 선호합니다."
+      description = "리스크를 최소화하며 안정적인 투자를 선호합니다. 원금 보존에 탁월합니다."
       emoji = "🛡️"
+      tips = ["안정적인 배당주 중심 포트폴리오를 구성해 보세요", "점진적으로 리스크 허용 범위를 넓혀보세요"]
     } else if (avgScore > 25) {
       investorType = "공격적 도전형 투자자"
-      description = "높은 수익을 위해 적극적인 투자를 추구합니다."
+      description = "높은 수익을 위해 적극적으로 투자합니다. 기회 포착력이 뛰어납니다."
       emoji = "⚡"
+      tips = ["손절 라인을 반드시 설정하고 지키세요", "감정이 아닌 전략에 기반한 매매를 연습하세요"]
     }
 
+    const abilityKeys = Object.keys(ABILITY_LABELS) as AbilityKey[]
+    const avgAbility = Math.round(abilityKeys.reduce((sum, k) => sum + abilities[k], 0) / abilityKeys.length)
+    const strongestKey = abilityKeys.reduce((best, k) => abilities[k] > abilities[best] ? k : best, abilityKeys[0])
+    const weakestKey = abilityKeys.reduce((worst, k) => abilities[k] < abilities[worst] ? k : worst, abilityKeys[0])
+
     return (
-      <div className="min-h-screen-mobile bg-gradient-to-b from-blue-600 to-purple-700 px-5 py-8 flex flex-col items-center justify-center">
+      <div className="min-h-screen-mobile bg-gradient-to-b from-blue-600 to-purple-700 px-5 py-8 flex flex-col items-center">
         <div className="max-w-md w-full animate-slide-up">
-          <div className="text-center mb-8">
-            <div className="text-8xl mb-6 animate-bounce">{emoji}</div>
-            <div className="inline-flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 mb-4">
+          <div className="text-center mb-6">
+            <div className="text-7xl mb-4 animate-bounce">{emoji}</div>
+            <div className="inline-flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 mb-3">
               <Zap className="w-5 h-5 text-yellow-300" />
               <span className="text-white font-bold text-lg">{totalScore} 점</span>
             </div>
-            <h1 className="text-3xl font-bold text-white mb-3">분석 완료!</h1>
-            <p className="text-blue-100 text-lg">당신은...</p>
+            <h1 className="text-3xl font-bold text-white mb-2">분석 완료!</h1>
+            <p className="text-blue-100 text-lg">당신의 투자 DNA는...</p>
           </div>
 
-          <div className="bg-[#252525] rounded-3xl p-8 shadow-2xl mb-6 border border-white/10">
-            <h2 className="text-2xl font-bold text-white mb-3 text-center">{investorType}</h2>
-            <p className="text-gray-400 text-center leading-relaxed mb-6">{description}</p>
+          <div className="bg-[#252525] rounded-3xl p-6 shadow-2xl mb-4 border border-white/10">
+            <h2 className="text-2xl font-bold text-white mb-2 text-center">{investorType}</h2>
+            <p className="text-gray-400 text-center leading-relaxed mb-5 text-sm">{description}</p>
 
-            <div className="space-y-4">
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-400">리스크 감수</span>
-                  <span className="font-bold text-white">{Math.min(avgScore * 4, 100)}%</span>
-                </div>
-                <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-1000"
-                    style={{ width: `${Math.min(avgScore * 4, 100)}%` }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-400">분석 선호도</span>
-                  <span className="font-bold text-white">85%</span>
-                </div>
-                <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full transition-all duration-1000 delay-200"
-                    style={{ width: "85%" }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-gray-400">감정 통제</span>
-                  <span className="font-bold text-white">65%</span>
-                </div>
-                <div className="h-3 bg-gray-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full transition-all duration-1000 delay-300"
-                    style={{ width: "65%" }}
-                  />
-                </div>
+            <div className="bg-[#1a1a1a] rounded-2xl p-4 mb-5">
+              <h3 className="text-sm font-bold text-gray-300 mb-3 flex items-center gap-2">
+                🧬 5대 투자 능력 지표
+              </h3>
+              <div className="space-y-3">
+                {abilityKeys.map((key, i) => {
+                  const { label, emoji: abilityEmoji, gradient } = ABILITY_LABELS[key]
+                  const value = abilities[key]
+                  return (
+                    <div key={key}>
+                      <div className="flex justify-between text-sm mb-1.5">
+                        <span className="text-gray-400 flex items-center gap-1.5">
+                          <span>{abilityEmoji}</span>
+                          {label}
+                        </span>
+                        <span className="font-bold text-white">{value}%</span>
+                      </div>
+                      <div className="h-2.5 bg-gray-700 rounded-full overflow-hidden">
+                        <div
+                          className={cn("h-full bg-gradient-to-r rounded-full transition-all duration-1000", gradient)}
+                          style={{ width: `${value}%`, transitionDelay: `${i * 150}ms` }}
+                        />
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
+
+            <div className="grid grid-cols-2 gap-3 mb-5">
+              <div className="bg-green-500/10 rounded-xl p-3 border border-green-500/20 text-center">
+                <p className="text-xs text-green-400 mb-1">가장 강한 능력</p>
+                <p className="text-lg">{ABILITY_LABELS[strongestKey].emoji}</p>
+                <p className="text-sm font-bold text-white">{ABILITY_LABELS[strongestKey].label}</p>
+              </div>
+              <div className="bg-orange-500/10 rounded-xl p-3 border border-orange-500/20 text-center">
+                <p className="text-xs text-orange-400 mb-1">보완 필요 능력</p>
+                <p className="text-lg">{ABILITY_LABELS[weakestKey].emoji}</p>
+                <p className="text-sm font-bold text-white">{ABILITY_LABELS[weakestKey].label}</p>
+              </div>
+            </div>
+
+            <div className="bg-blue-500/10 rounded-xl p-4 border border-blue-500/20">
+              <h4 className="text-sm font-bold text-blue-300 mb-2">💡 맞춤 성장 팁</h4>
+              <ul className="space-y-1.5">
+                {tips.map((tip, i) => (
+                  <li key={i} className="text-sm text-gray-300 flex items-start gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+                    {tip}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 mb-4 text-center border border-white/10">
+            <p className="text-sm text-white/70">종합 투자 역량</p>
+            <p className="text-4xl font-black text-white">{avgAbility}<span className="text-lg text-white/60">점</span></p>
           </div>
 
           <Button
