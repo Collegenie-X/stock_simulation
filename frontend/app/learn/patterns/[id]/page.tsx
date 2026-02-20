@@ -213,6 +213,7 @@ export default function PatternDetailPage() {
             목록으로
           </Button>
           <Button
+            onClick={() => router.push(`/learn/patterns/${pattern.id}/practice`)}
             className="flex-[2] h-12 rounded-xl font-bold text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:opacity-90"
           >
             <TrendingUp className="w-4 h-4 mr-2" />

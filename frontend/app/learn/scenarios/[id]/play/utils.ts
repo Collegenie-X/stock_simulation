@@ -1,11 +1,11 @@
-import type { ScenarioEvent } from "@/data/legendary-scenarios"
+import type { ScenarioEvent, StockInfo } from "@/data/legendary-scenarios"
 import playContent from "@/data/scenario-play-content.json"
+import { storage } from "@/lib/storage"
 
-const { game: GAME_CFG } = playContent
+const { game: G } = playContent
 
-// ── 타입 ─────────────────────────────────────
 export interface TurnData {
-  phase: number
+  turn: number
   event: ScenarioEvent
   startPrice: number
   endPrice: number
@@ -16,117 +16,125 @@ export interface TurnData {
 export type ActionType = "buy" | "sell" | "hold"
 
 export interface TradeRecord {
-  phase: number
+  turn: number
   action: ActionType
   quantity: number
   price: number
   eventTitle: string
+  ratioLabel?: string
 }
 
-// ── 핵심 4턴 선별 ────────────────────────────
-export function selectKeyEvents(events: ScenarioEvent[]): ScenarioEvent[] {
-  const n = events.length
-  if (n <= GAME_CFG.turnsPerScenario) return events.map((e, i) => ({ ...e, turn: i + 1 }))
-  const picks = [0, Math.floor(n * 0.3), Math.floor(n * 0.55), n - 1]
-  return picks.map((idx, phase) => ({ ...events[idx], turn: phase + 1 }))
+export interface GameState {
+  cash: number
+  holdings: number
+  avgPrice: number
+  totalInitial: number
+  stockName: string
+  stockCode: string
 }
 
-// ── 세밀한 차트 데이터 생성 ──────────────────
-// 턴 사이를 보간해서 자연스러운 곡선 생성
-function interpolatePoints(
-  startPrice: number,
-  endPrice: number,
-  count: number,
-  volatility: number = 0.008,
-): number[] {
-  const pts: number[] = [startPrice]
-  const diff = endPrice - startPrice
+export function getInitialState(stock: StockInfo): GameState {
+  const portfolio = storage.getPortfolio()
+  const cash = portfolio?.cash ?? G.defaultCash
+  const holdings = G.defaultHoldings
+  const avgPrice = stock.initialPrice
+  const spent = holdings * avgPrice
+  const totalInitial = cash
+
+  return {
+    cash: cash - spent,
+    holdings,
+    avgPrice,
+    totalInitial,
+    stockName: stock.name,
+    stockCode: stock.code,
+  }
+}
+
+function interpolate(start: number, end: number, count: number, vol: number): number[] {
+  const pts: number[] = [start]
+  const diff = end - start
   for (let i = 1; i < count - 1; i++) {
-    const progress = i / (count - 1)
-    const eased = progress < 0.5
-      ? 2 * progress * progress
-      : 1 - Math.pow(-2 * progress + 2, 2) / 2
-    const base = startPrice + diff * eased
-    const noise = base * volatility * (Math.random() * 2 - 1)
+    const t = i / (count - 1)
+    const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
+    const base = start + diff * eased
+    const noise = base * vol * (Math.random() * 2 - 1)
     pts.push(Math.round(base + noise))
   }
-  pts.push(endPrice)
+  pts.push(end)
   return pts
 }
 
-export function buildTurnData(events: ScenarioEvent[]): TurnData[] {
-  const keyEvents = selectKeyEvents(events)
-  let price = GAME_CFG.initialPrice
-  const pointsPerTurn = GAME_CFG.chartPointsPerTurn
-
-  return keyEvents.map((evt, idx) => {
-    const changePercent = parseFloat(evt.priceChange.replace("%", "").replace("+", ""))
+export function buildTurns(events: ScenarioEvent[], initialPrice: number): TurnData[] {
+  const evts = events.slice(0, 8)
+  let price = initialPrice
+  return evts.map((evt, idx) => {
+    const pct = parseFloat(evt.priceChange.replace("%", "").replace("+", ""))
     const startPrice = price
-    const endPrice = Math.round(price * (1 + changePercent / 100))
-    const vol = Math.abs(changePercent) > 10 ? 0.015 : Math.abs(changePercent) > 5 ? 0.01 : 0.006
-    const chartPoints = interpolatePoints(startPrice, endPrice, pointsPerTurn, vol)
+    const endPrice = Math.round(price * (1 + pct / 100))
+    const vol = Math.abs(pct) > 3 ? 0.006 : 0.004
+    const chartPoints = interpolate(startPrice, endPrice, G.chartPointsPerTurn, vol)
     price = endPrice
-    return {
-      phase: idx,
-      event: evt,
-      startPrice,
-      endPrice,
-      change: changePercent,
-      chartPoints,
-    }
+    return { turn: idx + 1, event: evt, startPrice, endPrice, change: pct, chartPoints }
   })
 }
 
-// ── 전체 차트 포인트 병합 ────────────────────
-export function getAllChartPoints(turns: TurnData[], upToPhase: number): number[] {
+export function getChartPoints(turns: TurnData[], upTo: number): number[] {
   const pts: number[] = []
-  for (let i = 0; i <= upToPhase && i < turns.length; i++) {
-    if (i === 0) {
-      pts.push(...turns[i].chartPoints)
-    } else {
-      pts.push(...turns[i].chartPoints.slice(1))
-    }
+  for (let i = 0; i <= upTo && i < turns.length; i++) {
+    pts.push(...(i === 0 ? turns[i].chartPoints : turns[i].chartPoints.slice(1)))
   }
   return pts
 }
 
-// ── 포트폴리오 계산 ─────────────────────────
-export function calcPortfolioValue(cash: number, holdings: number, price: number): number {
+export function portfolioValue(cash: number, holdings: number, price: number) {
   return cash + holdings * price
 }
 
-export function calcProfitRate(current: number, initial: number): number {
-  return ((current - initial) / initial) * 100
+export function calcRate(current: number, initial: number) {
+  return initial === 0 ? 0 : ((current - initial) / initial) * 100
 }
 
-// ── 이상적 행동 판단 ────────────────────────
-export function getIdealAction(
-  turns: TurnData[],
-  currentPhase: number,
-  hasHoldings: boolean,
-): ActionType {
-  const futureChanges = turns.slice(currentPhase + 1).map((t) => t.change)
-  const futureSum = futureChanges.reduce((a, b) => a + b, 0)
-  if (futureSum < -5) return hasHoldings ? "sell" : "hold"
-  if (futureSum > 3) return "buy"
+export function idealAction(turns: TurnData[], idx: number, hasHoldings: boolean): ActionType {
+  const next = turns.slice(idx + 1)
+  if (next.length === 0) return hasHoldings ? "sell" : "hold"
+  const nextChange = next[0].change
+  const futureSum = next.reduce((s, t) => s + t.change, 0)
+  if (nextChange < -2 || futureSum < -4) return hasHoldings ? "sell" : "hold"
+  if (nextChange > 2 || futureSum > 4) return "buy"
+  if (hasHoldings && futureSum < -1.5) return "sell"
   return "hold"
 }
 
-// ── 피드백 스코어 ───────────────────────────
-export function getFeedbackLevel(
-  action: ActionType,
-  idealAction: ActionType,
-): "correct" | "good" | "bad" {
-  if (action === idealAction) return "correct"
-  if (action === "hold") return "good"
-  return "bad"
+export function feedbackLevel(action: ActionType, ideal: ActionType): "correct" | "good" | "bad" {
+  if (action === ideal) return "correct"
+  if ((ideal === "sell" && action === "buy") || (ideal === "buy" && action === "sell")) return "bad"
+  return "good"
 }
 
-// ── 등급 판정 ───────────────────────────────
-export function getGrade(profitRate: number): string {
-  const grades = playContent.grades
-  for (const [key, cfg] of Object.entries(grades)) {
-    if (profitRate >= cfg.minRate) return key
+export function getMarketHint(turns: TurnData[], idx: number, hasHoldings: boolean) {
+  const { hints } = playContent
+  const ideal = idealAction(turns, idx, hasHoldings)
+  const seed = idx + (turns[idx]?.change ?? 0)
+  const pick = (arr: string[]) => arr[Math.abs(Math.round(seed * 10)) % arr.length]
+
+  let hint: string, ratioGuide: string
+  if (ideal === "buy") {
+    hint = pick(hints.buySignals)
+    ratioGuide = hints.ratioGuide.moderate
+  } else if (ideal === "sell") {
+    hint = pick(hints.sellSignals)
+    ratioGuide = hasHoldings ? hints.ratioGuide.aggressive : hints.ratioGuide.conservative
+  } else {
+    hint = pick(hints.holdSignals)
+    ratioGuide = hints.ratioGuide.conservative
+  }
+  return { hint, ratioGuide, signal: ideal }
+}
+
+export function getGrade(rate: number): string {
+  for (const [key, cfg] of Object.entries(playContent.grades)) {
+    if (rate >= cfg.minRate) return key
   }
   return "D"
 }

@@ -34,6 +34,13 @@ export interface ScenarioEvent {
   sentiment: "positive" | "negative" | "neutral" | "shock"
 }
 
+export interface StockInfo {
+  name: string
+  code: string
+  sector: string
+  initialPrice: number
+}
+
 export interface LegendaryScenario {
   id: string
   order: number
@@ -49,6 +56,7 @@ export interface LegendaryScenario {
   keyLesson: string
   survivalTip: string
   tags: string[]
+  stock: StockInfo
   events: ScenarioEvent[]
   strategies: SolutionStrategy[]
   aiStrategies: AIStrategy[]
