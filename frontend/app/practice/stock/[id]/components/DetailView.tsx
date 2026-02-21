@@ -1,13 +1,16 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState, useRef } from "react"
 import { ArrowLeft, Heart, Bell, MoreHorizontal, Search, TrendingUp, TrendingDown, Newspaper } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { formatNumber } from "@/lib/format"
 import { LABELS, CHART_PERIOD_MAP } from "../config"
 import { StockChart } from "./StockChart"
 import { WeeklyReportModal } from "./WeeklyReportModal"
 import { DatePopup } from "./DatePopup"
+import { FloatingExitButton } from "./FloatingExitButton"
 import { DAYS_PER_WEEK, DECISIONS_PER_DAY } from "../config"
+import type { ChartEvent } from "../types"
 
 // ── 타입 ──────────────────────────────────────────────────────
 interface PendingOrder {
@@ -86,6 +89,7 @@ export interface DetailViewProps {
   onBuy: () => void
   onSell: () => void
   onShowHint: () => void
+  onExitClick: () => void
 }
 
 // ── 컴포넌트 ──────────────────────────────────────────────────
@@ -130,6 +134,7 @@ export const DetailView = ({
   onBuy,
   onSell,
   onShowHint,
+  onExitClick,
 }: DetailViewProps) => {
   const profitAmt = currentHoldings > 0 ? Math.round((currentPrice - myAvg) * currentHoldings) : 0
   const totalStockValue = currentHoldings > 0 ? Math.round(currentPrice * currentHoldings) : 0
@@ -149,8 +154,57 @@ export const DetailView = ({
     })
   }, [isUp, change, stockNews, stockCategory, stockName, prevDayChange, prevDayIsUp, prevDayNews])
 
+  // 차트에 표시할 이벤트 마커 생성
+  const chartEvents = useMemo(() => {
+    if (!chartData || chartData.length === 0) return []
+    
+    let delayedCount = 0
+    let currentCount = 0
+    
+    return dailyEvents.map((evt, idx) => {
+      let eventIndex: number
+      
+      if (evt.isDelayed) {
+        // 전일 뉴스: 최근 여러 턴에 분산
+        eventIndex = Math.max(0, chartData.length - 2 - delayedCount)
+        delayedCount++
+      } else {
+        // 당일 뉴스: 마지막 턴 또는 그 근처
+        eventIndex = Math.max(0, chartData.length - 1 - currentCount)
+        currentCount++
+      }
+      
+      return {
+        index: eventIndex,
+        type: evt.type,
+        emoji: evt.emoji,
+        headline: evt.headline,
+      }
+    })
+  }, [dailyEvents, chartData])
+
+  const [selectedEventIndex, setSelectedEventIndex] = useState<number | null>(null)
+  const eventRefs = useRef<(HTMLDivElement | null)[]>([])
+  const chartRef = useRef<HTMLDivElement>(null)
+
+  const handleNewsClick = (index: number) => {
+    setSelectedEventIndex(index)
+    
+    // 차트로 스크롤
+    chartRef.current?.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'center' 
+    })
+    
+    // 3초 후 강조 해제
+    setTimeout(() => setSelectedEventIndex(null), 3000)
+  }
+
   return (
     <div className="min-h-screen bg-[#191919] text-white flex flex-col">
+      {/* 플로팅 종료 버튼 (항상 표시) */}
+      <FloatingExitButton onClick={onExitClick} />
+
       <DatePopup isVisible={showDatePopup} date={turnDate} />
 
       {/* 거래 완료 피드백 토스트 */}
@@ -238,10 +292,10 @@ export const DetailView = ({
               <Search className="w-3 h-3 text-gray-400" />
             </div>
           </div>
-          <div className="text-4xl font-bold mb-2">{currentPrice.toLocaleString()}원</div>
+          <div className="text-4xl font-bold mb-2">{formatNumber(currentPrice)}원</div>
           <div className={cn("text-sm font-medium flex items-center gap-1", isUp ? "text-red-500" : "text-blue-500")}>
             어제보다 {isUp ? "+" : ""}
-            {Math.abs(currentPrice - prevPrice).toLocaleString()}원 ({change}%)
+            {formatNumber(Math.abs(currentPrice - prevPrice))}원 ({change}%)
           </div>
         </div>
 
@@ -262,13 +316,18 @@ export const DetailView = ({
         </div>
 
         {/* 차트 */}
-        <div className="h-[360px] w-full mb-4 relative bg-gray-900 rounded-xl overflow-hidden">
+        <div 
+          ref={chartRef}
+          className="h-[360px] w-full mb-4 relative bg-gray-900 rounded-xl overflow-hidden"
+        >
           <StockChart
             data={chartData}
             height={360}
             color={isUp ? "red" : "blue"}
             showXAxis
             chartPeriod={chartPeriod}
+            events={chartEvents}
+            selectedEventIndex={selectedEventIndex}
           />
         </div>
 
@@ -298,23 +357,41 @@ export const DetailView = ({
         {dailyEvents.length > 0 && (
           <div className="px-5 mb-6">
             <div className="bg-[#1e1e1e] rounded-2xl overflow-hidden border border-gray-800/40">
-              <div className="flex items-center gap-2 px-4 pt-4 pb-2">
-                <Newspaper className="w-4 h-4 text-yellow-500" />
-                <span className="text-xs font-bold text-gray-300">시장 뉴스</span>
-                <span className={cn(
-                  "text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-auto",
-                  isUp ? "bg-red-500/15 text-red-400" : "bg-blue-500/15 text-blue-400"
-                )}>
-                  {isUp ? "상승세" : "하락세"}
-                </span>
+              <div className="px-4 pt-4 pb-2">
+                <div className="flex items-center gap-2 mb-1">
+                  <Newspaper className="w-4 h-4 text-yellow-500" />
+                  <span className="text-xs font-bold text-gray-300">시장 뉴스</span>
+                  <span className={cn(
+                    "text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-auto",
+                    isUp ? "bg-red-500/15 text-red-400" : "bg-blue-500/15 text-blue-400"
+                  )}>
+                    {isUp ? "상승세" : "하락세"}
+                  </span>
+                </div>
+                <p className="text-[10px] text-gray-500 flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-blue-500 inline-block animate-pulse" />
+                  뉴스를 클릭하면 차트에서 해당 구간을 확인할 수 있습니다
+                </p>
               </div>
               <div className="px-4 pb-4 space-y-0">
                 {dailyEvents.map((evt, idx) => (
-                  <div key={idx} className="flex items-start gap-2.5 py-2.5 border-b border-gray-800/30 last:border-0">
+                  <div 
+                    key={idx} 
+                    ref={el => eventRefs.current[idx] = el}
+                    onClick={() => handleNewsClick(idx)}
+                    className={cn(
+                      "flex items-start gap-2.5 py-2.5 border-b border-gray-800/30 last:border-0 transition-all duration-300 cursor-pointer hover:bg-gray-800/30 rounded-lg",
+                      selectedEventIndex === idx && "bg-yellow-500/15 ring-2 ring-yellow-500/40 px-2 -mx-2"
+                    )}
+                  >
                     <div className={cn(
-                      "w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5",
+                      "w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 relative",
                       evt.type === "positive" ? "bg-red-500/15" : evt.type === "negative" ? "bg-blue-500/15" : "bg-gray-700/50"
                     )}>
+                      {/* 차트 마커 표시 */}
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center text-[8px] font-bold text-white">
+                        {idx + 1}
+                      </div>
                       {evt.type === "positive"
                         ? <TrendingUp className="w-3 h-3 text-red-400" />
                         : evt.type === "negative"
@@ -335,7 +412,12 @@ export const DetailView = ({
                         </span>
                       )}
                     </div>
-                    <span className="text-[9px] text-gray-600 shrink-0 mt-1">{evt.time}</span>
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <span className="text-[9px] text-gray-600 mt-1">{evt.time}</span>
+                      <span className="text-[8px] text-blue-400 bg-blue-500/10 px-1.5 py-0.5 rounded flex items-center gap-0.5">
+                        📍 차트에서 보기
+                      </span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -365,7 +447,7 @@ export const DetailView = ({
                 <div className="flex items-center justify-between py-3.5 border-b border-gray-800/40">
                   <span className="text-sm text-gray-400">{LABELS.stockDetail.avgPerShare}</span>
                   <span className="text-sm font-medium text-white">
-                    {Math.round(myAvg).toLocaleString()}원
+                    {formatNumber(Math.round(myAvg))}원
                   </span>
                 </div>
 
@@ -386,11 +468,11 @@ export const DetailView = ({
                   </div>
                   <div className="text-right">
                     <div className="text-sm font-bold text-white">
-                      {totalStockValue.toLocaleString()}원
+                      {formatNumber(totalStockValue)}원
                     </div>
                     <div className={cn("text-xs font-bold", isProfit ? "text-red-500" : "text-blue-500")}>
                       {isProfit ? "+" : ""}
-                      {profitAmt.toLocaleString()}원 ({isProfit ? "+" : ""}
+                      {formatNumber(profitAmt)}원 ({isProfit ? "+" : ""}
                       {myReturn}%)
                     </div>
                   </div>
@@ -409,7 +491,7 @@ export const DetailView = ({
                 <div className="flex items-center justify-between py-3.5">
                   <span className="text-sm text-gray-400">{LABELS.stockDetail.sellTax}</span>
                   <span className="text-sm text-gray-300">
-                    {estimatedTax.toLocaleString()}원 예상
+                    {formatNumber(estimatedTax)}원 예상
                   </span>
                 </div>
               </div>
@@ -446,7 +528,7 @@ export const DetailView = ({
                     <div className="text-lg font-bold text-white">
                       {order.targetPrice < 100
                         ? `${order.targetPrice > 0 ? "+" : ""}${order.targetPrice}% 도달 시`
-                        : `${order.targetPrice.toLocaleString()}원 도달 시`}
+                        : `${formatNumber(order.targetPrice)}원 도달 시`}
                     </div>
                   </div>
                   <button

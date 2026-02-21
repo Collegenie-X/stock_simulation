@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { CheckCircle2, ChevronRight, Zap, TrendingUp } from "lucide-react"
+import { formatNumber } from "@/lib/format"
 import { storage } from "@/lib/storage"
 import { cn } from "@/lib/utils"
 
@@ -539,7 +540,7 @@ export default function AnalysisPage() {
                 <div className="flex items-baseline justify-between mb-3">
                   <span className="text-sm text-gray-400">현재가</span>
                   <span className="text-3xl font-bold text-white">
-                    {(currentQuestion as any).currentPrice.toLocaleString()}
+                    {(currentQuestion as any)formatNumber(.currentPrice)}
                   </span>
                 </div>
                 <div className="flex gap-4 text-sm">

@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { formatNumber } from "@/lib/format"
 import type { TradeRecord } from "../../types"
 import type { CompanyProfile } from "./CompanyCard"
 
@@ -45,7 +46,7 @@ export const TradeDetailCard = ({ trade, profile }: TradeDetailCardProps) => {
               {isBuy ? "매수" : "매도"}
             </span>
             <span className="text-xs text-gray-500">
-              {trade.quantity}주 × {trade.price.toLocaleString()}원
+              {trade.quantity}주 × {formatNumber(trade.price)}원
             </span>
           </div>
         </div>
@@ -55,13 +56,13 @@ export const TradeDetailCard = ({ trade, profile }: TradeDetailCardProps) => {
           {isBuy ? (
             /* 매수: 지출 금액을 중립 회색으로 표시 (- 기호만) */
             <p className="text-sm font-bold text-gray-300">
-              -{trade.totalAmount.toLocaleString()}원
+              -{formatNumber(trade.totalAmount)}원
             </p>
           ) : (
             /* 매도: 수령 금액(회색) + 수익/손실(색상) */
             <>
               <p className="text-sm font-bold text-gray-300">
-                +{trade.totalAmount.toLocaleString()}원
+                +{formatNumber(trade.totalAmount)}원
               </p>
               {hasProfit && (
                 <p
@@ -71,7 +72,7 @@ export const TradeDetailCard = ({ trade, profile }: TradeDetailCardProps) => {
                   )}
                 >
                   {isProfit ? "+" : "-"}
-                  {Math.abs(trade.profit!).toLocaleString()}원
+                  {formatNumber(Math.abs(trade.profit!))}원
                   {trade.profitRate !== undefined && (
                     <span className="ml-1 opacity-80">
                       ({isProfit ? "+" : ""}{trade.profitRate.toFixed(1)}%)
@@ -98,7 +99,7 @@ export const TradeDetailCard = ({ trade, profile }: TradeDetailCardProps) => {
             <div className="flex items-center gap-1">
               <span className="text-xs text-gray-600">목표가</span>
               <span className="text-xs font-semibold text-gray-400">
-                {profile.targetPrice.toLocaleString()}원
+                {formatNumber(profile.targetPrice)}원
               </span>
             </div>
             <span className="text-gray-700">·</span>

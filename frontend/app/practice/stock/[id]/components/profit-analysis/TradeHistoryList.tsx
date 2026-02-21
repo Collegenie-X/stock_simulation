@@ -50,7 +50,7 @@ export const TradeHistoryList = ({ trades, groupedByDate }: TradeHistoryListProp
                     className={dayProfit >= 0 ? "text-red-400" : "text-blue-400"}
                   >
                     {dayProfit >= 0 ? "+" : ""}
-                    {dayProfit.toLocaleString()}원
+                    {formatNumber(dayProfit)}원
                   </span>
                 )}
               </div>

@@ -5,6 +5,7 @@ import { useParams, useRouter, useSearchParams } from "next/navigation"
 import scenariosData from "@/data/game-scenarios.json"
 import scenarios100DaysData from "@/data/stock-100days-data.json"
 import { cn } from "@/lib/utils"
+import { formatNumber } from "@/lib/format"
 import { storage } from "@/lib/storage"
 import { AIRankingCard, AIRankingDetailModal, AINotification } from "@/components/ai-ranking-card"
 import { HintModal } from "@/components/hint-modal"
@@ -24,6 +25,7 @@ import {
   ResultScreen,
   ProfitAnalysisModal,
   DetailView,
+  FloatingExitButton,
 } from "./components"
 import { useLivePrices } from "./components/hooks/useLivePrices"
 import { useAICompetitor } from "./components/hooks/useAICompetitor"
@@ -986,7 +988,7 @@ export default function GamePlayPage() {
         setAveragePrices(prev => ({ ...prev, [stockId]: newAvg }))
 
         setFeedback({ 
-          text: `${stock.name} ${qty}주 매수 (${cost.toLocaleString()}원)`, 
+          text: `${stock.name} ${qty}주 매수 (${formatNumber(cost)}원)`, 
           type: "success" 
         })
       }
@@ -1014,7 +1016,7 @@ export default function GamePlayPage() {
         }
 
         setFeedback({ 
-          text: `${stock.name} ${sellQty}주 매도 (${profit >= 0 ? "+" : ""}${profit.toLocaleString()}원)`, 
+          text: `${stock.name} ${sellQty}주 매도 (${profit >= 0 ? "+" : ""}${formatNumber(profit)}원)`, 
           type: profit >= 0 ? "success" : "neutral" 
         })
       }
@@ -1118,6 +1120,9 @@ export default function GamePlayPage() {
 
     return (
       <div className="min-h-screen bg-[#191919] text-white flex flex-col">
+        {/* 플로팅 종료 버튼 (항상 표시) */}
+        <FloatingExitButton onClick={() => setShowExitConfirm(true)} />
+
         {/* 결정 피드백 오버레이 */}
         <CardFeedbackOverlay isVisible={showCardFeedback} data={cardFeedbackData} />
 
@@ -1262,7 +1267,15 @@ export default function GamePlayPage() {
     const isProfit = Number.parseFloat(myReturn) >= 0
 
     return (
-      <DetailView
+      <>
+        {/* 종료 확인 다이얼로그 */}
+        <ExitConfirmDialog
+          isOpen={showExitConfirm}
+          onCancel={() => setShowExitConfirm(false)}
+          onConfirm={() => router.push("/home")}
+        />
+
+        <DetailView
         stockName={currentStock.name}
         currentPrice={currentPrice}
         prevPrice={prevPrice}
@@ -1310,7 +1323,9 @@ export default function GamePlayPage() {
         onBuy={() => handleAction("buy")}
         onSell={() => handleAction("sell")}
         onShowHint={() => { setHintLevel(2); setShowHintModal(true) }}
+        onExitClick={() => setShowExitConfirm(true)}
       />
+      </>
     )
   }
 

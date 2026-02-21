@@ -5,6 +5,7 @@ import { MobileNav } from '@/components/mobile-nav';
 import { Button } from '@/components/ui/button';
 import leaderboardData from '@/data/leaderboard.json';
 import { ArrowLeft, TrendingUp, TrendingDown, Award, Target, Lightbulb, Activity, Zap, Waves } from 'lucide-react';
+import { formatNumber } from "@/lib/format"
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
@@ -217,7 +218,7 @@ export default function CompeteDetailPage() {
                     boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
                     padding: '12px'
                   }}
-                  formatter={(value: any) => [`${value.toLocaleString()}원`, '주가']}
+                  formatter={(value: any) => [`${formatNumber(value)}원`, '주가']}
                 />
                 <Area 
                   type="natural" 
@@ -401,7 +402,7 @@ export default function CompeteDetailPage() {
                     boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
                   }}
                   formatter={(value: any, name: string) => {
-                    if (name === 'price') return [`${value.toLocaleString()}원`, '주가'];
+                    if (name === 'price') return [`${formatNumber(value)}원`, '주가'];
                     return [value, name];
                   }}
                 />

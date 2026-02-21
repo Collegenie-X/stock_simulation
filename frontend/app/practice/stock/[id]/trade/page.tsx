@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, ChevronDown, Target, Lock, ArrowRight, MoreHorizontal, Minus, Plus } from "lucide-react"
+import { formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import { storage } from "@/lib/storage"
 import scenariosData from "@/data/game-scenarios.json"
@@ -164,10 +165,10 @@ export default function TradePage() {
     const targetPrice = type === "price" ? val : Math.round(currentPrice * (1 + val / 100))
     const diff = targetPrice - currentPrice
     const totalProfit = diff * quantity
-    const profitText = `${totalProfit > 0 ? "+" : ""}${totalProfit.toLocaleString()}원`
+    const profitText = `${totalProfit > 0 ? "+" : ""}${formatNumber(totalProfit)}원`
 
     if (type === "percent") {
-      return `${targetPrice.toLocaleString()}원 예상 (${profitText})`
+      return `${formatNumber(targetPrice)}원 예상 (${profitText})`
     }
     const percent = (((targetPrice - currentPrice) / currentPrice) * 100).toFixed(1)
     return `${percent}% 예상 (${profitText})`
@@ -207,7 +208,7 @@ export default function TradePage() {
         
         if (cost > newCash) {
           console.log("❌ 구매 실패: 잔액 부족", { cost, newCash })
-          alert(`잔액이 부족합니다. 필요: ${cost.toLocaleString()}원, 보유: ${newCash.toLocaleString()}원`)
+          alert(`잔액이 부족합니다. 필요: ${formatNumber(cost)}원, 보유: ${formatNumber(newCash)}원`)
           return
         }
 
@@ -477,7 +478,7 @@ export default function TradePage() {
                 <span className="text-gray-600">|</span>
                 <span>시장가</span>
               </div>
-              <div className="text-4xl font-bold text-white mb-1">{currentPrice.toLocaleString()}원</div>
+              <div className="text-4xl font-bold text-white mb-1">{formatNumber(currentPrice)}원</div>
               <div className={cn("text-sm font-medium", isUp ? "text-red-500" : "text-blue-500")}>
                 {stock.name} {isUp ? "+" : ""}
                 {change}%
@@ -491,9 +492,9 @@ export default function TradePage() {
                 {inputValue ? (
                   <>
                     <div className={cn("text-7xl font-bold mb-4", isBuy ? "text-red-500" : "text-blue-500")}>
-                      {Number.parseInt(inputValue).toLocaleString()}주
+                      {formatNumber(Number.parseInt(inputValue))}주
                     </div>
-                    <div className="text-xl text-white font-medium mb-2">{totalAmount.toLocaleString()}원</div>
+                    <div className="text-xl text-white font-medium mb-2">{formatNumber(totalAmount)}원</div>
                   </>
                 ) : (
                   <div className="text-4xl font-bold text-gray-600 text-center mb-4">
@@ -559,7 +560,7 @@ export default function TradePage() {
                   현재 수익률 {myReturn}%
                 </div>
                 <div className="text-sm font-medium text-gray-400">
-                  현재가 <span className="text-white ml-1">{currentPrice.toLocaleString()}원</span>
+                  현재가 <span className="text-white ml-1">{formatNumber(currentPrice)}원</span>
                 </div>
               </div>
             </div>
@@ -644,7 +645,7 @@ export default function TradePage() {
                       {takeProfit !== null
                         ? tradingMode === "percent"
                           ? `${takeProfit >= 0 ? "+" : ""}${takeProfit.toFixed(1)}%`
-                          : `${takeProfit.toLocaleString()}원`
+                          : `${formatNumber(takeProfit)}원`
                         : "-"}
                     </div>
                     <div className="text-sm text-gray-500 mt-1">{getExpectedValue(takeProfit, tradingMode)}</div>
@@ -694,7 +695,7 @@ export default function TradePage() {
                       {stopLoss !== null
                         ? tradingMode === "percent"
                           ? `${stopLoss.toFixed(1)}%`
-                          : `${stopLoss.toLocaleString()}원`
+                          : `${formatNumber(stopLoss)}원`
                         : "-"}
                     </div>
                     <div className="text-sm text-gray-500 mt-1">{getExpectedValue(stopLoss, tradingMode)}</div>

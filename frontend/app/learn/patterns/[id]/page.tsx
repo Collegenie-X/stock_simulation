@@ -18,16 +18,32 @@ import {
   Lightbulb,
   AlertTriangle,
   TrendingUp,
-  Eye,
-  Zap,
+  BarChart2,
+  ListOrdered,
+  Coins,
 } from 'lucide-react';
-import { SignalBadge, DifficultyBar } from './components';
+import {
+  SignalBadge,
+  DifficultyBar,
+  PatternChartSVG,
+  PatternSteps,
+  ProfitScenario,
+} from './components';
+
+type TabId = 'chart' | 'steps' | 'profit';
+
+const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
+  { id: 'chart',  label: '차트 분석',  icon: <BarChart2 className="w-3.5 h-3.5" /> },
+  { id: 'steps',  label: '단계별 설명', icon: <ListOrdered className="w-3.5 h-3.5" /> },
+  { id: 'profit', label: '수익 계산',   icon: <Coins className="w-3.5 h-3.5" /> },
+];
 
 export default function PatternDetailPage() {
   const params = useParams();
   const router = useRouter();
   const [pattern, setPattern] = useState<ChartPattern | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState<TabId>('chart');
 
   useEffect(() => {
     const found = CHART_PATTERNS.find(p => p.id === params.id);
@@ -81,97 +97,157 @@ export default function PatternDetailPage() {
           </div>
         </section>
 
-        {/* 설명 */}
-        <section className="mt-4">
-          <div className="bg-[#252525] rounded-xl p-4 border border-white/5">
-            <div className="flex items-start gap-2 mb-2">
-              <BookOpen className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
-              <p className="text-xs font-bold text-blue-400">패턴 설명</p>
-            </div>
+        {/* 한줄 설명 */}
+        <section className="mt-3">
+          <div className="bg-[#252525] rounded-xl p-3.5 border border-white/5 flex items-start gap-2">
+            <BookOpen className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
             <p className="text-xs text-gray-300 leading-relaxed">{pattern.description}</p>
           </div>
         </section>
 
-        {/* 읽는 법 */}
-        <section className="mt-3">
-          <div className="bg-[#252525] rounded-xl p-4 border border-purple-500/20">
-            <div className="flex items-start gap-2 mb-2">
-              <Eye className="w-4 h-4 text-purple-400 mt-0.5 shrink-0" />
-              <p className="text-xs font-bold text-purple-400">차트에서 읽는 법</p>
-            </div>
-            <p className="text-xs text-gray-300 leading-relaxed">{pattern.howToRead}</p>
-          </div>
-        </section>
-
-        {/* 핵심 포인트 */}
+        {/* 탭 */}
         <section className="mt-4">
-          <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
-            <Target className="w-4 h-4 text-green-400" />
-            핵심 포인트
-          </h3>
-          <div className="space-y-2">
-            {pattern.keyPoints.map((point, idx) => (
-              <div key={idx} className="flex items-start gap-3 bg-[#252525] rounded-xl p-3 border border-white/5">
-                <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center text-[10px] font-bold text-green-400 shrink-0">
-                  {idx + 1}
-                </div>
-                <p className="text-xs text-gray-300">{point}</p>
-              </div>
+          <div className="grid grid-cols-3 gap-1.5 bg-[#1a1a1a] rounded-xl p-1 border border-white/5">
+            {TABS.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  'flex items-center justify-center gap-1.5 py-2 rounded-lg text-[11px] font-medium transition-all',
+                  activeTab === tab.id
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'text-gray-500 hover:text-gray-300',
+                )}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
             ))}
           </div>
         </section>
 
-        {/* 매매 팁 */}
+        {/* 탭 컨텐츠 */}
         <section className="mt-4">
-          <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4">
-            <div className="flex items-start gap-2">
-              <Lightbulb className="w-4 h-4 text-yellow-400 mt-0.5 shrink-0" />
+
+          {/* ── 탭 1: 차트 분석 ── */}
+          {activeTab === 'chart' && (
+            <div className="space-y-4">
+              {/* SVG 차트 */}
+              <PatternChartSVG
+                chartData={pattern.chartData}
+                signal={pattern.signal}
+                patternName={pattern.name}
+              />
+
+              {/* 차트에서 읽는 법 */}
+              <div className="bg-[#252525] rounded-xl p-4 border border-purple-500/20">
+                <p className="text-[10px] font-bold text-purple-400 mb-2">📖 차트에서 읽는 법</p>
+                <p className="text-xs text-gray-300 leading-relaxed">{pattern.howToRead}</p>
+              </div>
+
+              {/* 핵심 포인트 */}
               <div>
-                <p className="text-xs font-bold text-yellow-400 mb-1">실전 매매 팁</p>
-                <p className="text-xs text-gray-300 leading-relaxed">{pattern.tradingTip}</p>
+                <h3 className="text-sm font-bold text-white mb-2.5 flex items-center gap-2">
+                  <Target className="w-4 h-4 text-green-400" />
+                  핵심 포인트
+                </h3>
+                <div className="space-y-2">
+                  {pattern.keyPoints.map((point, idx) => (
+                    <div key={idx} className="flex items-start gap-3 bg-[#252525] rounded-xl p-3 border border-white/5">
+                      <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center text-[10px] font-bold text-green-400 shrink-0">
+                        {idx + 1}
+                      </div>
+                      <p className="text-xs text-gray-300">{point}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 매매 팁 */}
+              <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-4 h-4 text-yellow-400 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-xs font-bold text-yellow-400 mb-1">실전 매매 팁</p>
+                    <p className="text-xs text-gray-300 leading-relaxed">{pattern.tradingTip}</p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          )}
 
-        {/* 실전 예시 */}
-        <section className="mt-4">
-          <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
-            <Zap className="w-4 h-4 text-orange-400" />
-            실전 예시
-          </h3>
-          <div className="bg-[#252525] rounded-xl p-4 border border-orange-500/20 space-y-3">
-            <div>
-              <p className="text-[10px] font-bold text-orange-400 mb-1">상황</p>
-              <p className="text-xs text-gray-300">{pattern.example.situation}</p>
-            </div>
-            <div className="h-px bg-white/5" />
-            <div>
-              <p className="text-[10px] font-bold text-blue-400 mb-1">행동</p>
-              <p className="text-xs text-gray-300">{pattern.example.action}</p>
-            </div>
-            <div className="h-px bg-white/5" />
-            <div>
-              <p className="text-[10px] font-bold text-green-400 mb-1">결과</p>
-              <p className="text-xs text-gray-300 font-bold">{pattern.example.result}</p>
-            </div>
-          </div>
-        </section>
+          {/* ── 탭 2: 단계별 설명 ── */}
+          {activeTab === 'steps' && (
+            <div className="space-y-4">
+              <div className="bg-[#252525] rounded-xl p-3 border border-white/5 flex items-start gap-2">
+                <span className="text-lg shrink-0">🎬</span>
+                <div>
+                  <p className="text-xs font-bold text-white mb-0.5">실전 상황별 흐름</p>
+                  <p className="text-[11px] text-gray-400 leading-relaxed">
+                    패턴이 만들어지는 과정을 단계별로 따라가 보세요. 각 상황에서 어떻게 대응해야 하는지 알 수 있어요.
+                  </p>
+                </div>
+              </div>
 
-        {/* 주의사항 */}
-        <section className="mt-4">
-          <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4">
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="w-4 h-4 text-orange-400 mt-0.5 shrink-0" />
+              <PatternSteps steps={pattern.steps} signal={pattern.signal} />
+
+              {/* 실전 예시 */}
               <div>
-                <p className="text-xs font-bold text-orange-400 mb-1">주의사항</p>
-                <p className="text-xs text-gray-300 leading-relaxed">
-                  패턴은 100% 정확하지 않습니다. 반드시 거래량, 이동평균선 등
-                  다른 지표와 함께 종합적으로 판단하세요. 하나의 패턴에만 의존하면 위험합니다.
-                </p>
+                <h3 className="text-sm font-bold text-white mb-2 flex items-center gap-2">
+                  <span className="text-base">⚡</span>
+                  실전 예시
+                </h3>
+                <div className="bg-[#252525] rounded-xl p-4 border border-orange-500/20 space-y-3">
+                  <div>
+                    <p className="text-[10px] font-bold text-orange-400 mb-1">상황</p>
+                    <p className="text-xs text-gray-300">{pattern.example.situation}</p>
+                  </div>
+                  <div className="h-px bg-white/5" />
+                  <div>
+                    <p className="text-[10px] font-bold text-blue-400 mb-1">행동</p>
+                    <p className="text-xs text-gray-300">{pattern.example.action}</p>
+                  </div>
+                  <div className="h-px bg-white/5" />
+                  <div>
+                    <p className="text-[10px] font-bold text-green-400 mb-1">결과</p>
+                    <p className="text-xs text-gray-300 font-bold">{pattern.example.result}</p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {/* ── 탭 3: 수익 계산 ── */}
+          {activeTab === 'profit' && (
+            <div className="space-y-4">
+              <div className="bg-[#252525] rounded-xl p-3 border border-white/5 flex items-start gap-2">
+                <span className="text-lg shrink-0">💰</span>
+                <div>
+                  <p className="text-xs font-bold text-white mb-0.5">돈으로 보는 수익 구조</p>
+                  <p className="text-[11px] text-gray-400 leading-relaxed">
+                    실제 투자했을 때 얼마를 벌고, 얼마를 잃을 수 있는지 구체적인 금액으로 알아봐요.
+                  </p>
+                </div>
+              </div>
+
+              <ProfitScenario scenario={pattern.profitScenario} />
+
+              {/* 주의사항 */}
+              <div className="bg-orange-500/10 border border-orange-500/20 rounded-xl p-4">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-orange-400 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-xs font-bold text-orange-400 mb-1">⚠️ 꼭 기억하세요!</p>
+                    <div className="text-xs text-gray-300 space-y-1">
+                      <p>• 이 수익은 <span className="text-white font-bold">예시이며 보장되지 않아요</span></p>
+                      <p>• 손절가를 <span className="text-white font-bold">반드시</span> 지켜야 해요</p>
+                      <p>• 한 종목에 전부 투자하면 위험해요!</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </section>
 
         {/* 이전/다음 패턴 네비게이션 */}
@@ -187,7 +263,7 @@ export default function PatternDetailPage() {
               <p className="text-xs font-bold text-white truncate">{prevPattern.emoji} {prevPattern.name}</p>
             </button>
           ) : <div className="flex-1" />}
-          
+
           {nextPattern ? (
             <button
               onClick={() => router.push(`/learn/patterns/${nextPattern.id}`)}

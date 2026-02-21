@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { ChevronRight, ChevronDown, ChevronUp, Bot } from "lucide-react"
+import { formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import { LABELS } from "../config"
 import { StockRow } from "./StockRow"
@@ -70,7 +71,7 @@ export const StockListSection = ({
                 "text-[11px] font-bold",
                 isTotalProfit ? "text-red-400" : "text-blue-400"
               )}>
-                {isTotalProfit ? "+" : ""}{totalLiveProfit.toLocaleString()}원
+                {isTotalProfit ? "+" : ""}{formatNumber(totalLiveProfit)}원
                 {" "}({isTotalProfit ? "+" : ""}{totalProfitRate}%)
               </span>
             </div>

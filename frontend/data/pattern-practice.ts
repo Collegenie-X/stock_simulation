@@ -35,12 +35,12 @@ export interface TradeLog {
 
 // ─── Constants ───────────────────────────────────────────
 export const TOTAL_ROUNDS = 5;
-export const TURNS_PER_ROUND = 5;
-export const CANDLES_PER_TURN = 4;
-export const INITIAL_REVEAL = 3;
+export const TURNS_PER_ROUND = 3;
+export const CANDLES_PER_TURN = 5;
+export const INITIAL_REVEAL = 4;
 export const MAX_POSITION = 3;
-export const DECISION_TIMERS = [10, 9, 8, 7, 6];
-const TARGET_LENGTH = INITIAL_REVEAL + TURNS_PER_ROUND * CANDLES_PER_TURN + 2; // 25
+export const DECISION_TIMERS = [12, 10, 9, 8, 7];
+const TARGET_LENGTH = INITIAL_REVEAL + TURNS_PER_ROUND * CANDLES_PER_TURN + 2; // 21
 
 const GRADE_MAP: { min: number; grade: Grade; emoji: string; message: string }[] = [
   { min: 17, grade: 'S', emoji: '🔥', message: '완벽한 매매!' },
@@ -494,4 +494,86 @@ export function getFinalResult(totalScore: number) {
   if (pct >= 30)
     return { stars: 1, emoji: '💪', title: '성장하고 있어요!', sub: '패턴 복습 후 다시 도전!' };
   return { stars: 0, emoji: '📚', title: '복습이 필요해요', sub: '패턴 설명을 다시 읽어보세요!' };
+}
+
+// ─── Smart Turn Feedback ─────────────────────────────────
+export interface TurnFeedback {
+  isGood: boolean;
+  emoji: string;
+  title: string;
+  reason: string;
+  effect: 'sparkle' | 'shake' | 'neutral';
+}
+
+function getZone(
+  idx: number,
+  optEntry: number,
+  optExit: number,
+): 'early' | 'forming' | 'entry' | 'hold' | 'exit' | 'late' {
+  if (idx < optEntry - 3) return 'early';
+  if (idx < optEntry) return 'forming';
+  if (idx <= optEntry + 2) return 'entry';
+  if (idx < optExit - 1) return 'hold';
+  if (idx <= optExit + 1) return 'exit';
+  return 'late';
+}
+
+export function getTurnFeedback(params: {
+  action: 'buy' | 'sell' | 'skip';
+  candleIndex: number;
+  scenario: PatternScenario;
+  netPosition: number;
+  isTimeout: boolean;
+}): TurnFeedback {
+  const { action, candleIndex, scenario, netPosition, isTimeout } = params;
+  const zone = getZone(candleIndex, scenario.optimalEntryIndex, scenario.optimalExitIndex);
+  const isBuySignal = scenario.signal === 'buy';
+  const entryAction = isBuySignal ? 'buy' : 'sell';
+  const exitAction = isBuySignal ? 'sell' : 'buy';
+  const hasPosition = isBuySignal ? netPosition > 0 : netPosition < 0;
+
+  if (isTimeout) {
+    return zone === 'entry'
+      ? { isGood: false, emoji: '⏰', title: '시간 초과!', reason: '지금이 최적의 진입 타이밍이었어요!', effect: 'shake' }
+      : { isGood: false, emoji: '⏰', title: '시간 초과', reason: '다음 턴에는 빠르게 결정하세요!', effect: 'neutral' };
+  }
+
+  if (action === entryAction) {
+    if (zone === 'early')
+      return { isGood: false, emoji: '🤔', title: '너무 빨라요!', reason: '패턴이 아직 형성 중이에요. 더 기다려보세요!', effect: 'shake' };
+    if (zone === 'forming')
+      return { isGood: false, emoji: '😬', title: '조금 일러요', reason: '패턴이 거의 완성돼요. 확인 후 진입하면 더 안전해요!', effect: 'shake' };
+    if (zone === 'entry')
+      return { isGood: true, emoji: '🎯', title: '완벽한 타이밍!', reason: '패턴이 확인되는 최적의 진입 포인트입니다!', effect: 'sparkle' };
+    if (zone === 'hold')
+      return { isGood: true, emoji: '👍', title: '늦었지만 좋아요', reason: '조금 늦었지만 아직 수익 구간이에요!', effect: 'sparkle' };
+    if (zone === 'exit' || zone === 'late')
+      return { isGood: false, emoji: '😅', title: '너무 늦었어요', reason: '이미 최적 구간을 지났어요. 다음 기회를 노리세요!', effect: 'shake' };
+  }
+
+  if (action === exitAction) {
+    if (hasPosition) {
+      if (zone === 'exit')
+        return { isGood: true, emoji: '💰', title: '완벽한 청산!', reason: '최적의 이익 실현 타이밍이에요!', effect: 'sparkle' };
+      if (zone === 'hold')
+        return { isGood: true, emoji: '💵', title: '수익 확정!', reason: '이익을 확정했어요. 조금 더 기다리면 더 좋았을 수도!', effect: 'sparkle' };
+      if (zone === 'late')
+        return { isGood: true, emoji: '🤏', title: '늦은 청산', reason: '최적보다 늦었지만 포지션을 정리한 건 잘했어요!', effect: 'neutral' };
+      return { isGood: false, emoji: '😱', title: '너무 빨리 청산!', reason: '아직 수익 구간이 남았어요. 좀 더 기다려보세요!', effect: 'shake' };
+    }
+    return { isGood: false, emoji: '⚠️', title: '방향이 반대!', reason: isBuySignal
+      ? '이 패턴은 상승 신호예요! 매도가 아닌 매수를 노리세요!'
+      : '이 패턴은 하락 신호예요! 매수가 아닌 매도를 노리세요!', effect: 'shake' };
+  }
+
+  // Skip
+  if (zone === 'entry')
+    return { isGood: false, emoji: '😱', title: '놓쳤어요!', reason: '지금이 최적의 진입 타이밍이었어요!', effect: 'shake' };
+  if (zone === 'early')
+    return { isGood: true, emoji: '🧐', title: '좋은 관망!', reason: '아직은 지켜보는 게 맞아요. 패턴을 기다리세요!', effect: 'neutral' };
+  if (zone === 'forming')
+    return { isGood: true, emoji: '👀', title: '관망 중', reason: '패턴이 만들어지고 있어요. 곧 진입 기회가 와요!', effect: 'neutral' };
+  if (hasPosition && (zone === 'exit'))
+    return { isGood: false, emoji: '💸', title: '청산 놓쳤어요!', reason: '지금이 이익 실현 타이밍이었는데...!', effect: 'shake' };
+  return { isGood: false, emoji: '🤷', title: '관망', reason: '기회를 찾아보세요!', effect: 'neutral' };
 }

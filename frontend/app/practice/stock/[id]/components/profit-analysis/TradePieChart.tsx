@@ -2,6 +2,7 @@
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts"
 import { cn } from "@/lib/utils"
+import { formatNumber } from "@/lib/format"
 import labelsData from "@/data/profit-analysis-labels.json"
 import { LABELS } from "../../config"
 import type { TradeRecord } from "../../types"
@@ -23,7 +24,7 @@ function formatProfit(profit: number): string {
   let str: string
   if (abs >= 100_000_000) str = `${(abs / 100_000_000).toFixed(1)}억원`
   else if (abs >= 10_000) str = `${Math.round(abs / 10_000)}만원`
-  else str = `${abs.toLocaleString()}원`
+  else str = `${formatNumber(abs)}원`
   return profit >= 0 ? `+${str}` : `-${str}`
 }
 

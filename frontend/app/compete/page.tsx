@@ -5,6 +5,7 @@ import { MobileNav } from '@/components/mobile-nav';
 import { Button } from '@/components/ui/button';
 import leaderboardData from '@/data/leaderboard.json';
 import { Trophy, Medal, Award, Eye, ChevronRight, Clock, Users } from 'lucide-react';
+import { formatNumber } from "@/lib/format"
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
@@ -206,7 +207,7 @@ export default function CompetePage() {
                           +{rank.profitRate}%
                         </p>
                         <p className={cn("text-sm", isTopThree ? 'text-white/80' : 'text-gray-400')}>
-                          {rank.totalAssets.toLocaleString()}원
+                          {formatNumber(rank.totalAssets)}원
                         </p>
                       </div>
                     </div>

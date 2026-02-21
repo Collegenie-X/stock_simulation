@@ -5,6 +5,7 @@ import { MobileNav } from '@/components/mobile-nav';
 import { Button } from '@/components/ui/button';
 import { useParams, useRouter } from 'next/navigation';
 import { Target, Trophy, Users, Clock, TrendingUp, ChevronRight } from 'lucide-react';
+import { formatNumber } from "@/lib/format"
 import { useState } from 'react';
 
 // 도전 과제 더미 데이터
@@ -117,7 +118,7 @@ export default function ChallengeDetailPage() {
         <section className="mt-6 grid grid-cols-3 gap-3">
           <div className="bg-white rounded-2xl p-4 text-center shadow-sm">
             <Users className="w-6 h-6 text-blue-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-gray-900">{challenge.participants.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-gray-900">{formatNumber(challenge.participants)}</p>
             <p className="text-xs text-gray-500 mt-1">도전 중</p>
           </div>
           <div className="bg-white rounded-2xl p-4 text-center shadow-sm">
@@ -155,7 +156,7 @@ export default function ChallengeDetailPage() {
                 </div>
                 <span className="font-semibold text-gray-900">게임 머니</span>
               </div>
-              <span className="text-lg font-bold text-yellow-600">+{challenge.reward.coins.toLocaleString()}원</span>
+              <span className="text-lg font-bold text-yellow-600">+{formatNumber(challenge.reward.coins)}원</span>
             </div>
             <div className="flex items-center justify-between p-3 bg-purple-50 rounded-xl">
               <div className="flex items-center gap-3">

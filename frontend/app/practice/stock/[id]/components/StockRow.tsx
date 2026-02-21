@@ -1,6 +1,7 @@
 "use client"
 
 import { Heart, Bot } from "lucide-react"
+import { formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import { MiniChart } from "./MiniChart"
 import { buildChartData } from "./utils/stockBreath"
@@ -80,14 +81,14 @@ export const StockRow = ({
           {showInvestmentInfo && stock.myHoldings > 0 ? (
             stockViewTab === "현재가" ? (
               <div className="text-xs text-gray-500">
-                내 평균 {Math.round(stock.myAvg).toLocaleString()}원
+                내 평균 {formatNumber(Math.round(stock.myAvg))}원
               </div>
             ) : (
               <div className="text-xs text-gray-500">{stock.myHoldings}주</div>
             )
           ) : (
             <div className="text-xs text-gray-500">
-              전일 {Math.round(stock.prevPrice).toLocaleString()}원
+              전일 {formatNumber(Math.round(stock.prevPrice))}원
             </div>
           )}
         </div>
@@ -99,7 +100,7 @@ export const StockRow = ({
               "text-sm font-bold transition-colors duration-300",
               liveIsProfit ? "text-red-400" : "text-blue-400"
             )}>
-              {Math.round(livePrice * stock.myHoldings).toLocaleString()}원
+              {formatNumber(Math.round(livePrice * stock.myHoldings))}원
             </div>
             <div className={cn(
               "text-xs font-bold",
@@ -114,7 +115,7 @@ export const StockRow = ({
               "text-sm font-bold transition-colors duration-300",
               liveDailyIsUp ? "text-red-400" : "text-blue-400"
             )}>
-              {livePrice.toLocaleString()}원
+              {formatNumber(livePrice)}원
             </div>
             <div className={cn(
               "text-xs font-bold",

@@ -17,9 +17,9 @@
         "sector": "반도체",
         "initialPrice": 72000
       },
-      "description": "삼성전자의 반도체 부문이 역대급 적자를 기록했습니다. 메모리 가격은 바닥을 모르고 추락 중이고, 시장에서는 \"반도체 겨울\"이라는 말이 나옵니다. 하지만 역사적으로 삼성전자는 다운사이클마다 감산 → 수급 개선 → 가격 반등 패턴을 반복해왔습니다. 이번에도 반복될까요?",
-      "keyLesson": "반도체 사이클은 반복된다. 바닥에서 사는 용기가 수익을 만든다.",
-      "survivalTip": "실적 악화가 주가 바닥은 아니다. 감산 → 수급 개선 → 가격 반등 사이클을 기억하라.",
+      "description": "삼성전자 반도체가 큰 적자를 냈어요. 반도체 가격이 계속 떨어지고 있는데... 이럴 때 사야 할까요, 팔아야 할까요?",
+      "keyLesson": "반도체는 떨어졌다가 다시 올라와요. 바닥에서 사는 용기가 중요!",
+      "survivalTip": "실적이 나빠도 바로 바닥은 아니에요. 생산을 줄이면 → 물건이 귀해지고 → 가격이 올라요!",
       "tags": [
         "삼성전자",
         "반도체",
@@ -30,7 +30,7 @@
         {
           "turn": 1,
           "title": "분기 실적 발표, 영업이익 -96% 충격",
-          "description": "삼성전자가 분기 실적을 발표했습니다. 반도체 부문 영업이익이 전년 대비 -96% 급감. 시장 예상보다 더 나쁜 \"어닝 쇼크\"입니다. 100주를 보유 중인 당신, 주가는 장 초반 -4%까지 빠졌다가 저가 매수세로 -2.8% 마감. 기관은 매도, 외국인은 소폭 매수. 삼성전자를 더 사야 할까, 손절해야 할까?",
+          "description": "삼성전자가 분기 실적을 발표했습니다. 반도체 부문 영업이익이 전년 대비 -96% 급감. 시장 예상보다 더 나쁜 \"어닝 쇼크\"입니다. 주가는 장 초반 -4%까지 빠졌다가 저가 매수세로 -2.8% 마감. 기관은 매도, 외국인은 소폭 매수. 삼성전자를 더 사야 할까, 손절해야 할까?",
           "priceChange": "-2.8%",
           "sentiment": "shock"
         },
@@ -101,33 +101,37 @@
         },
         {
           "id": "s1-2",
-          "title": "즉시 손절 후 재진입",
-          "emoji": "✂️",
-          "description": "실적 쇼크에 빠르게 손절, 바닥 확인 후 재매수",
+          "title": "추세 전환 매수",
+          "emoji": "📈",
+          "description": "기술적 반등 확인 후 진입",
           "steps": [
-            "1턴: 전량 매도",
-            "3~4턴: 바닥 확인 관망",
-            "5턴: AI 수혜 뉴스에 재진입"
+            "1~5턴: 관망",
+            "6턴: 이평선 돌파 시 100% 매수",
+            "7~8턴: 추가 상승 시 홀딩"
           ],
-          "risk": "보통",
-          "expectedReturn": "-3% ~ +8%",
+          "risk": "낮음",
+          "expectedReturn": "+3% ~ +8%",
           "difficulty": 2
         },
         {
           "id": "s1-3",
-          "title": "장기 보유 전략",
-          "emoji": "💎",
-          "description": "삼성전자의 펀더멘털을 믿고 버티기",
+          "title": "보수적 관망",
+          "emoji": "🛡️",
+          "description": "사이클 확정까지 대기",
           "steps": [
-            "전체: 홀딩 + 하락 시 소량 추가 매수",
-            "배당 수익으로 하락 쿠션",
-            "사이클 전환까지 인내"
+            "1~8턴: 전량 관망",
+            "사이클 반등 확정 후 다음 기회 대기"
           ],
-          "risk": "낮음",
-          "expectedReturn": "+3% ~ +15%",
+          "risk": "매우 낮음",
+          "expectedReturn": "0%",
           "difficulty": 1
         }
       ],
+      "stats": {
+        "avgClearRate": 82,
+        "avgSurvivalRate": 91,
+        "bestStrategy": "바닥 분할 매수"
+      },
       "aiStrategies": [
         {
           "name": "안정왕 김철수",
@@ -135,13 +139,13 @@
           "emoji": "🛡️",
           "color": "green",
           "actions": [
-            "1턴: 50% 손절",
-            "3턴: 감산 발표 확인 후 30% 재매수",
-            "6턴: 추세 확인 후 20% 추가 매수",
-            "8턴: 보유 유지"
+            "1~2턴: 관망",
+            "3턴: 감산 발표에도 관망",
+            "5턴: AI 수혜 확인 후에도 신중",
+            "8턴: 결국 매수 안 함"
           ],
-          "result": "리스크 관리하며 +4.5% 수익",
-          "returnRate": "+4.5%"
+          "result": "지나친 신중 → 0%",
+          "returnRate": "0%"
         },
         {
           "name": "공격왕 박영희",
@@ -149,13 +153,13 @@
           "emoji": "⚡",
           "color": "red",
           "actions": [
-            "1턴: 실적 쇼크에도 홀딩",
-            "2턴: 추가 매수 (물타기 30%)",
-            "5턴: AI 수혜에 추가 매수",
-            "8턴: 전량 보유 유지"
+            "1턴: 어닝쇼크에 50% 매수",
+            "3턴: 감산 발표에 50% 추가",
+            "5턴: AI 수혜에 홀딩",
+            "8턴: HBM 양산에 환호"
           ],
-          "result": "과감한 물타기로 +9.2%",
-          "returnRate": "+9.2%"
+          "result": "바닥 포착 성공 → +10.5%",
+          "returnRate": "+10.5%"
         },
         {
           "name": "균형왕 이준호",
@@ -163,20 +167,15 @@
           "emoji": "⚖️",
           "color": "blue",
           "actions": [
-            "1턴: 30% 부분 매도",
-            "3턴: 감산 발표에 재매수",
-            "5턴: 추가 매수 (20%)",
-            "7턴: 보유 유지"
+            "1~2턴: 관망",
+            "3턴: 감산 발표에 30% 매수",
+            "6턴: 이평선 돌파에 추가 30%",
+            "8턴: 보유 유지"
           ],
-          "result": "균형 잡힌 대응으로 +6.8%",
-          "returnRate": "+6.8%"
+          "result": "안정적 수익 → +6.2%",
+          "returnRate": "+6.2%"
         }
-      ],
-      "stats": {
-        "avgClearRate": 72,
-        "avgSurvivalRate": 85,
-        "bestStrategy": "바닥 분할 매수"
-      }
+      ]
     },
     {
       "id": "legend-2",
@@ -195,9 +194,9 @@
         "sector": "플랫폼",
         "initialPrice": 58000
       },
-      "description": "카카오 데이터센터 화재로 카카오톡이 마비됐습니다. 국민 메신저의 먹통 사태에 이어 공정위의 플랫폼 독점 규제까지 겹쳤습니다. SM엔터 인수전의 후폭풍도 남아있고... 한때 시가총액 4위였던 카카오가 위기에 빠졌습니다.",
-      "keyLesson": "플랫폼 기업은 규제 리스크가 가장 큰 변수. 위기 때 핵심 사업의 경쟁력을 냉정하게 판단하라.",
-      "survivalTip": "악재가 겹칠 때 패닉 매도는 금물. 하지만 구조적 변화인지, 일시적 악재인지 구분해야 한다.",
+      "description": "카카오톡이 먹통이 됐어요! 여기에 정부 규제까지 겹쳤어요. 한때 잘 나가던 카카오, 이 위기를 어떻게 넘길까요?",
+      "keyLesson": "큰 회사도 위기가 와요. 겁먹지 말고 '핵심 사업은 괜찮은지' 확인하세요!",
+      "survivalTip": "나쁜 뉴스가 겹쳐도 겁먹고 팔면 안 돼요. '잠깐인지 오래갈지' 구분하는 게 중요!",
       "tags": [
         "카카오",
         "규제",
@@ -373,9 +372,9 @@
         "sector": "바이오",
         "initialPrice": 185000
       },
-      "description": "셀트리온의 신약 후보물질이 FDA 임상 3상에 진입했습니다. 성공하면 주가 2배, 실패하면 -30% 폭락이 예상됩니다. 바이오주 특유의 \"올 오어 낫싱\" 상황에서 당신의 100주를 어떻게 관리하시겠습니까?",
-      "keyLesson": "바이오주는 임상 결과에 모든 것이 달려있다. 확률과 리스크를 냉정하게 계산하라.",
-      "survivalTip": "임상 전 분할 매도로 리스크를 줄이고, 결과 확인 후 대응하는 것이 안전하다.",
+      "description": "셀트리온이 새 약을 개발 중이에요. 성공하면 주가 2배! 실패하면 -30% 폭락! 이런 도박 같은 상황에서 어떻게 할까요?",
+      "keyLesson": "바이오 주식은 신약 성공/실패에 모든 게 달려 있어요. 확률을 따져보세요!",
+      "survivalTip": "결과 나오기 전에 일부는 팔아두세요. 전부 걸면 위험해요!",
       "tags": [
         "셀트리온",
         "바이오",
@@ -386,7 +385,7 @@
         {
           "turn": 1,
           "title": "FDA 임상 3상 진입 발표",
-          "description": "셀트리온이 자가면역 질환 신약의 FDA 임상 3상 진입을 발표했습니다. 시장이 환호하며 +2.8% 상승. 100주를 보유 중인 당신, 임상 성공률은 약 60%. 거래량이 평소의 3배로 폭증. 바이오주 특유의 기대감이 가득하지만, 실패 시 리스크도 큽니다.",
+          "description": "셀트리온이 자가면역 질환 신약의 FDA 임상 3상 진입을 발표했습니다. 시장이 환호하며 +2.8% 상승. 임상 성공률은 약 60%. 거래량이 평소의 3배로 폭증. 바이오주 특유의 기대감이 가득하지만, 실패 시 리스크도 큽니다.",
           "priceChange": "+2.8%",
           "sentiment": "positive"
         },
@@ -435,7 +434,7 @@
         {
           "turn": 8,
           "title": "FDA 승인 발표!",
-          "description": "FDA가 신약을 정식 승인했습니다! 셀트리온 역사상 가장 큰 신약 성과. +2.8% 추가 상승. 임상 실패 뉴스에 공포 매도했던 투자자들은 큰 기회를 놓쳤고, 과학적 분석을 바탕으로 버틴 투자자들은 보상을 받았습니다.",
+          "description": "FDA가 신약을 정식 승인했습니다! 셀트리온 역사상 가장 큰 신약 성과. +2.8% 추가 상승. 임상 실패 뉴스에 공포 매도했던 투자자들은 큰 기회를 놓쳤고. 과학적 분석을 바탕으로 버틴 투자자들은 보상을 받았습니다.",
           "priceChange": "+2.8%",
           "sentiment": "positive"
         }
@@ -551,9 +550,9 @@
         "sector": "자동차",
         "initialPrice": 188000
       },
-      "description": "현대차가 전기차 아이오닉5로 글로벌 시장을 공략하고 있습니다. 미국 조지아 공장 건설, 애플카 협력설까지. \"한국의 테슬라\"가 될 수 있을까요? 전통 자동차에서 전기차로의 대전환 속에서 투자 기회를 잡아보세요.",
-      "keyLesson": "산업 패러다임 전환기에는 선점 기업이 승자가 된다. 하지만 성급한 기대는 금물.",
-      "survivalTip": "전기차 전환은 장기 트렌드. 단기 변동에 흔들리지 말고 큰 그림을 보라.",
+      "description": "현대차가 전기차 아이오닉5로 세계 시장에 도전하고 있어요. '한국의 테슬라'가 될 수 있을까요?",
+      "keyLesson": "새로운 시대가 올 때 먼저 준비한 회사가 이겨요. 하지만 너무 서두르면 안 돼요!",
+      "survivalTip": "전기차는 오래 갈 흐름이에요. 오늘내일 변동에 흔들리지 말고 큰 그림을 보세요!",
       "tags": [
         "현대차",
         "전기차",
@@ -564,7 +563,7 @@
         {
           "turn": 1,
           "title": "아이오닉5 미국 판매 신기록",
-          "description": "현대차 아이오닉5가 미국에서 월간 판매 신기록을 경신했습니다! 전년 대비 +85% 성장. 100주를 보유 중인 당신, 주가는 +2.5% 상승. \"현대차가 전기차 시장에서 진짜 플레이어가 됐다\"는 평가. 테슬라 다음으로 미국에서 많이 팔리는 전기차. 추가 매수 기회?",
+          "description": "현대차 아이오닉5가 미국에서 월간 판매 신기록을 경신했습니다! 전년 대비 +85% 성장. 주가는 +2.5% 상승. \"현대차가 전기차 시장에서 진짜 플레이어가 됐다\"는 평가. 테슬라 다음으로 미국에서 많이 팔리는 전기차. 추가 매수 기회?",
           "priceChange": "+2.5%",
           "sentiment": "positive"
         },
@@ -727,9 +726,9 @@
         "sector": "IT/플랫폼",
         "initialPrice": 215000
       },
-      "description": "ChatGPT가 등장하며 \"검색의 시대가 끝났다\"는 말이 나옵니다. 네이버의 검색 광고 매출이 위협받고 있습니다. 하지만 네이버도 하이퍼클로바X로 AI 전환을 추진 중. 한국의 검색왕은 AI 시대에 살아남을 수 있을까요?",
-      "keyLesson": "기술 패러다임 변화에서는 빠른 적응이 생존의 열쇠. 위기를 기회로 바꾸는 기업을 찾아라.",
-      "survivalTip": "AI 전환은 기회이자 위협. 실제 사업에 AI가 어떻게 적용되는지를 봐야 한다.",
+      "description": "ChatGPT 때문에 '검색의 시대가 끝났다'는 말이 나와요. 네이버도 AI로 변신 중인데, 살아남을 수 있을까요?",
+      "keyLesson": "기술이 바뀔 때 빨리 적응하는 회사가 살아남아요. 위기를 기회로 바꾸는 곳을 찾으세요!",
+      "survivalTip": "AI는 기회이자 위협이에요. 실제로 AI를 사업에 잘 쓰고 있는지 확인하세요!",
       "tags": [
         "네이버",
         "AI",
@@ -905,9 +904,9 @@
         "sector": "반도체",
         "initialPrice": 128000
       },
-      "description": "엔비디아의 AI GPU에 들어가는 HBM(고대역폭메모리)의 최대 수혜주, SK하이닉스. HBM3E 독점 공급으로 주가가 연일 신고가를 경신하고 있습니다. 하지만 이미 많이 오른 주가, 여기서 더 갈 수 있을까요?",
-      "keyLesson": "과열된 테마에서도 펀더멘털이 뒷받침되면 추가 상승할 수 있다. 하지만 적절한 차익실현도 필요하다.",
-      "survivalTip": "AI는 장기 트렌드이지만 주가는 단기적으로 과열될 수 있다. RSI와 밸류에이션을 체크하라.",
+      "description": "AI 컴퓨터에 꼭 필요한 반도체를 만드는 SK하이닉스! 주가가 계속 오르고 있는데, 더 오를 수 있을까요?",
+      "keyLesson": "많이 올라도 실력이 있으면 더 오를 수 있어요. 하지만 중간에 이익을 챙기는 것도 중요해요!",
+      "survivalTip": "AI는 오래 갈 흐름이지만, 주가가 너무 빨리 오르면 잠깐 쉬어갈 수 있어요. 과열 신호를 확인하세요!",
       "tags": [
         "SK하이닉스",
         "HBM",
@@ -1083,9 +1082,9 @@
         "sector": "전력/에너지",
         "initialPrice": 22000
       },
-      "description": "한국전력은 연간 수십조원 적자를 기록 중입니다. 전기요금을 올리면 주가가 오르고, 정부가 막으면 주가가 빠집니다. 실적이 아닌 정책이 주가를 결정하는 특이한 종목. 정책주 투자의 묘미와 위험을 체험해 보세요.",
-      "keyLesson": "정책주는 정부 정책이 주가의 90%를 결정한다. 정치 일정과 규제를 항상 체크하라.",
-      "survivalTip": "한전은 \"전기요금 인상 발표 → 급등 → 실망 매도\" 패턴이 반복된다. 뉴스 매매에 능해야 한다.",
+      "description": "한국전력은 적자가 엄청나요. 전기요금을 올리면 주가가 오르고, 못 올리면 빠져요. 정부 정책이 주가를 결정하는 특이한 주식이에요!",
+      "keyLesson": "정책주는 정부가 뭘 결정하느냐에 따라 주가가 움직여요. 뉴스를 잘 봐야 해요!",
+      "survivalTip": "한전은 '요금 인상 뉴스 → 급등 → 실망 → 하락' 패턴이 반복돼요. 뉴스 타이밍이 중요해요!",
       "tags": [
         "한국전력",
         "전기요금",
@@ -1261,9 +1260,9 @@
         "sector": "2차전지",
         "initialPrice": 260000
       },
-      "description": "2차전지 테마로 6개월 만에 주가가 5배 올랐습니다. 양극재 시장의 성장성은 분명하지만, 현재 밸류에이션은 PER 100배를 넘었습니다. SNS에서는 \"에코프로 100만원 간다\"는 글이 떠돌고, 주변 모두가 이 주식을 사고 있습니다.",
-      "keyLesson": "테마주는 펀더멘털과 기대감의 괴리가 클수록 위험하다. 군중심리에서 벗어나라.",
-      "survivalTip": "PER 100배 이상은 극도의 기대가 반영된 것. 기대가 충족되지 않으면 급락한다.",
+      "description": "2차전지 열풍으로 주가가 6개월 만에 5배 올랐어요! 주변 모두가 사고 있는데... 이게 진짜 기회일까요, 위험 신호일까요?",
+      "keyLesson": "다들 '더 오른다'고 할 때가 가장 위험해요. 남들 따라 하지 말고 직접 판단하세요!",
+      "survivalTip": "주가가 너무 비싸면 기대가 잔뜩 들어간 거예요. 기대가 안 맞으면 확 떨어져요!",
       "tags": [
         "에코프로비엠",
         "2차전지",
@@ -1439,9 +1438,9 @@
         "sector": "철강/소재",
         "initialPrice": 385000
       },
-      "description": "글로벌 경기침체 우려가 커지고 있습니다. 철강 가격은 하락하고, 원/달러 환율은 급등. 수출 비중이 높은 포스코홀딩스에 직격탄. 하지만 리튬·니켈 등 2차전지 소재 사업이 새로운 성장 동력이 될 수 있습니다.",
-      "keyLesson": "경기 민감주는 매크로 변수에 취약하다. 경기 사이클을 읽는 능력이 핵심.",
-      "survivalTip": "경기침체 공포가 극에 달할 때가 종종 바닥이다. 하지만 섣부른 매수는 금물.",
+      "description": "경기가 나빠지면서 철강 가격이 떨어지고 있어요. 포스코에 직격탄! 하지만 2차전지 소재 사업이 새 희망이 될 수 있을까요?",
+      "keyLesson": "경기에 따라 움직이는 주식은 경제 흐름을 읽는 게 중요해요!",
+      "survivalTip": "모두가 '경기 망했다'고 할 때가 오히려 바닥일 수 있어요. 하지만 너무 서두르면 안 돼요!",
       "tags": [
         "포스코",
         "경기침체",
@@ -1617,9 +1616,9 @@
         "sector": "금융",
         "initialPrice": 58000
       },
-      "description": "KB금융은 국내 1위 금융지주회사입니다. 배당 수익률 5%대의 고배당주이면서, 금리 인상기에는 순이자마진(NIM) 확대로 실적이 좋아집니다. 화려하지 않지만 꾸준한 수익을 제공하는 \"거북이 투자\"의 대표주.",
-      "keyLesson": "배당 투자는 복리의 마법이다. 느리지만 확실한 수익이 장기적으로 승리한다.",
-      "survivalTip": "배당주는 배당락일 전후 매매 타이밍이 중요. 배당 재투자로 복리 효과를 극대화하라.",
+      "description": "KB금융은 매년 배당금을 많이 주는 회사예요. 화려하지 않지만 꾸준히 돈을 벌어다 주는 '거북이 투자'의 대표 주식이에요!",
+      "keyLesson": "배당금을 다시 투자하면 돈이 눈덩이처럼 불어나요. 느리지만 확실한 방법이에요!",
+      "survivalTip": "배당금 받으면 다시 주식을 사세요. 시간이 지나면 복리의 마법이 일어나요!",
       "tags": [
         "KB금융",
         "배당",
@@ -1777,6 +1776,3068 @@
         "avgSurvivalRate": 95,
         "bestStrategy": "배당 재투자(DRIP)"
       }
+    },
+    {
+      "id": "legend-11",
+      "order": 11,
+      "title": "마이크론, 메모리 사이클의 폭풍",
+      "subtitle": "삼성보다 2배 빠른 변동성",
+      "emoji": "🌪️",
+      "category": "사이클 분석",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-blue-600",
+      "gradientTo": "to-purple-600",
+      "stock": {
+        "name": "마이크론",
+        "code": "MU",
+        "sector": "반도체",
+        "initialPrice": 85
+      },
+      "description": "마이크론은 삼성전자보다 변동성이 2배 큽니다. 메모리 사이클 저점에서 용기 있게 들어갈 수 있나요?",
+      "keyLesson": "사이클주는 변동성이 클수록 수익도 크지만, 손실도 큽니다!",
+      "survivalTip": "미국 데이터센터 수요를 보면 마이크론의 미래가 보입니다.",
+      "tags": [
+        "마이크론",
+        "메모리",
+        "사이클",
+        "고변동성"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "분기 실적 -80% 충격",
+          "description": "마이크론이 분기 영업이익 -80% 급감을 발표했습니다. DRAM 가격이 전분기 대비 -15% 하락. 주가는 -8.5% 폭락. 삼성전자보다 훨씬 큰 낙폭입니다. 애널리스트들은 \"바닥이 아직\"이라고 경고.",
+          "priceChange": "-8.5%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 2,
+          "title": "재고 증가, 추가 하락 전망",
+          "description": "마이크론의 재고가 역대 최고 수준으로 증가. 시장은 추가 가격 하락을 예상하며 -5.2% 하락. 공포 지수가 최고조에 달했습니다.",
+          "priceChange": "-5.2%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 3,
+          "title": "감산 발표, 수급 개선 기대",
+          "description": "마이크론이 생산량 20% 감축을 발표! 업계 전체 감산으로 수급 개선 기대감. +6.8% 급등. 바닥 신호일까요?",
+          "priceChange": "+6.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "중국 수출 규제 우려",
+          "description": "미국이 중국 반도체 수출 규제를 강화. 마이크론의 중국 매출 비중이 25%라 타격 우려. -4.3% 하락.",
+          "priceChange": "-4.3%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 5,
+          "title": "AI 서버 수요 폭증",
+          "description": "엔비디아가 AI 서버 수요 폭증을 발표. 마이크론의 HBM 수주가 급증할 것이라는 기대감에 +9.2% 급등!",
+          "priceChange": "+9.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "외국인 대량 매수",
+          "description": "외국인이 3거래일 연속 대량 매수. +5.5% 상승하며 기술적 반등 신호 확정.",
+          "priceChange": "+5.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "DRAM 가격 반등 시작",
+          "description": "DRAM 현물가가 3개월 만에 처음으로 상승 전환. +4.8% 상승하며 사이클 반등 확정.",
+          "priceChange": "+4.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "HBM 공급 계약 체결",
+          "description": "마이크론이 엔비디아와 HBM 장기 공급 계약 체결! +7.1% 급등하며 저점 대비 +25% 회복.",
+          "priceChange": "+7.1%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s11-1",
+          "title": "사이클 저점 매수",
+          "emoji": "🎯",
+          "description": "감산 발표 후 분할 매수",
+          "steps": [
+            "1~2턴: 관망",
+            "3턴: 감산 발표에 50% 매수",
+            "5턴: AI 수혜 확인 후 50% 추가"
+          ],
+          "risk": "높음",
+          "expectedReturn": "+20% ~ +30%",
+          "difficulty": 4
+        },
+        {
+          "id": "s11-2",
+          "title": "반등 추격 매수",
+          "emoji": "🚀",
+          "description": "기술적 반등 확인 후 매수",
+          "steps": [
+            "1~5턴: 관망",
+            "6턴: 이평선 돌파 시 100% 매수",
+            "7~8턴: 추가 상승 시 홀딩"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+10% ~ +15%",
+          "difficulty": 3
+        },
+        {
+          "id": "s11-3",
+          "title": "보수적 관망",
+          "emoji": "🛡️",
+          "description": "변동성이 너무 커서 관망",
+          "steps": [
+            "1~8턴: 전량 관망",
+            "사이클 확정 후 다음 기회 대기"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "stats": {
+        "avgClearRate": 65,
+        "avgSurvivalRate": 75,
+        "bestStrategy": "사이클 저점 매수"
+      },
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: 변동성이 너무 커서 전량 관망",
+            "삼성전자보다 리스크 2배라 판단"
+          ],
+          "result": "안전 우선 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "2턴: 재고 공포에 50% 매수",
+            "3턴: 감산 발표에 50% 추가",
+            "5턴: AI 수혜 확인 후 홀딩",
+            "8턴: HBM 계약에 환호"
+          ],
+          "result": "사이클 저점 포착 → +28.5%",
+          "returnRate": "+28.5%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1~5턴: 관망",
+            "6턴: 기술적 반등 확인 후 100% 매수",
+            "7~8턴: 상승 추세 홀딩"
+          ],
+          "result": "추세 확인 매수 → +12.8%",
+          "returnRate": "+12.8%"
+        }
+      ]
+    },
+    {
+      "id": "legend-12",
+      "order": 12,
+      "title": "구글, 앱마켓 독점 소송",
+      "subtitle": "규제 리스크 vs 실제 영향",
+      "emoji": "⚖️",
+      "category": "규제 리스크",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-yellow-500",
+      "gradientTo": "to-orange-600",
+      "stock": {
+        "name": "구글(알파벳)",
+        "code": "GOOGL",
+        "sector": "플랫폼",
+        "initialPrice": 142
+      },
+      "description": "구글이 앱마켓 독점 소송에서 패소했습니다. 규제 리스크가 주가에 얼마나 반영돼야 할까요?",
+      "keyLesson": "규제 뉴스와 실제 영향을 구분하는 능력이 핵심!",
+      "survivalTip": "소송 패소 뉴스에 과도하게 반응하면 손해를 봅니다.",
+      "tags": [
+        "구글",
+        "규제",
+        "독점",
+        "소송"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "앱마켓 독점 소송 패소",
+          "description": "구글이 앱마켓 독점 소송에서 패소! 법원은 \"30% 수수료가 독점적\"이라고 판결. 주가 -6.2% 폭락. 시장은 패닉 상태.",
+          "priceChange": "-6.2%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 2,
+          "title": "항소 계획 발표",
+          "description": "구글이 즉시 항소하겠다고 발표. 최종 판결까지 2~3년 소요 예상. -2.1% 추가 하락하지만 낙폭은 축소.",
+          "priceChange": "-2.1%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 3,
+          "title": "애널리스트 \"영향 제한적\"",
+          "description": "증권사들이 \"앱마켓 수익은 전체의 5% 미만\"이라며 영향이 제한적이라고 분석. +3.5% 반등.",
+          "priceChange": "+3.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "EU 추가 조사 착수",
+          "description": "유럽연합이 구글의 검색 독점에 대한 추가 조사를 시작. 규제 리스크 확대 우려에 -3.8% 하락.",
+          "priceChange": "-3.8%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 5,
+          "title": "클라우드 실적 호조",
+          "description": "구글 클라우드 부문이 예상을 뛰어넘는 실적 발표. AI 수요 급증으로 +4.2% 상승. 규제보다 실적이 중요!",
+          "priceChange": "+4.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "자사주 매입 발표",
+          "description": "구글이 700억 달러 규모 자사주 매입 계획 발표. 주주 환원 강화에 +2.8% 상승.",
+          "priceChange": "+2.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "AI 검색 출시",
+          "description": "구글이 AI 검색 \"Bard Search\" 출시. 검색 시장 지배력 유지 기대감에 +3.1% 상승.",
+          "priceChange": "+3.1%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "소송 합의 가능성 부상",
+          "description": "구글이 소송 합의를 검토 중이라는 보도. 불확실성 해소 기대감에 +2.5% 상승. 규제 리스크 극복!",
+          "priceChange": "+2.5%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s12-1",
+          "title": "패닉 저점 매수",
+          "emoji": "🎯",
+          "description": "소송 패소 직후 매수",
+          "steps": [
+            "1턴: 패소 뉴스에 100% 매수",
+            "3~8턴: 홀딩"
+          ],
+          "risk": "높음",
+          "expectedReturn": "+10% ~ +15%",
+          "difficulty": 4
+        },
+        {
+          "id": "s12-2",
+          "title": "실적 확인 후 매수",
+          "emoji": "📊",
+          "description": "클라우드 실적 확인 후 매수",
+          "steps": [
+            "1~4턴: 관망",
+            "5턴: 실적 호조 확인 후 100% 매수"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+8% ~ +12%",
+          "difficulty": 3
+        },
+        {
+          "id": "s12-3",
+          "title": "규제 리스크 회피",
+          "emoji": "🛡️",
+          "description": "불확실성 해소까지 관망",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "stats": {
+        "avgClearRate": 68,
+        "avgSurvivalRate": 78,
+        "bestStrategy": "패닉 저점 매수"
+      },
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: 규제 불확실성으로 관망",
+            "소송 결과 확정 후 재검토 계획"
+          ],
+          "result": "리스크 회피 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 패소 폭락에 100% 매수",
+            "3~8턴: 홀딩",
+            "클라우드 성장 + AI에 주목"
+          ],
+          "result": "역발상 매수 성공 → +13.2%",
+          "returnRate": "+13.2%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1~4턴: 관망",
+            "5턴: 클라우드 실적 확인 후 100% 매수",
+            "6~8턴: 홀딩"
+          ],
+          "result": "실적 확인 후 진입 → +10.5%",
+          "returnRate": "+10.5%"
+        }
+      ]
+    },
+    {
+      "id": "legend-13",
+      "order": 13,
+      "title": "알테오젠, 기술수출 계약 해지",
+      "subtitle": "한 방에 승부가 갈리는 바이오",
+      "emoji": "🧪",
+      "category": "임상 리스크",
+      "difficulty": 4,
+      "difficultyLabel": "고급",
+      "gradientFrom": "from-purple-500",
+      "gradientTo": "to-pink-600",
+      "stock": {
+        "name": "알테오젠",
+        "code": "196170",
+        "sector": "바이오",
+        "initialPrice": 125000
+      },
+      "description": "알테오젠이 글로벌 제약사와 맺은 기술수출 계약이 해지될 위기입니다. 바이오는 한 방에 승부가 갈립니다.",
+      "keyLesson": "바이오는 계약 성공/실패에 따라 ±50% 변동!",
+      "survivalTip": "파이프라인이 다각화된 바이오가 안전합니다.",
+      "tags": [
+        "알테오젠",
+        "바이오",
+        "기술수출",
+        "고위험"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "계약 해지 가능성 보도",
+          "description": "글로벌 제약사가 알테오젠과의 기술수출 계약을 재검토 중이라는 보도. 주가 -12.5% 폭락!",
+          "priceChange": "-12.5%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 2,
+          "title": "회사 \"협의 중\" 해명",
+          "description": "알테오젠이 \"계약 조건 재협의 중\"이라고 해명. 하지만 불확실성에 -8.3% 추가 하락.",
+          "priceChange": "-8.3%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 3,
+          "title": "신규 파이프라인 발표",
+          "description": "알테오젠이 새로운 바이오베터 파이프라인을 발표. 다각화 기대감에 +6.5% 반등.",
+          "priceChange": "+6.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "계약 해지 확정",
+          "description": "결국 글로벌 제약사가 계약 해지를 공식 발표. 주가 -15.2% 폭락. 바이오의 리스크가 현실화!",
+          "priceChange": "-15.2%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 5,
+          "title": "국내 제약사와 신규 계약",
+          "description": "알테오젠이 국내 대형 제약사와 신규 기술수출 계약 체결! +18.5% 급등. 위기를 기회로!",
+          "priceChange": "+18.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "임상 3상 성공",
+          "description": "신규 파이프라인의 임상 3상이 성공. FDA 허가 기대감에 +12.3% 급등.",
+          "priceChange": "+12.3%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "글로벌 제약사 재접촉",
+          "description": "계약 해지했던 글로벌 제약사가 재협의 의사 타진. +8.7% 상승.",
+          "priceChange": "+8.7%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "FDA 허가 획득",
+          "description": "신규 파이프라인이 FDA 허가 획득! +15.2% 급등하며 저점 대비 +50% 회복.",
+          "priceChange": "+15.2%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s13-1",
+          "title": "계약 해지 후 매수",
+          "emoji": "🎯",
+          "description": "최악의 상황 후 반등 노리기",
+          "steps": [
+            "1~4턴: 관망",
+            "4턴: 해지 확정 후 50% 매수",
+            "5턴: 신규 계약 후 50% 추가"
+          ],
+          "risk": "높음",
+          "expectedReturn": "+40% ~ +60%",
+          "difficulty": 5
+        },
+        {
+          "id": "s13-2",
+          "title": "신규 계약 확인 후 매수",
+          "emoji": "📊",
+          "description": "리스크 해소 후 안전 매수",
+          "steps": [
+            "1~4턴: 관망",
+            "5턴: 신규 계약 확인 후 100% 매수"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+30% ~ +40%",
+          "difficulty": 4
+        },
+        {
+          "id": "s13-3",
+          "title": "바이오 리스크 회피",
+          "emoji": "🛡️",
+          "description": "변동성이 너무 커서 관망",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: 바이오 리스크 너무 커서 관망",
+            "안전한 다른 종목 탐색"
+          ],
+          "result": "리스크 회피 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1~3턴: 관망",
+            "4턴: 계약 해지 폭락에 50% 매수",
+            "5턴: 신규 계약에 50% 추가",
+            "8턴: FDA 허가에 환호"
+          ],
+          "result": "공포 속 매수 대박 → +52.3%",
+          "returnRate": "+52.3%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1~4턴: 관망",
+            "5턴: 신규 계약 확인 후 100% 매수",
+            "6~8턴: 홀딩"
+          ],
+          "result": "리스크 해소 후 진입 → +35.8%",
+          "returnRate": "+35.8%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 55,
+        "avgSurvivalRate": 65,
+        "bestStrategy": "계약 해지 후 매수"
+      }
+    },
+    {
+      "id": "legend-14",
+      "order": 14,
+      "title": "테슬라, 머스크 리스크 폭발",
+      "subtitle": "트윗 한 줄에 ±10% 변동",
+      "emoji": "⚡",
+      "category": "경영자 리스크",
+      "difficulty": 4,
+      "difficultyLabel": "고급",
+      "gradientFrom": "from-green-500",
+      "gradientTo": "to-teal-600",
+      "stock": {
+        "name": "테슬라",
+        "code": "TSLA",
+        "sector": "전기차",
+        "initialPrice": 245
+      },
+      "description": "일론 머스크의 트윗 한 줄에 테슬라 주가가 ±10% 변동합니다. 머스크 리스크를 견딜 수 있나요?",
+      "keyLesson": "경영자 리스크는 단기 변동성일 뿐, 본질은 사업!",
+      "survivalTip": "트윗에 흔들리지 말고 생산량과 인도량을 보세요.",
+      "tags": [
+        "테슬라",
+        "머스크",
+        "고변동성",
+        "EV"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "머스크 트위터 인수 발표",
+          "description": "일론 머스크가 트위터 인수에 440억 달러를 쓰겠다고 발표. 테슬라 주식 매각 우려에 -9.2% 폭락!",
+          "priceChange": "-9.2%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 2,
+          "title": "중국 공장 생산 차질",
+          "description": "상하이 공장이 코로나 봉쇄로 3주간 가동 중단. -6.5% 하락. 인도량 감소 우려.",
+          "priceChange": "-6.5%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 3,
+          "title": "가격 인하 발표",
+          "description": "테슬라가 전 모델 가격을 5~10% 인하. 수요 확대 기대감에 +7.8% 반등.",
+          "priceChange": "+7.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "머스크 \"테슬라에 집중\" 트윗",
+          "description": "머스크가 \"테슬라에 다시 집중하겠다\"고 트윗. +5.2% 상승. 트윗 한 줄의 위력!",
+          "priceChange": "+5.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 5,
+          "title": "분기 인도량 신기록",
+          "description": "테슬라가 분기 인도량 48만대로 신기록 달성! +11.5% 급등. 본질은 실적!",
+          "priceChange": "+11.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "FSD 베타 출시",
+          "description": "완전자율주행(FSD) 베타 버전 출시. AI 기술력 입증에 +8.3% 상승.",
+          "priceChange": "+8.3%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "멕시코 공장 착공",
+          "description": "테슬라가 멕시코에 신규 기가팩토리 착공. 생산능력 확대 기대감에 +6.7% 상승.",
+          "priceChange": "+6.7%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "AI 로봇 \"옵티머스\" 공개",
+          "description": "테슬라가 AI 휴머노이드 로봇 공개. 미래 성장성 기대감에 +9.2% 급등!",
+          "priceChange": "+9.2%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s14-1",
+          "title": "머스크 리스크 저점 매수",
+          "emoji": "🎯",
+          "description": "트윗 폭락 시 매수",
+          "steps": [
+            "1턴: 트윗 폭락에 50% 매수",
+            "3턴: 가격 인하 후 50% 추가"
+          ],
+          "risk": "높음",
+          "expectedReturn": "+35% ~ +50%",
+          "difficulty": 5
+        },
+        {
+          "id": "s14-2",
+          "title": "실적 확인 후 매수",
+          "emoji": "📊",
+          "description": "인도량 신기록 후 매수",
+          "steps": [
+            "1~4턴: 관망",
+            "5턴: 인도량 신기록 후 100% 매수"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+25% ~ +35%",
+          "difficulty": 4
+        },
+        {
+          "id": "s14-3",
+          "title": "머스크 리스크 회피",
+          "emoji": "🛡️",
+          "description": "변동성이 너무 커서 관망",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: 머스크 리스크 너무 커서 관망",
+            "변동성 견딜 자신 없음"
+          ],
+          "result": "리스크 회피 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 트위터 인수 폭락에 50% 매수",
+            "3턴: 가격 인하에 50% 추가",
+            "5~8턴: 홀딩"
+          ],
+          "result": "역발상 대박 → +45.8%",
+          "returnRate": "+45.8%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1~4턴: 관망",
+            "5턴: 인도량 신기록 확인 후 100% 매수",
+            "6~8턴: 홀딩"
+          ],
+          "result": "실적 확인 후 진입 → +28.5%",
+          "returnRate": "+28.5%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 60,
+        "avgSurvivalRate": 70,
+        "bestStrategy": "머스크 리스크 저점 매수"
+      }
+    },
+    {
+      "id": "legend-15",
+      "order": 15,
+      "title": "메타, AI 전환 성공할까?",
+      "subtitle": "메타버스 실패 후 AI 도전",
+      "emoji": "🤖",
+      "category": "사업 전환",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-cyan-500",
+      "gradientTo": "to-blue-600",
+      "stock": {
+        "name": "메타(페이스북)",
+        "code": "META",
+        "sector": "플랫폼",
+        "initialPrice": 325
+      },
+      "description": "메타가 메타버스에 10조원을 날리고 이제 AI로 전환 중입니다. 성공할 수 있을까요?",
+      "keyLesson": "사업 전환은 시간이 걸립니다. 인내가 필요!",
+      "survivalTip": "광고 수익 회복과 AI 투자 성과를 동시에 봐야 합니다.",
+      "tags": [
+        "메타",
+        "AI",
+        "전환",
+        "광고"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "메타버스 부문 10조원 손실",
+          "description": "메타가 메타버스 부문에서 10조원 손실을 발표. 주가 -7.8% 폭락!",
+          "priceChange": "-7.8%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 2,
+          "title": "대규모 구조조정 발표",
+          "description": "메타가 1만명 감원 발표. 비용 절감 기대감에 +4.2% 반등.",
+          "priceChange": "+4.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 3,
+          "title": "AI 투자 확대 선언",
+          "description": "저커버그가 \"AI에 집중 투자\"를 선언. 하지만 비용 증가 우려에 -2.5% 하락.",
+          "priceChange": "-2.5%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 4,
+          "title": "광고 수익 회복",
+          "description": "분기 광고 수익이 예상을 뛰어넘음. +6.8% 상승.",
+          "priceChange": "+6.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 5,
+          "title": "AI 챗봇 \"Meta AI\" 출시",
+          "description": "메타가 AI 챗봇 출시. 인스타그램·왓츠앱 통합. +8.5% 급등!",
+          "priceChange": "+8.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "AI 광고 타겟팅 개선",
+          "description": "AI 기반 광고 타겟팅으로 광고 효율 30% 개선. +5.2% 상승.",
+          "priceChange": "+5.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "자사주 매입 확대",
+          "description": "메타가 자사주 매입을 500억 달러로 확대. +4.5% 상승.",
+          "priceChange": "+4.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "AI 수익 모델 확정",
+          "description": "메타가 AI 구독 서비스로 수익화 성공. +6.3% 급등.",
+          "priceChange": "+6.3%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s15-1",
+          "title": "메타버스 실패 후 매수",
+          "emoji": "🎯",
+          "description": "최악의 상황 후 반등",
+          "steps": [
+            "1턴: 메타버스 손실 후 100% 매수",
+            "2~8턴: 홀딩"
+          ],
+          "risk": "높음",
+          "expectedReturn": "+30% ~ +40%",
+          "difficulty": 4
+        },
+        {
+          "id": "s15-2",
+          "title": "AI 성과 확인 후 매수",
+          "emoji": "📊",
+          "description": "AI 출시 후 안전 매수",
+          "steps": [
+            "1~4턴: 관망",
+            "5턴: AI 출시 후 100% 매수"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+20% ~ +25%",
+          "difficulty": 3
+        },
+        {
+          "id": "s15-3",
+          "title": "전환 리스크 회피",
+          "emoji": "🛡️",
+          "description": "성공 확정까지 관망",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: 전환 리스크 해소 때까지 관망"
+          ],
+          "result": "리스크 회피 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 메타버스 손실 폭락에 100% 매수",
+            "2~8턴: 전량 홀딩"
+          ],
+          "result": "바닥 매수 성공 → +35.2%",
+          "returnRate": "+35.2%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1~4턴: 관망",
+            "5턴: AI 출시 확인 후 100% 매수",
+            "6~8턴: 홀딩"
+          ],
+          "result": "AI 확인 후 안전 진입 → +22.8%",
+          "returnRate": "+22.8%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 70,
+        "avgSurvivalRate": 80,
+        "bestStrategy": "메타버스 실패 후 매수"
+      }
+    },
+    {
+      "id": "legend-16",
+      "order": 16,
+      "title": "엔비디아, AI 버블인가 혁명인가?",
+      "subtitle": "PER 100배의 진실",
+      "emoji": "🚀",
+      "category": "밸류에이션",
+      "difficulty": 4,
+      "difficultyLabel": "고급",
+      "gradientFrom": "from-orange-500",
+      "gradientTo": "to-red-600",
+      "stock": {
+        "name": "엔비디아",
+        "code": "NVDA",
+        "sector": "AI 반도체",
+        "initialPrice": 485
+      },
+      "description": "엔비디아의 PER이 100배입니다. AI 혁명인가, 버블인가? 당신의 판단은?",
+      "keyLesson": "고밸류에이션도 성장이 뒷받침되면 정당화됩니다!",
+      "survivalTip": "GPU 공급 부족과 수요를 보면 답이 보입니다.",
+      "tags": [
+        "엔비디아",
+        "AI",
+        "고밸류",
+        "GPU"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "실적 발표, 매출 3배 급증",
+          "description": "엔비디아가 AI GPU 수요 폭증으로 매출 3배 증가 발표! 하지만 PER 100배 부담에 +2.5%만 상승.",
+          "priceChange": "+2.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 2,
+          "title": "중국 수출 규제 강화",
+          "description": "미국이 중국 AI 칩 수출 규제 강화. 매출 20% 타격 우려에 -8.5% 폭락.",
+          "priceChange": "-8.5%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 3,
+          "title": "신제품 \"H200\" 발표",
+          "description": "엔비디아가 차세대 AI 칩 H200 발표. 성능 2배 향상에 +11.2% 급등!",
+          "priceChange": "+11.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "AMD 경쟁 제품 출시",
+          "description": "AMD가 엔비디아 경쟁 AI 칩 출시. 시장 점유율 우려에 -5.8% 하락.",
+          "priceChange": "-5.8%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 5,
+          "title": "마이크로소프트 대량 주문",
+          "description": "MS가 AI 데이터센터용 GPU 100억 달러 주문! +9.5% 급등.",
+          "priceChange": "+9.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "공급 부족 1년 대기",
+          "description": "GPU 공급 부족으로 주문 후 1년 대기. 수요 폭발 확인에 +7.8% 상승.",
+          "priceChange": "+7.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "TSMC 생산능력 확대",
+          "description": "TSMC가 엔비디아 GPU 생산능력 2배 확대. +6.2% 상승.",
+          "priceChange": "+6.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "AI 슈퍼사이클 확정",
+          "description": "애널리스트들이 \"AI 슈퍼사이클 시작\"이라고 평가. +8.5% 급등.",
+          "priceChange": "+8.5%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s16-1",
+          "title": "규제 리스크 저점 매수",
+          "emoji": "🎯",
+          "description": "중국 규제 폭락 시 매수",
+          "steps": [
+            "1턴: 관망",
+            "2턴: 규제 폭락에 100% 매수"
+          ],
+          "risk": "높음",
+          "expectedReturn": "+40% ~ +55%",
+          "difficulty": 5
+        },
+        {
+          "id": "s16-2",
+          "title": "수요 확인 후 매수",
+          "emoji": "📊",
+          "description": "대량 주문 확인 후 매수",
+          "steps": [
+            "1~4턴: 관망",
+            "5턴: MS 주문 후 100% 매수"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+25% ~ +35%",
+          "difficulty": 4
+        },
+        {
+          "id": "s16-3",
+          "title": "고밸류 리스크 회피",
+          "emoji": "🛡️",
+          "description": "PER 100배는 너무 부담",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: PER 100배 부담으로 관망"
+          ],
+          "result": "리스크 회피 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 관망",
+            "2턴: 규제 폭락에 100% 매수",
+            "3~8턴: 홀딩"
+          ],
+          "result": "규제 폭락 매수 대박 → +48.5%",
+          "returnRate": "+48.5%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1~4턴: 관망",
+            "5턴: MS 주문 확인 후 100% 매수",
+            "6~8턴: 홀딩"
+          ],
+          "result": "수요 확인 후 안전 진입 → +28.8%",
+          "returnRate": "+28.8%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 58,
+        "avgSurvivalRate": 68,
+        "bestStrategy": "규제 리스크 저점 매수"
+      }
+    },
+    {
+      "id": "legend-17",
+      "order": 17,
+      "title": "KT&G, 담뱃세 인상 쇼크",
+      "subtitle": "독점 사업의 정책 리스크",
+      "emoji": "🏛️",
+      "category": "정책 리스크",
+      "difficulty": 2,
+      "difficultyLabel": "초급",
+      "gradientFrom": "from-slate-500",
+      "gradientTo": "to-gray-600",
+      "stock": {
+        "name": "KT&G",
+        "code": "033780",
+        "sector": "담배",
+        "initialPrice": 82000
+      },
+      "description": "KT&G는 담배 독점 기업이지만 정부가 담뱃세를 올리면 수익이 줄어듭니다.",
+      "keyLesson": "정책 뉴스와 실제 영향을 빠르게 구분하세요!",
+      "survivalTip": "담뱃세 인상은 단기 악재, 장기적으로는 회복합니다.",
+      "tags": [
+        "KT&G",
+        "담배",
+        "정책",
+        "규제"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "담뱃세 인상 추진 보도",
+          "description": "정부가 담뱃세 2,000원 인상을 추진 중이라는 보도. -6.5% 폭락!",
+          "priceChange": "-6.5%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 2,
+          "title": "업계 반발, 국회 논의",
+          "description": "담배 업계 강력 반발. 국회 논의 시작. -2.3% 추가 하락.",
+          "priceChange": "-2.3%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 3,
+          "title": "인상 폭 축소 가능성",
+          "description": "담뱃세 인상 폭이 1,000원으로 축소될 가능성. +3.8% 반등.",
+          "priceChange": "+3.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "국회 통과 유예",
+          "description": "국회에서 담뱃세 인상안 통과 유예 결정. +4.2% 상승.",
+          "priceChange": "+4.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 5,
+          "title": "해외 사업 호조",
+          "description": "KT&G의 해외 담배 사업이 호조. 수출 증가에 +2.5% 상승.",
+          "priceChange": "+2.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "배당 확대 발표",
+          "description": "KT&G가 배당을 20% 확대 발표. 배당 매력에 +3.2% 상승.",
+          "priceChange": "+3.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "궐련형 전자담배 성장",
+          "description": "궐련형 전자담배 \"릴\" 판매량 급증. +2.8% 상승.",
+          "priceChange": "+2.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "정책 리스크 해소",
+          "description": "정부가 담뱃세 인상 계획 철회. +4.5% 급등.",
+          "priceChange": "+4.5%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s17-1",
+          "title": "정책 리스크 저점 매수",
+          "emoji": "🎯",
+          "description": "담뱃세 보도 시 매수",
+          "steps": [
+            "1턴: 인상 보도에 100% 매수",
+            "2~8턴: 홀딩"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+15% ~ +20%",
+          "difficulty": 3
+        },
+        {
+          "id": "s17-2",
+          "title": "유예 확인 후 매수",
+          "emoji": "📊",
+          "description": "국회 유예 후 매수",
+          "steps": [
+            "1~3턴: 관망",
+            "4턴: 유예 확인 후 100% 매수"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "+10% ~ +15%",
+          "difficulty": 2
+        },
+        {
+          "id": "s17-3",
+          "title": "정책 리스크 회피",
+          "emoji": "🛡️",
+          "description": "해소까지 관망",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "매우 낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: 정책 리스크 해소 때까지 관망"
+          ],
+          "result": "리스크 회피 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 담뱃세 보도 폭락에 100% 매수",
+            "2~8턴: 홀딩"
+          ],
+          "result": "역발상 매수 → +18.2%",
+          "returnRate": "+18.2%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1~3턴: 관망",
+            "4턴: 유예 확인 후 100% 매수",
+            "5~8턴: 홀딩"
+          ],
+          "result": "유예 확인 후 진입 → +12.5%",
+          "returnRate": "+12.5%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 78,
+        "avgSurvivalRate": 88,
+        "bestStrategy": "정책 리스크 저점 매수"
+      }
+    },
+    {
+      "id": "legend-18",
+      "order": 18,
+      "title": "코인베이스, 비트코인과 동행",
+      "subtitle": "암호화폐 거래소의 운명",
+      "emoji": "🪙",
+      "category": "테마주",
+      "difficulty": 4,
+      "difficultyLabel": "고급",
+      "gradientFrom": "from-red-500",
+      "gradientTo": "to-pink-600",
+      "stock": {
+        "name": "코인베이스",
+        "code": "COIN",
+        "sector": "암호화폐",
+        "initialPrice": 125
+      },
+      "description": "코인베이스는 비트코인이 오르면 같이 오르고, 떨어지면 같이 떨어집니다.",
+      "keyLesson": "테마주는 본질(비트코인 가격)을 보세요!",
+      "survivalTip": "비트코인 차트를 보면 코인베이스가 보입니다.",
+      "tags": [
+        "코인베이스",
+        "비트코인",
+        "테마",
+        "고변동성"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "비트코인 -15% 폭락",
+          "description": "비트코인이 -15% 폭락하며 암호화폐 시장 패닉. 코인베이스 -18.5% 폭락!",
+          "priceChange": "-18.5%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 2,
+          "title": "SEC 규제 조사 착수",
+          "description": "미국 SEC가 코인베이스 규제 조사 착수. -12.3% 추가 폭락.",
+          "priceChange": "-12.3%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 3,
+          "title": "비트코인 반등 +10%",
+          "description": "비트코인이 +10% 반등. 코인베이스도 +15.2% 급등!",
+          "priceChange": "+15.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "거래량 급감, 실적 악화",
+          "description": "암호화폐 거래량 급감으로 수수료 수익 -40%. -8.5% 하락.",
+          "priceChange": "-8.5%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 5,
+          "title": "비트코인 ETF 승인",
+          "description": "미국에서 비트코인 현물 ETF 승인! +22.5% 급등!",
+          "priceChange": "+22.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "기관 투자자 유입",
+          "description": "ETF 승인으로 기관 투자자 대거 유입. +12.8% 상승.",
+          "priceChange": "+12.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "비트코인 신고가",
+          "description": "비트코인이 사상 최고가 경신! +18.5% 급등!",
+          "priceChange": "+18.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "수수료 수익 회복",
+          "description": "거래량 폭증으로 수수료 수익 3배 증가. +15.2% 급등!",
+          "priceChange": "+15.2%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s18-1",
+          "title": "패닉 저점 매수",
+          "emoji": "🎯",
+          "description": "비트코인 폭락 시 매수",
+          "steps": [
+            "1~2턴: SEC 조사 폭락에 100% 매수",
+            "3~8턴: 홀딩"
+          ],
+          "risk": "높음",
+          "expectedReturn": "+80% ~ +120%",
+          "difficulty": 5
+        },
+        {
+          "id": "s18-2",
+          "title": "ETF 승인 후 매수",
+          "emoji": "📊",
+          "description": "규제 해소 후 매수",
+          "steps": [
+            "1~4턴: 관망",
+            "5턴: ETF 승인 후 100% 매수"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+50% ~ +70%",
+          "difficulty": 4
+        },
+        {
+          "id": "s18-3",
+          "title": "암호화폐 리스크 회피",
+          "emoji": "🛡️",
+          "description": "변동성 너무 커서 관망",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: 암호화폐 리스크 너무 커서 관망"
+          ],
+          "result": "리스크 회피 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "2턴: SEC 조사 폭락에 100% 매수",
+            "3~8턴: 전량 홀딩"
+          ],
+          "result": "패닉 매수 대박 → +95.8%",
+          "returnRate": "+95.8%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1~4턴: 관망",
+            "5턴: ETF 승인 후 100% 매수",
+            "6~8턴: 홀딩"
+          ],
+          "result": "ETF 확인 후 진입 → +58.5%",
+          "returnRate": "+58.5%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 50,
+        "avgSurvivalRate": 60,
+        "bestStrategy": "패닉 저점 매수"
+      }
+    },
+    {
+      "id": "legend-19",
+      "order": 19,
+      "title": "노벨리스, 중국 경기 직격탄",
+      "subtitle": "알루미늄 가격과 100% 연동",
+      "emoji": "🌐",
+      "category": "원자재",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-amber-500",
+      "gradientTo": "to-yellow-600",
+      "stock": {
+        "name": "노벨리스(알루미늄)",
+        "code": "NVL",
+        "sector": "원자재",
+        "initialPrice": 68
+      },
+      "description": "노벨리스는 알루미늄 가격과 100% 연동됩니다. 중국 경기에 직격탄.",
+      "keyLesson": "원자재주는 글로벌 경기 지표를 보세요!",
+      "survivalTip": "중국 PMI 지표를 보면 미래가 보입니다.",
+      "tags": [
+        "알루미늄",
+        "원자재",
+        "중국",
+        "경기민감"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "중국 부동산 경기 악화",
+          "description": "중국 부동산 경기가 급격히 악화. 알루미늄 수요 급감 우려에 -9.5% 폭락!",
+          "priceChange": "-9.5%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 2,
+          "title": "알루미늄 가격 -12% 하락",
+          "description": "알루미늄 현물가가 -12% 폭락. -7.8% 추가 하락.",
+          "priceChange": "-7.8%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 3,
+          "title": "중국 경기 부양책 발표",
+          "description": "중국 정부가 대규모 경기 부양책 발표. +8.5% 반등!",
+          "priceChange": "+8.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "미국 경기 침체 우려",
+          "description": "미국 제조업 PMI 급락. 경기 침체 우려에 -5.2% 하락.",
+          "priceChange": "-5.2%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 5,
+          "title": "전기차 수요 증가",
+          "description": "전기차 경량화로 알루미늄 수요 급증. +6.8% 상승.",
+          "priceChange": "+6.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "알루미늄 가격 반등",
+          "description": "알루미늄 현물가 +15% 반등. +9.2% 급등!",
+          "priceChange": "+9.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "중국 PMI 회복",
+          "description": "중국 제조업 PMI가 50 돌파. +5.5% 상승.",
+          "priceChange": "+5.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "글로벌 경기 회복",
+          "description": "글로벌 제조업 PMI 일제히 상승. +7.2% 급등.",
+          "priceChange": "+7.2%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s19-1",
+          "title": "경기 저점 매수",
+          "emoji": "🎯",
+          "description": "부양책 발표 시 매수",
+          "steps": [
+            "1~2턴: 관망",
+            "3턴: 부양책 발표에 100% 매수"
+          ],
+          "risk": "높음",
+          "expectedReturn": "+25% ~ +35%",
+          "difficulty": 4
+        },
+        {
+          "id": "s19-2",
+          "title": "가격 반등 확인 후 매수",
+          "emoji": "📊",
+          "description": "알루미늄 반등 후 매수",
+          "steps": [
+            "1~5턴: 관망",
+            "6턴: 가격 반등 후 100% 매수"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+15% ~ +20%",
+          "difficulty": 3
+        },
+        {
+          "id": "s19-3",
+          "title": "경기 리스크 회피",
+          "emoji": "🛡️",
+          "description": "경기 회복 확정까지 관망",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: 경기 리스크 해소 때까지 관망"
+          ],
+          "result": "리스크 회피 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1~2턴: 관망",
+            "3턴: 부양책 발표에 100% 매수",
+            "4~8턴: 홀딩"
+          ],
+          "result": "부양책 매수 → +28.5%",
+          "returnRate": "+28.5%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1~5턴: 관망",
+            "6턴: 가격 반등 확인 후 100% 매수",
+            "7~8턴: 홀딩"
+          ],
+          "result": "반등 확인 후 진입 → +18.2%",
+          "returnRate": "+18.2%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 65,
+        "avgSurvivalRate": 75,
+        "bestStrategy": "경기 저점 매수"
+      }
+    },
+    {
+      "id": "legend-20",
+      "order": 20,
+      "title": "삼성생명, 금리 역전의 공포",
+      "subtitle": "보험사의 금리 리스크",
+      "emoji": "🏦",
+      "category": "금리 리스크",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-emerald-500",
+      "gradientTo": "to-green-600",
+      "stock": {
+        "name": "삼성생명",
+        "code": "032830",
+        "sector": "보험",
+        "initialPrice": 78000
+      },
+      "description": "삼성생명은 금리가 급등하면 보유 채권 평가손이 발생합니다.",
+      "keyLesson": "금리 상승기에는 보험주가 고전합니다!",
+      "survivalTip": "금리 하락기에는 투자 수익이 증가합니다.",
+      "tags": [
+        "삼성생명",
+        "보험",
+        "금리",
+        "배당"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "한은 기준금리 0.5%p 인상",
+          "description": "한국은행이 기준금리를 0.5%p 인상. 보유 채권 평가손 우려에 -5.8% 하락!",
+          "priceChange": "-5.8%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 2,
+          "title": "채권 평가손 3조원 발생",
+          "description": "삼성생명이 채권 평가손 3조원 발표. -4.2% 추가 하락.",
+          "priceChange": "-4.2%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 3,
+          "title": "배당 유지 발표",
+          "description": "삼성생명이 배당을 전년 수준으로 유지 발표. +3.5% 반등.",
+          "priceChange": "+3.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "금리 추가 인상",
+          "description": "한은이 금리를 추가 0.25%p 인상. -3.2% 하락.",
+          "priceChange": "-3.2%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 5,
+          "title": "금리 인상 종료 시사",
+          "description": "한은 총재가 \"금리 인상 사이클 종료\" 시사. +4.8% 반등!",
+          "priceChange": "+4.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "투자 수익 개선",
+          "description": "금리 안정화로 투자 수익 개선. +3.5% 상승.",
+          "priceChange": "+3.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "금리 인하 기대감",
+          "description": "시장이 내년 금리 인하를 기대. +4.2% 상승.",
+          "priceChange": "+4.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "배당 확대 발표",
+          "description": "삼성생명이 배당을 20% 확대 발표. +5.5% 급등.",
+          "priceChange": "+5.5%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s20-1",
+          "title": "금리 인상 저점 매수",
+          "emoji": "🎯",
+          "description": "평가손 발표 후 매수",
+          "steps": [
+            "1~2턴: 관망",
+            "2턴: 평가손 발표에 100% 매수"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+15% ~ +20%",
+          "difficulty": 3
+        },
+        {
+          "id": "s20-2",
+          "title": "금리 안정화 후 매수",
+          "emoji": "📊",
+          "description": "인상 종료 시사 후 매수",
+          "steps": [
+            "1~4턴: 관망",
+            "5턴: 인상 종료 후 100% 매수"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "+12% ~ +15%",
+          "difficulty": 2
+        },
+        {
+          "id": "s20-3",
+          "title": "금리 리스크 회피",
+          "emoji": "🛡️",
+          "description": "금리 하락 확정까지 관망",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "매우 낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: 금리 리스크 해소 때까지 관망"
+          ],
+          "result": "리스크 회피 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1~2턴: 관망",
+            "2턴: 평가손 발표 폭락에 100% 매수",
+            "3~8턴: 홀딩"
+          ],
+          "result": "저점 매수 → +17.8%",
+          "returnRate": "+17.8%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1~4턴: 관망",
+            "5턴: 금리 안정화 후 100% 매수",
+            "6~8턴: 홀딩"
+          ],
+          "result": "안정화 후 진입 → +13.5%",
+          "returnRate": "+13.5%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 72,
+        "avgSurvivalRate": 82,
+        "bestStrategy": "금리 인상 저점 매수"
+      }
+    },
+    {
+      "id": "legend-21",
+      "order": 21,
+      "title": "한화에어로스페이스, 방산 수출 대박",
+      "subtitle": "전쟁 뉴스에 오르는 주식",
+      "emoji": "🎯",
+      "category": "방산",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-rose-500",
+      "gradientTo": "to-red-600",
+      "stock": {
+        "name": "한화에어로스페이스",
+        "code": "012450",
+        "sector": "방산",
+        "initialPrice": 185000
+      },
+      "description": "한화에어로스페이스는 전쟁 뉴스가 나오면 급등합니다. 방산 수출 계약이 주가를 움직입니다.",
+      "keyLesson": "지정학적 리스크가 방산주의 기회!",
+      "survivalTip": "수출 계약 뉴스를 빠르게 캐치하세요.",
+      "tags": [
+        "한화",
+        "방산",
+        "수출",
+        "지정학"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "중동 지정학적 긴장 고조",
+          "description": "중동에서 군사 충돌 발생. 방산주 전체 급등. +8.5% 상승!",
+          "priceChange": "+8.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 2,
+          "title": "폴란드 수출 계약 체결",
+          "description": "한화가 폴란드와 15조원 규모 K2 전차·K9 자주포 수출 계약 체결! +12.5% 급등!",
+          "priceChange": "+12.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 3,
+          "title": "실적 발표, 수주 급증",
+          "description": "분기 실적 발표. 수주 잔고 50조원 돌파. +6.8% 상승.",
+          "priceChange": "+6.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "평화 협상 뉴스",
+          "description": "중동 평화 협상 진행 중이라는 뉴스. 방산주 조정에 -5.2% 하락.",
+          "priceChange": "-5.2%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 5,
+          "title": "호주 수출 협상 진행",
+          "description": "한화가 호주와 K9 자주포 수출 협상 진행 중. +4.5% 상승.",
+          "priceChange": "+4.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "NATO 표준 인증 획득",
+          "description": "한화 무기가 NATO 표준 인증 획득. 유럽 수출 확대 기대감에 +7.2% 상승.",
+          "priceChange": "+7.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "이집트 수출 계약 체결",
+          "description": "한화가 이집트와 K9 자주포 수출 계약 체결. +8.5% 급등!",
+          "priceChange": "+8.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "수주 잔고 70조원 돌파",
+          "description": "한화의 수주 잔고가 70조원 돌파. 향후 3년 실적 가시성 확보. +9.2% 급등!",
+          "priceChange": "+9.2%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s21-1",
+          "title": "지정학적 리스크 매수",
+          "emoji": "🎯",
+          "description": "중동 긴장 고조 시 매수",
+          "steps": [
+            "1턴: 중동 긴장에 100% 매수",
+            "2~8턴: 홀딩"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+40% ~ +55%",
+          "difficulty": 3
+        },
+        {
+          "id": "s21-2",
+          "title": "수출 계약 확인 후 매수",
+          "emoji": "📊",
+          "description": "폴란드 계약 후 매수",
+          "steps": [
+            "1턴: 관망",
+            "2턴: 폴란드 계약 후 100% 매수"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "+30% ~ +40%",
+          "difficulty": 2
+        },
+        {
+          "id": "s21-3",
+          "title": "방산 리스크 회피",
+          "emoji": "🛡️",
+          "description": "윤리적 이유로 관망",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "매우 낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "stats": {
+        "avgClearRate": 70,
+        "avgSurvivalRate": 80,
+        "bestStrategy": "지정학적 리스크 매수"
+      },
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: 방산주 윤리적 부담으로 관망",
+            "다른 섹터 투자 검토"
+          ],
+          "result": "가치관 우선 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 지정학 긴장에 100% 매수",
+            "2턴: 폴란드 계약에 환호",
+            "4턴: 조정에도 홀딩",
+            "8턴: 수주 잔고에 만족"
+          ],
+          "result": "초기 진입 대박 → +48.5%",
+          "returnRate": "+48.5%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1턴: 관망",
+            "2턴: 폴란드 계약 확인 후 100% 매수",
+            "4턴: 조정에도 홀딩",
+            "8턴: 수주 확인"
+          ],
+          "result": "계약 확인 후 안정 진입 → +35.2%",
+          "returnRate": "+35.2%"
+        }
+      ]
+    },
+    {
+      "id": "legend-22",
+      "order": 22,
+      "title": "LIG넥스원, 국방 예산 수혜",
+      "subtitle": "레이더·미사일의 강자",
+      "emoji": "🚀",
+      "category": "방산",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-rose-500",
+      "gradientTo": "to-pink-600",
+      "stock": {
+        "name": "LIG넥스원",
+        "code": "079550",
+        "sector": "방산",
+        "initialPrice": 145000
+      },
+      "description": "LIG넥스원은 레이더·미사일 전문 기업입니다. 국방 예산과 수출 계약에 의존합니다.",
+      "keyLesson": "정부 예산안과 국제 정세를 읽으세요!",
+      "survivalTip": "대형 수주 뉴스가 주가를 크게 움직입니다.",
+      "tags": [
+        "LIG넥스원",
+        "방산",
+        "레이더",
+        "미사일"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "국방 예산 10% 증액",
+          "description": "정부가 국방 예산을 10% 증액 발표. 방산주 전체 급등. +7.5% 상승!",
+          "priceChange": "+7.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 2,
+          "title": "천궁-II 수출 계약 체결",
+          "description": "LIG넥스원이 중동 국가와 천궁-II 미사일 수출 계약 체결! +11.2% 급등!",
+          "priceChange": "+11.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 3,
+          "title": "실적 발표, 수주 증가",
+          "description": "분기 실적 발표. 수주 잔고 15조원 돌파. +5.8% 상승.",
+          "priceChange": "+5.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "기술 유출 의혹 보도",
+          "description": "일부 기술이 유출됐다는 의혹 보도. -8.5% 폭락!",
+          "priceChange": "-8.5%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 5,
+          "title": "회사 \"사실무근\" 해명",
+          "description": "LIG넥스원이 \"기술 유출은 사실무근\"이라고 해명. +6.2% 반등.",
+          "priceChange": "+6.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "호주 레이더 수출 계약",
+          "description": "LIG넥스원이 호주와 함정용 레이더 수출 계약 체결. +8.5% 급등!",
+          "priceChange": "+8.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "국방부 추가 발주",
+          "description": "국방부가 천궁-II 추가 발주 결정. +7.2% 상승.",
+          "priceChange": "+7.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "수주 잔고 20조원 돌파",
+          "description": "LIG넥스원의 수주 잔고가 20조원 돌파. +9.5% 급등!",
+          "priceChange": "+9.5%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s22-1",
+          "title": "예산 증액 시 매수",
+          "emoji": "🎯",
+          "description": "국방 예산 증액 발표 시 매수",
+          "steps": [
+            "1턴: 예산 증액에 100% 매수",
+            "2~8턴: 홀딩"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+35% ~ +45%",
+          "difficulty": 3
+        },
+        {
+          "id": "s22-2",
+          "title": "기술 유출 저점 매수",
+          "emoji": "📊",
+          "description": "기술 유출 의혹 폭락 시 매수",
+          "steps": [
+            "1~3턴: 관망",
+            "4턴: 기술 유출 폭락에 100% 매수"
+          ],
+          "risk": "높음",
+          "expectedReturn": "+40% ~ +50%",
+          "difficulty": 4
+        },
+        {
+          "id": "s22-3",
+          "title": "방산 리스크 회피",
+          "emoji": "🛡️",
+          "description": "윤리적 이유로 관망",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "매우 낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "stats": {
+        "avgClearRate": 68,
+        "avgSurvivalRate": 78,
+        "bestStrategy": "기술 유출 저점 매수"
+      },
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: 방산주 변동성 부담으로 관망"
+          ],
+          "result": "관망 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 관망",
+            "4턴: 기술유출 폭락에 100% 매수",
+            "5턴: 해명 반등 확인",
+            "8턴: 수주 잔고에 만족"
+          ],
+          "result": "공포 속 매수 → +42.5%",
+          "returnRate": "+42.5%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1턴: 예산 증액에 100% 매수",
+            "3턴: 실적 확인 후 홀딩",
+            "4턴: 기술유출 조정에도 보유",
+            "8턴: 장기 보유"
+          ],
+          "result": "예산 증액 기반 매수 → +38.2%",
+          "returnRate": "+38.2%"
+        }
+      ]
+    },
+    {
+      "id": "legend-23",
+      "order": 23,
+      "title": "미래에셋증권, 거래대금 폭증",
+      "subtitle": "시장이 뜨거우면 함께 타오르는 주식",
+      "emoji": "📈",
+      "category": "증권",
+      "difficulty": 2,
+      "difficultyLabel": "초급",
+      "gradientFrom": "from-indigo-500",
+      "gradientTo": "to-purple-600",
+      "stock": {
+        "name": "미래에셋증권",
+        "code": "006800",
+        "sector": "증권",
+        "initialPrice": 8500
+      },
+      "description": "미래에셋증권은 주식 거래가 활발할수록 수수료 수익이 늘어납니다. 시장 과열을 읽는 능력이 핵심!",
+      "keyLesson": "거래대금이 2배 증가하면 실적도 2배!",
+      "survivalTip": "코스피 거래대금을 보면 증권주가 보입니다.",
+      "tags": [
+        "미래에셋",
+        "증권",
+        "거래대금",
+        "사이클"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "코스피 거래대금 급증",
+          "description": "코스피 일평균 거래대금이 10조 → 20조로 급증. 증권주 전체 급등. +9.5% 상승!",
+          "priceChange": "+9.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 2,
+          "title": "개인 투자자 유입",
+          "description": "개인 투자자가 대거 유입. MTS 가입자 급증. +7.2% 상승.",
+          "priceChange": "+7.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 3,
+          "title": "분기 실적 발표, 수익 2배",
+          "description": "미래에셋증권이 분기 실적 발표. 수수료 수익 2배 증가. +8.5% 급등!",
+          "priceChange": "+8.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "코스피 조정, 거래대금 감소",
+          "description": "코스피가 -5% 조정. 거래대금 20조 → 12조로 감소. -6.5% 하락.",
+          "priceChange": "-6.5%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 5,
+          "title": "시장 반등, 거래대금 회복",
+          "description": "코스피 반등으로 거래대금 다시 18조로 회복. +5.8% 상승.",
+          "priceChange": "+5.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "IPO 시장 활성화",
+          "description": "대형 IPO가 연이어 성공. 증권사 수수료 수익 증가. +6.5% 상승.",
+          "priceChange": "+6.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "배당 확대 발표",
+          "description": "미래에셋증권이 배당을 30% 확대 발표. +4.2% 상승.",
+          "priceChange": "+4.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "거래대금 30조 돌파",
+          "description": "코스피 거래대금이 30조 돌파. 증권주 슈퍼사이클! +8.5% 급등!",
+          "priceChange": "+8.5%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s23-1",
+          "title": "거래대금 급증 시 매수",
+          "emoji": "🎯",
+          "description": "거래대금 2배 증가 시 매수",
+          "steps": [
+            "1턴: 거래대금 급증에 100% 매수",
+            "2~8턴: 홀딩"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+35% ~ +45%",
+          "difficulty": 3
+        },
+        {
+          "id": "s23-2",
+          "title": "실적 확인 후 매수",
+          "emoji": "📊",
+          "description": "분기 실적 발표 후 매수",
+          "steps": [
+            "1~2턴: 관망",
+            "3턴: 실적 발표 후 100% 매수"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "+25% ~ +30%",
+          "difficulty": 2
+        },
+        {
+          "id": "s23-3",
+          "title": "증권 사이클 회피",
+          "emoji": "🛡️",
+          "description": "변동성이 커서 관망",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "매우 낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "stats": {
+        "avgClearRate": 75,
+        "avgSurvivalRate": 85,
+        "bestStrategy": "거래대금 급증 시 매수"
+      },
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: 증권주 사이클 변동성 커서 관망"
+          ],
+          "result": "관망 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 거래대금 급증에 100% 매수",
+            "4턴: 조정에도 홀딩",
+            "8턴: 거래대금 30조에 환호"
+          ],
+          "result": "초기 진입 대박 → +42.5%",
+          "returnRate": "+42.5%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1~2턴: 관망",
+            "3턴: 실적 확인 후 100% 매수",
+            "4턴: 조정에도 보유",
+            "8턴: 추가 상승"
+          ],
+          "result": "실적 확인 후 진입 → +28.8%",
+          "returnRate": "+28.8%"
+        }
+      ]
+    },
+    {
+      "id": "legend-24",
+      "order": 24,
+      "title": "NH투자증권, IB 수익 폭발",
+      "subtitle": "대형 IPO 주관이 핵심",
+      "emoji": "💼",
+      "category": "증권",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-indigo-500",
+      "gradientTo": "to-blue-600",
+      "stock": {
+        "name": "NH투자증권",
+        "code": "005940",
+        "sector": "증권",
+        "initialPrice": 12500
+      },
+      "description": "NH투자증권은 IB(기업금융) 수익 비중이 높습니다. 대형 IPO 주관이 주가를 움직입니다.",
+      "keyLesson": "IPO 시장을 보면 증권주가 보입니다!",
+      "survivalTip": "대형 IPO 주관 뉴스를 빠르게 캐치하세요.",
+      "tags": [
+        "NH투자증권",
+        "증권",
+        "IB",
+        "IPO"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "대형 IPO 주관 확정",
+          "description": "NH투자증권이 10조원 규모 대형 IPO 주관사로 선정! +8.5% 급등!",
+          "priceChange": "+8.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 2,
+          "title": "IPO 대박 성공",
+          "description": "주관한 IPO가 공모가 대비 +150% 상승. 수수료 수익 폭발. +11.2% 급등!",
+          "priceChange": "+11.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 3,
+          "title": "분기 실적 발표, IB 수익 3배",
+          "description": "NH투자증권이 분기 실적 발표. IB 수익 3배 증가. +7.5% 상승.",
+          "priceChange": "+7.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "IPO 시장 침체",
+          "description": "시장 조정으로 IPO 시장 침체. 신규 상장 연기 속출. -6.8% 하락.",
+          "priceChange": "-6.8%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 5,
+          "title": "M&A 자문 수주",
+          "description": "NH투자증권이 대형 M&A 자문 수주. +5.5% 상승.",
+          "priceChange": "+5.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "IPO 시장 재개",
+          "description": "시장 회복으로 IPO 시장 재개. 신규 상장 러시. +6.8% 상승.",
+          "priceChange": "+6.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "해외 IB 수익 증가",
+          "description": "해외 IB 수익이 급증. 글로벌 진출 성공. +5.2% 상승.",
+          "priceChange": "+5.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "IB 부문 1위 달성",
+          "description": "NH투자증권이 IB 부문 시장점유율 1위 달성! +7.8% 급등!",
+          "priceChange": "+7.8%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s24-1",
+          "title": "IPO 주관 확정 시 매수",
+          "emoji": "🎯",
+          "description": "대형 IPO 주관 뉴스에 매수",
+          "steps": [
+            "1턴: IPO 주관 확정에 100% 매수",
+            "2~8턴: 홀딩"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+35% ~ +45%",
+          "difficulty": 3
+        },
+        {
+          "id": "s24-2",
+          "title": "실적 확인 후 매수",
+          "emoji": "📊",
+          "description": "분기 실적 발표 후 매수",
+          "steps": [
+            "1~2턴: 관망",
+            "3턴: 실적 발표 후 100% 매수"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "+20% ~ +25%",
+          "difficulty": 2
+        },
+        {
+          "id": "s24-3",
+          "title": "IPO 리스크 회피",
+          "emoji": "🛡️",
+          "description": "IPO 시장 침체 우려로 관망",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "매우 낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "stats": {
+        "avgClearRate": 72,
+        "avgSurvivalRate": 82,
+        "bestStrategy": "IPO 주관 확정 시 매수"
+      },
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: IPO 시장 리스크 커서 관망"
+          ],
+          "result": "관망 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: IPO 주관 확정에 100% 매수",
+            "4턴: IPO 침체에도 홀딩",
+            "8턴: IB 1위 달성에 만족"
+          ],
+          "result": "초기 진입 성공 → +42.8%",
+          "returnRate": "+42.8%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1~2턴: 관망",
+            "3턴: IB 수익 3배 확인 후 매수",
+            "4턴: 침체에도 보유",
+            "8턴: 장기 보유"
+          ],
+          "result": "실적 확인 후 진입 → +22.5%",
+          "returnRate": "+22.5%"
+        }
+      ]
+    },
+    {
+      "id": "legend-25",
+      "order": 25,
+      "title": "원익IPS, 반도체 장비 수주",
+      "subtitle": "삼성·SK 설비투자가 운명",
+      "emoji": "🔩",
+      "category": "소부장",
+      "difficulty": 4,
+      "difficultyLabel": "고급",
+      "gradientFrom": "from-teal-500",
+      "gradientTo": "to-cyan-600",
+      "stock": {
+        "name": "원익IPS",
+        "code": "240810",
+        "sector": "반도체 장비",
+        "initialPrice": 45000
+      },
+      "description": "원익IPS는 반도체 식각 장비를 만듭니다. 삼성·SK 설비투자가 실적을 결정합니다.",
+      "keyLesson": "반도체 설비투자 사이클을 읽으세요!",
+      "survivalTip": "삼성·SK 공장 증설 뉴스를 빠르게 캐치하세요.",
+      "tags": [
+        "원익IPS",
+        "반도체",
+        "장비",
+        "소부장"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "삼성전자 설비투자 확대",
+          "description": "삼성전자가 반도체 설비투자를 30조원으로 확대 발표. 원익IPS +12.5% 급등!",
+          "priceChange": "+12.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 2,
+          "title": "SK하이닉스 공장 증설",
+          "description": "SK하이닉스가 용인 공장 증설 발표. 원익IPS 수주 기대감에 +9.8% 상승.",
+          "priceChange": "+9.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 3,
+          "title": "대규모 수주 계약 체결",
+          "description": "원익IPS가 삼성전자와 5,000억원 규모 수주 계약 체결! +15.2% 급등!",
+          "priceChange": "+15.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "반도체 경기 둔화",
+          "description": "글로벌 반도체 경기 둔화. 설비투자 연기 우려에 -11.5% 폭락.",
+          "priceChange": "-11.5%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 5,
+          "title": "중국 고객사 추가 수주",
+          "description": "원익IPS가 중국 반도체 업체와 추가 수주 계약 체결. +8.5% 반등.",
+          "priceChange": "+8.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "AI 반도체 장비 개발",
+          "description": "원익IPS가 AI 반도체용 차세대 장비 개발 성공. +10.2% 급등!",
+          "priceChange": "+10.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "삼성전자 추가 발주",
+          "description": "삼성전자가 HBM 생산 확대로 원익IPS에 추가 발주. +7.8% 상승.",
+          "priceChange": "+7.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "수주 잔고 1조원 돌파",
+          "description": "원익IPS의 수주 잔고가 1조원 돌파. 향후 2년 실적 가시성 확보. +11.5% 급등!",
+          "priceChange": "+11.5%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s25-1",
+          "title": "설비투자 확대 시 매수",
+          "emoji": "🎯",
+          "description": "삼성 설비투자 발표 시 매수",
+          "steps": [
+            "1턴: 설비투자 확대에 100% 매수",
+            "2~8턴: 홀딩"
+          ],
+          "risk": "높음",
+          "expectedReturn": "+50% ~ +70%",
+          "difficulty": 4
+        },
+        {
+          "id": "s25-2",
+          "title": "경기 둔화 저점 매수",
+          "emoji": "📊",
+          "description": "반도체 경기 둔화 폭락 시 매수",
+          "steps": [
+            "1~3턴: 관망",
+            "4턴: 경기 둔화 폭락에 100% 매수"
+          ],
+          "risk": "매우 높음",
+          "expectedReturn": "+60% ~ +80%",
+          "difficulty": 5
+        },
+        {
+          "id": "s25-3",
+          "title": "소형주 리스크 회피",
+          "emoji": "🛡️",
+          "description": "변동성이 너무 커서 관망",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "stats": {
+        "avgClearRate": 60,
+        "avgSurvivalRate": 70,
+        "bestStrategy": "경기 둔화 저점 매수"
+      },
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: 소형주 변동성 너무 커서 관망"
+          ],
+          "result": "리스크 회피 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1~3턴: 관망",
+            "4턴: 경기둔화 폭락에 100% 매수",
+            "5~8턴: 반등 홀딩"
+          ],
+          "result": "저점 포착 대박 → +68.5%",
+          "returnRate": "+68.5%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1턴: 설비투자 확대에 100% 매수",
+            "4턴: 경기둔화에 동요하지만 홀딩",
+            "8턴: 수주잔고 1조에 만족"
+          ],
+          "result": "설비투자 기반 진입 → +58.2%",
+          "returnRate": "+58.2%"
+        }
+      ]
+    },
+    {
+      "id": "legend-26",
+      "order": 26,
+      "title": "주성엔지니어링, OLED 투자 사이클",
+      "subtitle": "디스플레이 장비의 강자",
+      "emoji": "📺",
+      "category": "소부장",
+      "difficulty": 4,
+      "difficultyLabel": "고급",
+      "gradientFrom": "from-teal-500",
+      "gradientTo": "to-green-600",
+      "stock": {
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "sector": "디스플레이 장비",
+        "initialPrice": 28000
+      },
+      "description": "주성엔지니어링은 OLED 증착 장비를 만듭니다. 삼성디스플레이·LG디스플레이 투자가 운명입니다.",
+      "keyLesson": "OLED 투자 사이클을 읽으세요!",
+      "survivalTip": "중국 BOE 발주 취소 리스크를 주의하세요.",
+      "tags": [
+        "주성엔지니어링",
+        "OLED",
+        "장비",
+        "소부장"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "삼성디스플레이 투자 확대",
+          "description": "삼성디스플레이가 OLED 투자를 15조원으로 확대. 주성엔지니어링 +14.5% 급등!",
+          "priceChange": "+14.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 2,
+          "title": "중국 BOE 대량 수주",
+          "description": "주성엔지니어링이 중국 BOE와 3,000억원 규모 수주 계약 체결! +18.2% 급등!",
+          "priceChange": "+18.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 3,
+          "title": "분기 실적 발표, 수익 2배",
+          "description": "주성엔지니어링이 분기 실적 발표. 영업이익 2배 증가. +10.5% 상승.",
+          "priceChange": "+10.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "중국 BOE 발주 취소",
+          "description": "중국 BOE가 경기 악화로 발주 취소! 주성엔지니어링 -22.5% 폭락!",
+          "priceChange": "-22.5%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 5,
+          "title": "LG디스플레이 추가 발주",
+          "description": "LG디스플레이가 OLED TV 투자 확대로 추가 발주. +12.8% 반등.",
+          "priceChange": "+12.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "애플 OLED 탑재 확대",
+          "description": "애플이 아이패드·맥북에도 OLED 탑재 결정. 수요 폭증 기대감에 +15.5% 급등!",
+          "priceChange": "+15.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "삼성디스플레이 추가 투자",
+          "description": "삼성디스플레이가 QD-OLED 투자 확대. +9.2% 상승.",
+          "priceChange": "+9.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "수주 잔고 8,000억 돌파",
+          "description": "주성엔지니어링의 수주 잔고가 8,000억 돌파. +13.5% 급등!",
+          "priceChange": "+13.5%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s26-1",
+          "title": "OLED 투자 확대 시 매수",
+          "emoji": "🎯",
+          "description": "삼성디스플레이 투자 발표 시 매수",
+          "steps": [
+            "1턴: OLED 투자 확대에 100% 매수",
+            "2~8턴: 홀딩"
+          ],
+          "risk": "매우 높음",
+          "expectedReturn": "+55% ~ +75%",
+          "difficulty": 5
+        },
+        {
+          "id": "s26-2",
+          "title": "BOE 발주 취소 저점 매수",
+          "emoji": "📊",
+          "description": "중국 BOE 발주 취소 폭락 시 매수",
+          "steps": [
+            "1~3턴: 관망",
+            "4턴: BOE 발주 취소 폭락에 100% 매수"
+          ],
+          "risk": "극도로 높음",
+          "expectedReturn": "+70% ~ +100%",
+          "difficulty": 5
+        },
+        {
+          "id": "s26-3",
+          "title": "소형주 리스크 회피",
+          "emoji": "🛡️",
+          "description": "변동성이 너무 커서 관망",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "stats": {
+        "avgClearRate": 58,
+        "avgSurvivalRate": 68,
+        "bestStrategy": "BOE 발주 취소 저점 매수"
+      },
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: 소형 장비주 변동성 너무 커서 관망"
+          ],
+          "result": "리스크 회피 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1~3턴: 관망",
+            "4턴: BOE 발주 취소 폭락에 100% 매수",
+            "5턴: LG 발주 반등 확인",
+            "8턴: 수주잔고에 만족"
+          ],
+          "result": "공포 속 매수 대박 → +85.2%",
+          "returnRate": "+85.2%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1턴: OLED 투자확대에 100% 매수",
+            "4턴: BOE 취소에 패닉하지만 홀딩",
+            "6턴: 애플 OLED에 안도",
+            "8턴: 수주 확인"
+          ],
+          "result": "초기 진입 + 인내 → +62.8%",
+          "returnRate": "+62.8%"
+        }
+      ]
+    },
+    {
+      "id": "legend-27",
+      "order": 27,
+      "title": "LG에너지솔루션, 배터리 전쟁",
+      "subtitle": "전기차 배터리 1위의 위기와 기회",
+      "emoji": "🔋",
+      "category": "배터리",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-lime-500",
+      "gradientTo": "to-green-600",
+      "stock": {
+        "name": "LG에너지솔루션",
+        "code": "373220",
+        "sector": "배터리",
+        "initialPrice": 420000
+      },
+      "description": "LG에너지솔루션은 전기차 배터리 글로벌 2위. 테슬라·GM과 공급 계약을 맺고 있지만, 중국 CATL의 추격이 거셉니다.",
+      "keyLesson": "수주 잔고와 공급 계약이 배터리주의 핵심!",
+      "survivalTip": "완성차 업체의 EV 판매량이 배터리 수요를 결정합니다.",
+      "tags": [
+        "LG에너지솔루션",
+        "배터리",
+        "전기차",
+        "수주"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "테슬라 배터리 내재화 선언",
+          "description": "테슬라가 자체 배터리 생산 확대를 선언. LG에너지솔루션의 최대 고객 이탈 우려에 -7.5% 폭락!",
+          "priceChange": "-7.5%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 2,
+          "title": "GM 초대형 수주 계약",
+          "description": "GM이 LG에너지솔루션과 10조원 규모 장기 공급 계약 체결! +8.2% 급등.",
+          "priceChange": "+8.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 3,
+          "title": "CATL 가격 경쟁 심화",
+          "description": "중국 CATL이 배터리 가격을 20% 인하. 가격 경쟁 심화 우려에 -4.8% 하락.",
+          "priceChange": "-4.8%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 4,
+          "title": "리콜 이슈 발생",
+          "description": "배터리 결함으로 대규모 리콜 발생. 비용 1조원 예상에 -9.2% 폭락!",
+          "priceChange": "-9.2%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 5,
+          "title": "IRA 보조금 확정",
+          "description": "미국 IRA법에 따른 배터리 보조금이 확정. 북미 생산 공장 수혜. +11.5% 급등!",
+          "priceChange": "+11.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "전고체 배터리 개발 성공",
+          "description": "LG에너지솔루션이 차세대 전고체 배터리 샘플 개발에 성공! +8.8% 급등.",
+          "priceChange": "+8.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "애리조나 공장 양산 시작",
+          "description": "미국 애리조나 공장이 양산을 시작. +5.5% 상승.",
+          "priceChange": "+5.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "수주 잔고 300조원 돌파",
+          "description": "LG에너지솔루션의 수주 잔고가 300조원 돌파. +7.2% 급등. 배터리 전쟁 승리!",
+          "priceChange": "+7.2%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s27-1",
+          "title": "리콜 저점 매수",
+          "emoji": "🎯",
+          "description": "리콜 폭락 시 매수",
+          "steps": [
+            "1~3턴: 관망",
+            "4턴: 리콜 폭락에 100% 매수",
+            "5~8턴: 홀딩"
+          ],
+          "risk": "높음",
+          "expectedReturn": "+35% ~ +45%",
+          "difficulty": 4
+        },
+        {
+          "id": "s27-2",
+          "title": "IRA 수혜 확인 후 매수",
+          "emoji": "📊",
+          "description": "보조금 확정 후 매수",
+          "steps": [
+            "1~4턴: 관망",
+            "5턴: IRA 보조금 확정 후 100% 매수"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+25% ~ +30%",
+          "difficulty": 3
+        },
+        {
+          "id": "s27-3",
+          "title": "배터리 리스크 회피",
+          "emoji": "🛡️",
+          "description": "경쟁 심화로 관망",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: 배터리 경쟁 심화로 관망",
+            "리콜 리스크도 부담"
+          ],
+          "result": "리스크 회피 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1~3턴: 관망",
+            "4턴: 리콜 폭락에 100% 매수",
+            "5턴: IRA 수혜에 환호",
+            "8턴: 수주 잔고에 만족"
+          ],
+          "result": "리콜 저점 매수 → +38.5%",
+          "returnRate": "+38.5%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1~4턴: 관망",
+            "5턴: IRA 보조금 확정 후 100% 매수",
+            "6~8턴: 홀딩"
+          ],
+          "result": "IRA 확인 후 진입 → +26.2%",
+          "returnRate": "+26.2%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 62,
+        "avgSurvivalRate": 72,
+        "bestStrategy": "리콜 저점 매수"
+      }
+    },
+    {
+      "id": "legend-28",
+      "order": 28,
+      "title": "삼성SDI, 전고체 배터리의 꿈",
+      "subtitle": "차세대 배터리 기술 경쟁",
+      "emoji": "⚡",
+      "category": "배터리",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-lime-600",
+      "gradientTo": "to-emerald-600",
+      "stock": {
+        "name": "삼성SDI",
+        "code": "006400",
+        "sector": "배터리",
+        "initialPrice": 510000
+      },
+      "description": "삼성SDI는 BMW·아우디 등 프리미엄 완성차에 배터리를 공급합니다. 전고체 배터리 기술이 미래를 결정합니다.",
+      "keyLesson": "기술력이 가격 경쟁력보다 중요한 프리미엄 시장!",
+      "survivalTip": "전고체 배터리 개발 진척도가 주가를 움직입니다.",
+      "tags": [
+        "삼성SDI",
+        "배터리",
+        "전고체",
+        "프리미엄"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "BMW 수주 감소 뉴스",
+          "description": "BMW가 EV 판매 부진으로 배터리 주문량을 20% 감축. -6.8% 하락!",
+          "priceChange": "-6.8%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 2,
+          "title": "중국 배터리 관세 부과",
+          "description": "EU가 중국산 배터리에 관세 부과 발표. 삼성SDI의 유럽 점유율 확대 기대에 +5.5% 상승.",
+          "priceChange": "+5.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 3,
+          "title": "전고체 배터리 시제품 공개",
+          "description": "삼성SDI가 전고체 배터리 시제품을 공개! 2027년 양산 목표. +12.5% 급등!",
+          "priceChange": "+12.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "원재료 가격 급등",
+          "description": "리튬·니켈 가격이 급등. 원가 부담 증가에 -5.2% 하락.",
+          "priceChange": "-5.2%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 5,
+          "title": "아우디 전기차 출시 호조",
+          "description": "아우디 전기 SUV가 대박. 삼성SDI 배터리 수주 급증에 +7.8% 상승.",
+          "priceChange": "+7.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "헝가리 공장 가동 시작",
+          "description": "삼성SDI 헝가리 2공장이 양산 시작. 유럽 생산능력 2배 확대. +6.2% 상승.",
+          "priceChange": "+6.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "전고체 배터리 투자 확대",
+          "description": "삼성SDI가 전고체 배터리에 3조원 추가 투자 발표. +8.5% 급등.",
+          "priceChange": "+8.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "리비안 신규 수주",
+          "description": "미국 리비안과 신규 배터리 공급 계약 체결! +9.5% 급등.",
+          "priceChange": "+9.5%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s28-1",
+          "title": "전고체 기술 매수",
+          "emoji": "🎯",
+          "description": "전고체 시제품 공개 시 매수",
+          "steps": [
+            "1~2턴: 관망",
+            "3턴: 전고체 시제품에 100% 매수"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+30% ~ +40%",
+          "difficulty": 3
+        },
+        {
+          "id": "s28-2",
+          "title": "원가 부담 저점 매수",
+          "emoji": "📊",
+          "description": "원재료 급등 폭락 시 매수",
+          "steps": [
+            "1~3턴: 관망",
+            "4턴: 원가 부담 하락에 100% 매수"
+          ],
+          "risk": "높음",
+          "expectedReturn": "+35% ~ +45%",
+          "difficulty": 4
+        },
+        {
+          "id": "s28-3",
+          "title": "배터리 리스크 회피",
+          "emoji": "🛡️",
+          "description": "경쟁 심화로 관망",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1~8턴: 배터리 경쟁 불확실성으로 관망"
+          ],
+          "result": "리스크 회피 → 0%",
+          "returnRate": "0%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1~2턴: 관망",
+            "3턴: 전고체 시제품에 100% 매수",
+            "4턴: 원가 부담에 흔들리지만 홀딩",
+            "8턴: 신규 수주에 환호"
+          ],
+          "result": "기술 기대감 매수 → +35.8%",
+          "returnRate": "+35.8%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1~3턴: 관망",
+            "4턴: 원가 부담 하락에 100% 매수",
+            "5~8턴: 홀딩"
+          ],
+          "result": "저점 포착 → +32.5%",
+          "returnRate": "+32.5%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 64,
+        "avgSurvivalRate": 74,
+        "bestStrategy": "전고체 기술 매수"
+      }
     }
   ],
   "difficultyConfig": {
@@ -1821,7 +4882,21 @@
     "매크로 대응": "from-slate-500/20 to-zinc-500/20",
     "심리 관리": "from-pink-500/20 to-rose-500/20",
     "극한 생존": "from-gray-700/30 to-gray-900/30",
-    "배당 전략": "from-amber-500/20 to-yellow-500/20"
+    "배당 전략": "from-amber-500/20 to-yellow-500/20",
+    "경영자 리스크": "from-green-500/20 to-teal-500/20",
+    "규제 리스크": "from-yellow-500/20 to-orange-500/20",
+    "금리 리스크": "from-emerald-500/20 to-green-500/20",
+    "방산": "from-rose-500/20 to-red-500/20",
+    "배터리": "from-lime-500/20 to-green-500/20",
+    "밸류에이션": "from-orange-500/20 to-red-500/20",
+    "사업 전환": "from-cyan-500/20 to-blue-500/20",
+    "사이클 분석": "from-blue-500/20 to-purple-500/20",
+    "소부장": "from-teal-500/20 to-cyan-500/20",
+    "원자재": "from-amber-500/20 to-yellow-500/20",
+    "임상 리스크": "from-purple-500/20 to-pink-500/20",
+    "정책 리스크": "from-slate-500/20 to-gray-500/20",
+    "증권": "from-indigo-500/20 to-purple-500/20",
+    "테마주": "from-red-500/20 to-pink-500/20"
   },
   "learningProcessSteps": [
     {

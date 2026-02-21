@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { formatNumber } from "@/lib/format"
 import { LABELS } from "../../config"
 
 interface ProfitSummaryCardProps {
@@ -30,7 +31,7 @@ export const ProfitSummaryCard = ({
           )}
         >
           {isPositive ? "+" : ""}
-          {totalProfit.toLocaleString()}원
+          {formatNumber(totalProfit)}원
         </p>
         <p className={cn("text-sm", isPositive ? "text-red-400" : "text-blue-400")}>
           ({isPositive ? "+" : ""}

@@ -101,6 +101,13 @@ export interface ChartPoint {
   date?: string
 }
 
+export interface ChartEvent {
+  index: number // 차트 데이터의 인덱스
+  type: "positive" | "negative" | "neutral"
+  emoji: string
+  headline: string
+}
+
 export interface StockChartProps {
   data: ChartPoint[]
   height?: number
@@ -108,6 +115,8 @@ export interface StockChartProps {
   dataKey?: string
   showXAxis?: boolean
   chartPeriod?: ChartPeriod
+  events?: ChartEvent[] // 차트에 표시할 이벤트 마커
+  selectedEventIndex?: number | null // 선택된 이벤트 인덱스
 }
 
 export interface WeeklyReportModalProps {

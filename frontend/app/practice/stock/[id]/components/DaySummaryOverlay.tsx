@@ -7,6 +7,7 @@ import {
   ChevronDown, ChevronUp, Swords, Bot, User,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { formatNumber } from "@/lib/format"
 import { LABELS } from "../config"
 import type { AIAction, InvestStyle } from "./hooks/useAICompetitor"
 
@@ -162,13 +163,13 @@ export const DaySummaryOverlay = ({
                   {isProfit ? "+" : ""}{profitRate}%
                 </div>
                 <div className="text-[11px] text-gray-400 mt-1">
-                  {totalValue.toLocaleString()}원
+                  {formatNumber(totalValue)}원
                 </div>
                 <div className={cn(
                   "text-[10px] font-semibold mt-0.5",
                   isProfit ? "text-red-400/70" : "text-blue-400/70"
                 )}>
-                  {isProfit ? "+" : ""}{profitAmount.toLocaleString()}원
+                  {isProfit ? "+" : ""}{formatNumber(profitAmount)}원
                 </div>
               </div>
 
@@ -207,13 +208,13 @@ export const DaySummaryOverlay = ({
                   {isAiProfit ? "+" : ""}{aiProfitRate.toFixed(1)}%
                 </div>
                 <div className="text-[11px] text-gray-400 mt-1">
-                  {aiTotalValue.toLocaleString()}원
+                  {formatNumber(aiTotalValue)}원
                 </div>
                 <div className={cn(
                   "text-[10px] font-semibold mt-0.5",
                   isAiProfit ? "text-red-400/70" : "text-blue-400/70"
                 )}>
-                  {isAiProfit ? "+" : ""}{aiProfitAmount.toLocaleString()}원
+                  {isAiProfit ? "+" : ""}{formatNumber(aiProfitAmount)}원
                 </div>
               </div>
 

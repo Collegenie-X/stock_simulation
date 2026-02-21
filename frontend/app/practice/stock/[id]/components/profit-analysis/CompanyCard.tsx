@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { formatNumber } from "@/lib/format"
 
 export interface CompanyProfile {
   stockId: string
@@ -110,7 +111,7 @@ export const CompanyCard = ({
                 isProfit ? "text-red-400" : "text-blue-400",
               )}
             >
-              {isProfit ? "+" : ""}{totalProfit.toLocaleString()}원
+              {isProfit ? "+" : ""}{formatNumber(totalProfit)}원
             </p>
             <p
               className={cn(
@@ -125,7 +126,7 @@ export const CompanyCard = ({
           <div className="text-right flex-shrink-0">
             <p className="text-xs text-gray-500">목표가</p>
             <p className="text-sm font-semibold text-gray-300">
-              {profile.targetPrice.toLocaleString()}원
+              {formatNumber(profile.targetPrice)}원
             </p>
           </div>
         )}
@@ -207,12 +208,12 @@ export const CompanyCard = ({
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">평균 단가</p>
-                  <p className="text-sm font-bold text-white">{myAvgPrice.toLocaleString()}원</p>
+                  <p className="text-sm font-bold text-white">{formatNumber(myAvgPrice)}원</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">현재가</p>
                   <p className="text-sm font-bold text-white">
-                    {currentPrice ? currentPrice.toLocaleString() : "-"}원
+                    {currentPrice ? formatNumber(currentPrice) : "-"}원
                   </p>
                 </div>
               </div>

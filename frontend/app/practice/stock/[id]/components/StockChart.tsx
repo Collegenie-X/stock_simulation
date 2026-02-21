@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo } from "react"
+import { useMemo, useState, useEffect } from "react"
 import {
   ResponsiveContainer,
   AreaChart,
@@ -10,12 +10,21 @@ import {
   Tooltip,
   ReferenceDot,
   Label,
+  ReferenceLine,
+  ReferenceArea,
 } from "recharts"
-import type { StockChartProps } from "../types"
+import { formatNumber } from "@/lib/format"
+import type { StockChartProps, ChartEvent } from "../types"
 
 const COLOR_MAP = {
   red: "#F87171",
   blue: "#60A5FA",
+}
+
+const EVENT_COLOR_MAP = {
+  positive: "#F87171", // 상승 - 빨강
+  negative: "#60A5FA", // 하락 - 파랑
+  neutral: "#9CA3AF",  // 중립 - 회색
 }
 
 export const StockChart = ({
@@ -25,9 +34,12 @@ export const StockChart = ({
   dataKey = "price",
   showXAxis = true,
   chartPeriod = "1M",
+  events = [],
+  selectedEventIndex,
 }: StockChartProps) => {
   const chartColor = COLOR_MAP[color]
   const gradientId = `gradient-${color}-${Math.random().toString(36).substr(2, 9)}`
+  const [hoveredEvent, setHoveredEvent] = useState<number | null>(null)
 
   const { min, max, maxPointIndex, minPointIndex, maxPrice, minPrice } = useMemo(() => {
     if (!data || data.length === 0)
@@ -97,7 +109,7 @@ export const StockChart = ({
                 return (
                   <div className="bg-gray-900/90 backdrop-blur border border-gray-700 text-white text-xs font-bold py-2 px-3 rounded-xl shadow-xl">
                     <div className="text-gray-400">{pointData.date || ""}</div>
-                    <div className="mt-1">{Number(payload[0].value).toLocaleString()}원</div>
+                    <div className="mt-1">{formatNumber(Number(payload[0].value))}원</div>
                   </div>
                 )
               }
@@ -123,7 +135,7 @@ export const StockChart = ({
                   const { x, y } = viewBox
                   return (
                     <text x={x} y={y - 12} fill="#F87171" fontSize={10} textAnchor="middle" fontWeight="600">
-                      최고 {maxPrice.toLocaleString()}원
+                      최고 {formatNumber(maxPrice)}원
                     </text>
                   )
                 }}
@@ -138,13 +150,114 @@ export const StockChart = ({
                   const { x, y } = viewBox
                   return (
                     <text x={x} y={y + 18} fill="#9CA3AF" fontSize={10} textAnchor="middle" fontWeight="600">
-                      최저 {minPrice.toLocaleString()}원
+                      최저 {formatNumber(minPrice)}원
                     </text>
                   )
                 }}
               />
             </ReferenceDot>
           )}
+
+          {/* 이벤트 구간 표시 */}
+          {events && events.map((event, idx) => {
+            const eventData = data[event.index]
+            if (!eventData) return null
+            
+            const eventColor = EVENT_COLOR_MAP[event.type]
+            const isSelected = selectedEventIndex === idx
+            const isHovered = hoveredEvent === idx
+            
+            // 구간 계산 (이벤트 전후로 약간의 범위)
+            const rangeSize = Math.max(2, Math.floor(data.length * 0.02))
+            const startIdx = Math.max(0, event.index - rangeSize)
+            const endIdx = Math.min(data.length - 1, event.index + rangeSize)
+            
+            return (
+              <g key={`event-${idx}`}>
+                {/* 선택된 이벤트 구간 강조 */}
+                {isSelected && (
+                  <ReferenceArea
+                    x1={startIdx}
+                    x2={endIdx}
+                    fill={eventColor}
+                    fillOpacity={0.2}
+                    stroke={eventColor}
+                    strokeWidth={2}
+                    strokeOpacity={0.6}
+                  />
+                )}
+                
+                {/* 이벤트 세로 라인 */}
+                <ReferenceLine
+                  x={event.index}
+                  stroke={eventColor}
+                  strokeWidth={isSelected ? 3 : (isHovered ? 2.5 : 2)}
+                  strokeOpacity={isSelected ? 0.9 : 0.4}
+                  strokeDasharray={isSelected ? "0" : "5 5"}
+                  onMouseEnter={() => setHoveredEvent(idx)}
+                  onMouseLeave={() => setHoveredEvent(null)}
+                >
+                  <Label
+                    content={({ viewBox }: any) => {
+                      const { x, y, height } = viewBox
+                      const labelY = y + height - 40
+                      
+                      return (
+                        <g>
+                          {/* 번호 배지 */}
+                          <circle
+                            cx={x}
+                            cy={labelY}
+                            r={isSelected ? 12 : 10}
+                            fill={isSelected ? eventColor : "#3B82F6"}
+                            stroke="white"
+                            strokeWidth={isSelected ? 2.5 : 2}
+                          />
+                          <text
+                            x={x}
+                            y={labelY + 4}
+                            fill="white"
+                            fontSize={isSelected ? 11 : 10}
+                            textAnchor="middle"
+                            fontWeight="bold"
+                          >
+                            {idx + 1}
+                          </text>
+                          
+                          {/* 호버 시 상세 정보 */}
+                          {(isHovered || isSelected) && (
+                            <>
+                              <rect
+                                x={x - 75}
+                                y={labelY - 35}
+                                width={150}
+                                height={24}
+                                fill="#1e1e1e"
+                                stroke={eventColor}
+                                strokeWidth={1.5}
+                                rx={8}
+                                opacity={0.98}
+                              />
+                              <text
+                                x={x}
+                                y={labelY - 19}
+                                fill="white"
+                                fontSize={10}
+                                textAnchor="middle"
+                                fontWeight="600"
+                              >
+                                {event.emoji} {event.headline.slice(0, 14)}...
+                              </text>
+                            </>
+                          )}
+                        </g>
+                      )
+                    }}
+                  />
+                </ReferenceLine>
+              </g>
+            )
+          })}
 
           {data && data.length > 0 && (
             <ReferenceDot

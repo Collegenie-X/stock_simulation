@@ -1,0 +1,91 @@
+{
+  "category": "소부장",
+  "scenarios": [
+    {
+      "id": "legend-25",
+      "order": 25,
+      "title": "원익IPS, 반도체 장비 수주",
+      "subtitle": "삼성·SK 설비투자가 운명",
+      "emoji": "🔩",
+      "category": "소부장",
+      "difficulty": 4,
+      "difficultyLabel": "고급",
+      "gradientFrom": "from-teal-500",
+      "gradientTo": "to-cyan-600",
+      "stock": {
+        "name": "원익IPS",
+        "code": "240810",
+        "sector": "반도체 장비",
+        "initialPrice": 45000
+      },
+      "description": "원익IPS는 반도체 식각 장비를 만듭니다. 삼성·SK 설비투자가 실적을 결정합니다.",
+      "keyLesson": "반도체 설비투자 사이클을 읽으세요!",
+      "survivalTip": "삼성·SK 공장 증설 뉴스를 빠르게 캐치하세요.",
+      "tags": ["원익IPS", "반도체", "장비", "소부장"],
+      "events": [
+        { "turn": 1, "title": "삼성전자 설비투자 확대", "description": "삼성전자가 반도체 설비투자를 30조원으로 확대 발표. 원익IPS +12.5% 급등!", "priceChange": "+12.5%", "sentiment": "positive" },
+        { "turn": 2, "title": "SK하이닉스 공장 증설", "description": "SK하이닉스가 용인 공장 증설 발표. 원익IPS 수주 기대감에 +9.8% 상승.", "priceChange": "+9.8%", "sentiment": "positive" },
+        { "turn": 3, "title": "대규모 수주 계약 체결", "description": "원익IPS가 삼성전자와 5,000억원 규모 수주 계약 체결! +15.2% 급등!", "priceChange": "+15.2%", "sentiment": "positive" },
+        { "turn": 4, "title": "반도체 경기 둔화", "description": "글로벌 반도체 경기 둔화. 설비투자 연기 우려에 -11.5% 폭락.", "priceChange": "-11.5%", "sentiment": "shock" },
+        { "turn": 5, "title": "중국 고객사 추가 수주", "description": "원익IPS가 중국 반도체 업체와 추가 수주 계약 체결. +8.5% 반등.", "priceChange": "+8.5%", "sentiment": "positive" },
+        { "turn": 6, "title": "AI 반도체 장비 개발", "description": "원익IPS가 AI 반도체용 차세대 장비 개발 성공. +10.2% 급등!", "priceChange": "+10.2%", "sentiment": "positive" },
+        { "turn": 7, "title": "삼성전자 추가 발주", "description": "삼성전자가 HBM 생산 확대로 원익IPS에 추가 발주. +7.8% 상승.", "priceChange": "+7.8%", "sentiment": "positive" },
+        { "turn": 8, "title": "수주 잔고 1조원 돌파", "description": "원익IPS의 수주 잔고가 1조원 돌파. 향후 2년 실적 가시성 확보. +11.5% 급등!", "priceChange": "+11.5%", "sentiment": "positive" }
+      ],
+      "strategies": [
+        { "id": "s25-1", "title": "설비투자 확대 시 매수", "emoji": "🎯", "description": "삼성 설비투자 발표 시 매수", "steps": ["1턴: 설비투자 확대에 100% 매수", "2~8턴: 홀딩"], "risk": "높음", "expectedReturn": "+50% ~ +70%", "difficulty": 4 },
+        { "id": "s25-2", "title": "경기 둔화 저점 매수", "emoji": "📊", "description": "반도체 경기 둔화 폭락 시 매수", "steps": ["1~3턴: 관망", "4턴: 경기 둔화 폭락에 100% 매수"], "risk": "매우 높음", "expectedReturn": "+60% ~ +80%", "difficulty": 5 },
+        { "id": "s25-3", "title": "소형주 리스크 회피", "emoji": "🛡️", "description": "변동성이 너무 커서 관망", "steps": ["1~8턴: 전량 관망"], "risk": "낮음", "expectedReturn": "0%", "difficulty": 1 }
+      ],
+      "aiResponses": [
+        { "personality": "conservative", "strategyId": "s25-3", "finalReturn": "0%", "reasoning": "소형주는 변동성이 너무 커서 관망했습니다." },
+        { "personality": "aggressive", "strategyId": "s25-2", "finalReturn": "+68.5%", "reasoning": "경기 둔화 폭락에 과감하게 매수! 대박 수익!" },
+        { "personality": "balanced", "strategyId": "s25-1", "finalReturn": "+58.2%", "reasoning": "설비투자 확대 발표에 매수했습니다." }
+      ],
+      "stats": { "avgClearRate": 60, "avgSurvivalRate": 70, "bestStrategy": "경기 둔화 저점 매수" }
+    },
+    {
+      "id": "legend-26",
+      "order": 26,
+      "title": "주성엔지니어링, OLED 투자 사이클",
+      "subtitle": "디스플레이 장비의 강자",
+      "emoji": "📺",
+      "category": "소부장",
+      "difficulty": 4,
+      "difficultyLabel": "고급",
+      "gradientFrom": "from-teal-500",
+      "gradientTo": "to-green-600",
+      "stock": {
+        "name": "주성엔지니어링",
+        "code": "036930",
+        "sector": "디스플레이 장비",
+        "initialPrice": 28000
+      },
+      "description": "주성엔지니어링은 OLED 증착 장비를 만듭니다. 삼성디스플레이·LG디스플레이 투자가 운명입니다.",
+      "keyLesson": "OLED 투자 사이클을 읽으세요!",
+      "survivalTip": "중국 BOE 발주 취소 리스크를 주의하세요.",
+      "tags": ["주성엔지니어링", "OLED", "장비", "소부장"],
+      "events": [
+        { "turn": 1, "title": "삼성디스플레이 투자 확대", "description": "삼성디스플레이가 OLED 투자를 15조원으로 확대. 주성엔지니어링 +14.5% 급등!", "priceChange": "+14.5%", "sentiment": "positive" },
+        { "turn": 2, "title": "중국 BOE 대량 수주", "description": "주성엔지니어링이 중국 BOE와 3,000억원 규모 수주 계약 체결! +18.2% 급등!", "priceChange": "+18.2%", "sentiment": "positive" },
+        { "turn": 3, "title": "분기 실적 발표, 수익 2배", "description": "주성엔지니어링이 분기 실적 발표. 영업이익 2배 증가. +10.5% 상승.", "priceChange": "+10.5%", "sentiment": "positive" },
+        { "turn": 4, "title": "중국 BOE 발주 취소", "description": "중국 BOE가 경기 악화로 발주 취소! 주성엔지니어링 -22.5% 폭락!", "priceChange": "-22.5%", "sentiment": "shock" },
+        { "turn": 5, "title": "LG디스플레이 추가 발주", "description": "LG디스플레이가 OLED TV 투자 확대로 추가 발주. +12.8% 반등.", "priceChange": "+12.8%", "sentiment": "positive" },
+        { "turn": 6, "title": "애플 OLED 탑재 확대", "description": "애플이 아이패드·맥북에도 OLED 탑재 결정. 수요 폭증 기대감에 +15.5% 급등!", "priceChange": "+15.5%", "sentiment": "positive" },
+        { "turn": 7, "title": "삼성디스플레이 추가 투자", "description": "삼성디스플레이가 QD-OLED 투자 확대. +9.2% 상승.", "priceChange": "+9.2%", "sentiment": "positive" },
+        { "turn": 8, "title": "수주 잔고 8,000억 돌파", "description": "주성엔지니어링의 수주 잔고가 8,000억 돌파. +13.5% 급등!", "priceChange": "+13.5%", "sentiment": "positive" }
+      ],
+      "strategies": [
+        { "id": "s26-1", "title": "OLED 투자 확대 시 매수", "emoji": "🎯", "description": "삼성디스플레이 투자 발표 시 매수", "steps": ["1턴: OLED 투자 확대에 100% 매수", "2~8턴: 홀딩"], "risk": "매우 높음", "expectedReturn": "+55% ~ +75%", "difficulty": 5 },
+        { "id": "s26-2", "title": "BOE 발주 취소 저점 매수", "emoji": "📊", "description": "중국 BOE 발주 취소 폭락 시 매수", "steps": ["1~3턴: 관망", "4턴: BOE 발주 취소 폭락에 100% 매수"], "risk": "극도로 높음", "expectedReturn": "+70% ~ +100%", "difficulty": 5 },
+        { "id": "s26-3", "title": "소형주 리스크 회피", "emoji": "🛡️", "description": "변동성이 너무 커서 관망", "steps": ["1~8턴: 전량 관망"], "risk": "낮음", "expectedReturn": "0%", "difficulty": 1 }
+      ],
+      "aiResponses": [
+        { "personality": "conservative", "strategyId": "s26-3", "finalReturn": "0%", "reasoning": "소형주는 변동성이 너무 커서 관망했습니다." },
+        { "personality": "aggressive", "strategyId": "s26-2", "finalReturn": "+85.2%", "reasoning": "BOE 발주 취소 폭락에 과감하게 매수! 대박 수익!" },
+        { "personality": "balanced", "strategyId": "s26-1", "finalReturn": "+62.8%", "reasoning": "OLED 투자 확대 발표에 매수했습니다." }
+      ],
+      "stats": { "avgClearRate": 58, "avgSurvivalRate": 68, "bestStrategy": "BOE 발주 취소 저점 매수" }
+    }
+  ]
+}

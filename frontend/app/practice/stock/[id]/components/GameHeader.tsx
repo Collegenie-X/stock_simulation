@@ -2,6 +2,7 @@
 
 import { Pause, Play, ChevronRight, Bot, Swords } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { formatNumber } from "@/lib/format"
 import { LABELS, DAY_PHASES, DECISIONS_PER_DAY } from "../config"
 import type { GameHeaderProps } from "../types"
 
@@ -128,8 +129,8 @@ export const GameHeader = ({
         </div>
       )}
 
-      {/* 축약 헤더 - 총 자산 + AI 대결 + 종료 */}
-      <div className="px-4 py-2.5 bg-[#191919]/95 border-b border-gray-800/50">
+      {/* 축약 헤더 - 총 자산 + AI 대결 + 종료 (항상 표시) */}
+      <div className="sticky top-0 z-20 px-4 py-2.5 bg-[#191919]/95 backdrop-blur-sm border-b border-gray-800/50">
         {/* 1행: 총 자산 + 종료 */}
         <div className="flex items-center justify-between">
           <button
@@ -139,7 +140,7 @@ export const GameHeader = ({
             <div>
               <div className="text-[10px] text-gray-500 mb-0.5">{LABELS.header.totalAsset}</div>
               <div className="text-base font-black text-white leading-none">
-                {totalValue.toLocaleString()}원
+                {formatNumber(totalValue)}원
               </div>
             </div>
             <div

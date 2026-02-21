@@ -1,0 +1,91 @@
+{
+  "category": "증권",
+  "scenarios": [
+    {
+      "id": "legend-23",
+      "order": 23,
+      "title": "미래에셋증권, 거래대금 폭증",
+      "subtitle": "시장이 뜨거우면 함께 타오르는 주식",
+      "emoji": "📈",
+      "category": "증권",
+      "difficulty": 2,
+      "difficultyLabel": "초급",
+      "gradientFrom": "from-indigo-500",
+      "gradientTo": "to-purple-600",
+      "stock": {
+        "name": "미래에셋증권",
+        "code": "006800",
+        "sector": "증권",
+        "initialPrice": 8500
+      },
+      "description": "미래에셋증권은 주식 거래가 활발할수록 수수료 수익이 늘어납니다. 시장 과열을 읽는 능력이 핵심!",
+      "keyLesson": "거래대금이 2배 증가하면 실적도 2배!",
+      "survivalTip": "코스피 거래대금을 보면 증권주가 보입니다.",
+      "tags": ["미래에셋", "증권", "거래대금", "사이클"],
+      "events": [
+        { "turn": 1, "title": "코스피 거래대금 급증", "description": "코스피 일평균 거래대금이 10조 → 20조로 급증. 증권주 전체 급등. +9.5% 상승!", "priceChange": "+9.5%", "sentiment": "positive" },
+        { "turn": 2, "title": "개인 투자자 유입", "description": "개인 투자자가 대거 유입. MTS 가입자 급증. +7.2% 상승.", "priceChange": "+7.2%", "sentiment": "positive" },
+        { "turn": 3, "title": "분기 실적 발표, 수익 2배", "description": "미래에셋증권이 분기 실적 발표. 수수료 수익 2배 증가. +8.5% 급등!", "priceChange": "+8.5%", "sentiment": "positive" },
+        { "turn": 4, "title": "코스피 조정, 거래대금 감소", "description": "코스피가 -5% 조정. 거래대금 20조 → 12조로 감소. -6.5% 하락.", "priceChange": "-6.5%", "sentiment": "negative" },
+        { "turn": 5, "title": "시장 반등, 거래대금 회복", "description": "코스피 반등으로 거래대금 다시 18조로 회복. +5.8% 상승.", "priceChange": "+5.8%", "sentiment": "positive" },
+        { "turn": 6, "title": "IPO 시장 활성화", "description": "대형 IPO가 연이어 성공. 증권사 수수료 수익 증가. +6.5% 상승.", "priceChange": "+6.5%", "sentiment": "positive" },
+        { "turn": 7, "title": "배당 확대 발표", "description": "미래에셋증권이 배당을 30% 확대 발표. +4.2% 상승.", "priceChange": "+4.2%", "sentiment": "positive" },
+        { "turn": 8, "title": "거래대금 30조 돌파", "description": "코스피 거래대금이 30조 돌파. 증권주 슈퍼사이클! +8.5% 급등!", "priceChange": "+8.5%", "sentiment": "positive" }
+      ],
+      "strategies": [
+        { "id": "s23-1", "title": "거래대금 급증 시 매수", "emoji": "🎯", "description": "거래대금 2배 증가 시 매수", "steps": ["1턴: 거래대금 급증에 100% 매수", "2~8턴: 홀딩"], "risk": "보통", "expectedReturn": "+35% ~ +45%", "difficulty": 3 },
+        { "id": "s23-2", "title": "실적 확인 후 매수", "emoji": "📊", "description": "분기 실적 발표 후 매수", "steps": ["1~2턴: 관망", "3턴: 실적 발표 후 100% 매수"], "risk": "낮음", "expectedReturn": "+25% ~ +30%", "difficulty": 2 },
+        { "id": "s23-3", "title": "증권 사이클 회피", "emoji": "🛡️", "description": "변동성이 커서 관망", "steps": ["1~8턴: 전량 관망"], "risk": "매우 낮음", "expectedReturn": "0%", "difficulty": 1 }
+      ],
+      "aiResponses": [
+        { "personality": "conservative", "strategyId": "s23-3", "finalReturn": "0%", "reasoning": "증권주는 변동성이 커서 관망했습니다." },
+        { "personality": "aggressive", "strategyId": "s23-1", "finalReturn": "+42.5%", "reasoning": "거래대금 급증에 과감하게 매수! 대박 수익!" },
+        { "personality": "balanced", "strategyId": "s23-2", "finalReturn": "+28.8%", "reasoning": "실적 확인 후 안전하게 매수했습니다." }
+      ],
+      "stats": { "avgClearRate": 75, "avgSurvivalRate": 85, "bestStrategy": "거래대금 급증 시 매수" }
+    },
+    {
+      "id": "legend-24",
+      "order": 24,
+      "title": "NH투자증권, IB 수익 폭발",
+      "subtitle": "대형 IPO 주관이 핵심",
+      "emoji": "💼",
+      "category": "증권",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-indigo-500",
+      "gradientTo": "to-blue-600",
+      "stock": {
+        "name": "NH투자증권",
+        "code": "005940",
+        "sector": "증권",
+        "initialPrice": 12500
+      },
+      "description": "NH투자증권은 IB(기업금융) 수익 비중이 높습니다. 대형 IPO 주관이 주가를 움직입니다.",
+      "keyLesson": "IPO 시장을 보면 증권주가 보입니다!",
+      "survivalTip": "대형 IPO 주관 뉴스를 빠르게 캐치하세요.",
+      "tags": ["NH투자증권", "증권", "IB", "IPO"],
+      "events": [
+        { "turn": 1, "title": "대형 IPO 주관 확정", "description": "NH투자증권이 10조원 규모 대형 IPO 주관사로 선정! +8.5% 급등!", "priceChange": "+8.5%", "sentiment": "positive" },
+        { "turn": 2, "title": "IPO 대박 성공", "description": "주관한 IPO가 공모가 대비 +150% 상승. 수수료 수익 폭발. +11.2% 급등!", "priceChange": "+11.2%", "sentiment": "positive" },
+        { "turn": 3, "title": "분기 실적 발표, IB 수익 3배", "description": "NH투자증권이 분기 실적 발표. IB 수익 3배 증가. +7.5% 상승.", "priceChange": "+7.5%", "sentiment": "positive" },
+        { "turn": 4, "title": "IPO 시장 침체", "description": "시장 조정으로 IPO 시장 침체. 신규 상장 연기 속출. -6.8% 하락.", "priceChange": "-6.8%", "sentiment": "negative" },
+        { "turn": 5, "title": "M&A 자문 수주", "description": "NH투자증권이 대형 M&A 자문 수주. +5.5% 상승.", "priceChange": "+5.5%", "sentiment": "positive" },
+        { "turn": 6, "title": "IPO 시장 재개", "description": "시장 회복으로 IPO 시장 재개. 신규 상장 러시. +6.8% 상승.", "priceChange": "+6.8%", "sentiment": "positive" },
+        { "turn": 7, "title": "해외 IB 수익 증가", "description": "해외 IB 수익이 급증. 글로벌 진출 성공. +5.2% 상승.", "priceChange": "+5.2%", "sentiment": "positive" },
+        { "turn": 8, "title": "IB 부문 1위 달성", "description": "NH투자증권이 IB 부문 시장점유율 1위 달성! +7.8% 급등!", "priceChange": "+7.8%", "sentiment": "positive" }
+      ],
+      "strategies": [
+        { "id": "s24-1", "title": "IPO 주관 확정 시 매수", "emoji": "🎯", "description": "대형 IPO 주관 뉴스에 매수", "steps": ["1턴: IPO 주관 확정에 100% 매수", "2~8턴: 홀딩"], "risk": "보통", "expectedReturn": "+35% ~ +45%", "difficulty": 3 },
+        { "id": "s24-2", "title": "실적 확인 후 매수", "emoji": "📊", "description": "분기 실적 발표 후 매수", "steps": ["1~2턴: 관망", "3턴: 실적 발표 후 100% 매수"], "risk": "낮음", "expectedReturn": "+20% ~ +25%", "difficulty": 2 },
+        { "id": "s24-3", "title": "IPO 리스크 회피", "emoji": "🛡️", "description": "IPO 시장 침체 우려로 관망", "steps": ["1~8턴: 전량 관망"], "risk": "매우 낮음", "expectedReturn": "0%", "difficulty": 1 }
+      ],
+      "aiResponses": [
+        { "personality": "conservative", "strategyId": "s24-3", "finalReturn": "0%", "reasoning": "IPO 시장 리스크가 커서 관망했습니다." },
+        { "personality": "aggressive", "strategyId": "s24-1", "finalReturn": "+42.8%", "reasoning": "IPO 주관 확정에 과감하게 매수! 대박 수익!" },
+        { "personality": "balanced", "strategyId": "s24-2", "finalReturn": "+22.5%", "reasoning": "실적 확인 후 안전하게 매수했습니다." }
+      ],
+      "stats": { "avgClearRate": 72, "avgSurvivalRate": 82, "bestStrategy": "IPO 주관 확정 시 매수" }
+    }
+  ]
+}

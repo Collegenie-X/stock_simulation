@@ -4,3 +4,4 @@ export { MyAIMatchupSection } from './MyAIMatchupSection';
 export { ReturnComparisonChart } from './ReturnComparisonChart';
 export { LearnFromOthersSection } from './LearnFromOthersSection';
 export { StatsSection } from './StatsSection';
+export { ScenarioPriceChart } from './ScenarioPriceChart';

@@ -1,5 +1,37 @@
 import patternData from './chart-patterns.json'
 
+export interface ChartHighlight {
+  x: number
+  y: number
+  label: string
+  type: 'buy' | 'sell' | 'info' | 'danger'
+  position: 'above' | 'below'
+}
+
+export interface ChartData {
+  points: [number, number][]
+  necklineY: number | null
+  highlights: ChartHighlight[]
+}
+
+export interface PatternStep {
+  phase: 'before' | 'forming' | 'signal' | 'after'
+  emoji: string
+  title: string
+  description: string
+  priceNote?: string
+}
+
+export interface ProfitScenario {
+  stock: string
+  entryPrice: number
+  shares: number
+  targetPrice: number
+  stopLoss: number
+  entryNote: string
+  signalType: 'buy' | 'sell'
+}
+
 export interface ChartPattern {
   id: string
   name: string
@@ -19,6 +51,9 @@ export interface ChartPattern {
     action: string
     result: string
   }
+  chartData: ChartData
+  steps: PatternStep[]
+  profitScenario: ProfitScenario
 }
 
 export type PatternCategory =

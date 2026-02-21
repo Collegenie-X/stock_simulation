@@ -1,6 +1,5 @@
 import type { ScenarioEvent, StockInfo } from "@/data/legendary-scenarios"
 import playContent from "@/data/scenario-play-content.json"
-import { storage } from "@/lib/storage"
 
 const { game: G } = playContent
 
@@ -34,15 +33,15 @@ export interface GameState {
 }
 
 export function getInitialState(stock: StockInfo): GameState {
-  const portfolio = storage.getPortfolio()
-  const cash = portfolio?.cash ?? G.defaultCash
   const holdings = G.defaultHoldings
   const avgPrice = stock.initialPrice
-  const spent = holdings * avgPrice
-  const totalInitial = cash
+  const holdingValue = holdings * avgPrice
+  const extraCash = Math.round(avgPrice * 50)
+  const totalCash = holdingValue + extraCash
+  const totalInitial = totalCash
 
   return {
-    cash: cash - spent,
+    cash: extraCash,
     holdings,
     avgPrice,
     totalInitial,

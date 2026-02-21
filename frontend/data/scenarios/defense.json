@@ -1,0 +1,91 @@
+{
+  "category": "방산",
+  "scenarios": [
+    {
+      "id": "legend-21",
+      "order": 21,
+      "title": "한화에어로스페이스, 방산 수출 대박",
+      "subtitle": "전쟁 뉴스에 오르는 주식",
+      "emoji": "🎯",
+      "category": "방산",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-rose-500",
+      "gradientTo": "to-red-600",
+      "stock": {
+        "name": "한화에어로스페이스",
+        "code": "012450",
+        "sector": "방산",
+        "initialPrice": 185000
+      },
+      "description": "한화에어로스페이스는 전쟁 뉴스가 나오면 급등합니다. 방산 수출 계약이 주가를 움직입니다.",
+      "keyLesson": "지정학적 리스크가 방산주의 기회!",
+      "survivalTip": "수출 계약 뉴스를 빠르게 캐치하세요.",
+      "tags": ["한화", "방산", "수출", "지정학"],
+      "events": [
+        { "turn": 1, "title": "중동 지정학적 긴장 고조", "description": "중동에서 군사 충돌 발생. 방산주 전체 급등. +8.5% 상승!", "priceChange": "+8.5%", "sentiment": "positive" },
+        { "turn": 2, "title": "폴란드 수출 계약 체결", "description": "한화가 폴란드와 15조원 규모 K2 전차·K9 자주포 수출 계약 체결! +12.5% 급등!", "priceChange": "+12.5%", "sentiment": "positive" },
+        { "turn": 3, "title": "실적 발표, 수주 급증", "description": "분기 실적 발표. 수주 잔고 50조원 돌파. +6.8% 상승.", "priceChange": "+6.8%", "sentiment": "positive" },
+        { "turn": 4, "title": "평화 협상 뉴스", "description": "중동 평화 협상 진행 중이라는 뉴스. 방산주 조정에 -5.2% 하락.", "priceChange": "-5.2%", "sentiment": "negative" },
+        { "turn": 5, "title": "호주 수출 협상 진행", "description": "한화가 호주와 K9 자주포 수출 협상 진행 중. +4.5% 상승.", "priceChange": "+4.5%", "sentiment": "positive" },
+        { "turn": 6, "title": "NATO 표준 인증 획득", "description": "한화 무기가 NATO 표준 인증 획득. 유럽 수출 확대 기대감에 +7.2% 상승.", "priceChange": "+7.2%", "sentiment": "positive" },
+        { "turn": 7, "title": "이집트 수출 계약 체결", "description": "한화가 이집트와 K9 자주포 수출 계약 체결. +8.5% 급등!", "priceChange": "+8.5%", "sentiment": "positive" },
+        { "turn": 8, "title": "수주 잔고 70조원 돌파", "description": "한화의 수주 잔고가 70조원 돌파. 향후 3년 실적 가시성 확보. +9.2% 급등!", "priceChange": "+9.2%", "sentiment": "positive" }
+      ],
+      "strategies": [
+        { "id": "s21-1", "title": "지정학적 리스크 매수", "emoji": "🎯", "description": "중동 긴장 고조 시 매수", "steps": ["1턴: 중동 긴장에 100% 매수", "2~8턴: 홀딩"], "risk": "보통", "expectedReturn": "+40% ~ +55%", "difficulty": 3 },
+        { "id": "s21-2", "title": "수출 계약 확인 후 매수", "emoji": "📊", "description": "폴란드 계약 후 매수", "steps": ["1턴: 관망", "2턴: 폴란드 계약 후 100% 매수"], "risk": "낮음", "expectedReturn": "+30% ~ +40%", "difficulty": 2 },
+        { "id": "s21-3", "title": "방산 리스크 회피", "emoji": "🛡️", "description": "윤리적 이유로 관망", "steps": ["1~8턴: 전량 관망"], "risk": "매우 낮음", "expectedReturn": "0%", "difficulty": 1 }
+      ],
+      "aiResponses": [
+        { "personality": "conservative", "strategyId": "s21-3", "finalReturn": "0%", "reasoning": "방산주는 윤리적으로 부담스러워 관망했습니다." },
+        { "personality": "aggressive", "strategyId": "s21-1", "finalReturn": "+48.5%", "reasoning": "지정학적 리스크에 과감하게 매수! 대박 수익!" },
+        { "personality": "balanced", "strategyId": "s21-2", "finalReturn": "+35.2%", "reasoning": "수출 계약 확인 후 안전하게 매수했습니다." }
+      ],
+      "stats": { "avgClearRate": 70, "avgSurvivalRate": 80, "bestStrategy": "지정학적 리스크 매수" }
+    },
+    {
+      "id": "legend-22",
+      "order": 22,
+      "title": "LIG넥스원, 국방 예산 수혜",
+      "subtitle": "레이더·미사일의 강자",
+      "emoji": "🚀",
+      "category": "방산",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-rose-500",
+      "gradientTo": "to-pink-600",
+      "stock": {
+        "name": "LIG넥스원",
+        "code": "079550",
+        "sector": "방산",
+        "initialPrice": 145000
+      },
+      "description": "LIG넥스원은 레이더·미사일 전문 기업입니다. 국방 예산과 수출 계약에 의존합니다.",
+      "keyLesson": "정부 예산안과 국제 정세를 읽으세요!",
+      "survivalTip": "대형 수주 뉴스가 주가를 크게 움직입니다.",
+      "tags": ["LIG넥스원", "방산", "레이더", "미사일"],
+      "events": [
+        { "turn": 1, "title": "국방 예산 10% 증액", "description": "정부가 국방 예산을 10% 증액 발표. 방산주 전체 급등. +7.5% 상승!", "priceChange": "+7.5%", "sentiment": "positive" },
+        { "turn": 2, "title": "천궁-II 수출 계약 체결", "description": "LIG넥스원이 중동 국가와 천궁-II 미사일 수출 계약 체결! +11.2% 급등!", "priceChange": "+11.2%", "sentiment": "positive" },
+        { "turn": 3, "title": "실적 발표, 수주 증가", "description": "분기 실적 발표. 수주 잔고 15조원 돌파. +5.8% 상승.", "priceChange": "+5.8%", "sentiment": "positive" },
+        { "turn": 4, "title": "기술 유출 의혹 보도", "description": "일부 기술이 유출됐다는 의혹 보도. -8.5% 폭락!", "priceChange": "-8.5%", "sentiment": "shock" },
+        { "turn": 5, "title": "회사 \"사실무근\" 해명", "description": "LIG넥스원이 \"기술 유출은 사실무근\"이라고 해명. +6.2% 반등.", "priceChange": "+6.2%", "sentiment": "positive" },
+        { "turn": 6, "title": "호주 레이더 수출 계약", "description": "LIG넥스원이 호주와 함정용 레이더 수출 계약 체결. +8.5% 급등!", "priceChange": "+8.5%", "sentiment": "positive" },
+        { "turn": 7, "title": "국방부 추가 발주", "description": "국방부가 천궁-II 추가 발주 결정. +7.2% 상승.", "priceChange": "+7.2%", "sentiment": "positive" },
+        { "turn": 8, "title": "수주 잔고 20조원 돌파", "description": "LIG넥스원의 수주 잔고가 20조원 돌파. +9.5% 급등!", "priceChange": "+9.5%", "sentiment": "positive" }
+      ],
+      "strategies": [
+        { "id": "s22-1", "title": "예산 증액 시 매수", "emoji": "🎯", "description": "국방 예산 증액 발표 시 매수", "steps": ["1턴: 예산 증액에 100% 매수", "2~8턴: 홀딩"], "risk": "보통", "expectedReturn": "+35% ~ +45%", "difficulty": 3 },
+        { "id": "s22-2", "title": "기술 유출 저점 매수", "emoji": "📊", "description": "기술 유출 의혹 폭락 시 매수", "steps": ["1~3턴: 관망", "4턴: 기술 유출 폭락에 100% 매수"], "risk": "높음", "expectedReturn": "+40% ~ +50%", "difficulty": 4 },
+        { "id": "s22-3", "title": "방산 리스크 회피", "emoji": "🛡️", "description": "윤리적 이유로 관망", "steps": ["1~8턴: 전량 관망"], "risk": "매우 낮음", "expectedReturn": "0%", "difficulty": 1 }
+      ],
+      "aiResponses": [
+        { "personality": "conservative", "strategyId": "s22-3", "finalReturn": "0%", "reasoning": "방산주는 윤리적으로 부담스러워 관망했습니다." },
+        { "personality": "aggressive", "strategyId": "s22-2", "finalReturn": "+42.5%", "reasoning": "기술 유출 의혹 폭락에 과감하게 매수! 대박!" },
+        { "personality": "balanced", "strategyId": "s22-1", "finalReturn": "+38.2%", "reasoning": "예산 증액 발표에 안전하게 매수했습니다." }
+      ],
+      "stats": { "avgClearRate": 68, "avgSurvivalRate": 78, "bestStrategy": "기술 유출 저점 매수" }
+    }
+  ]
+}

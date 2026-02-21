@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
+import { formatNumber } from "@/lib/format"
 import { storage } from "@/lib/storage"
 import scenariosData from "@/data/game-scenarios.json"
 import scenarios100DaysData from "@/data/stock-100days-data.json"
@@ -78,7 +79,7 @@ export default function PendingOrdersPage() {
                       <span className="text-lg font-bold text-white">
                         {typeof order.targetPrice === "number" && order.targetPrice < 100
                           ? `${order.targetPrice > 0 ? "+" : ""}${order.targetPrice}% 도달 시`
-                          : `${order.targetPrice.toLocaleString()}원 도달 시`}
+                          : `${formatNumber(order.targetPrice)}원 도달 시`}
                       </span>
                     </div>
                     <div className="text-sm text-gray-500 mt-1">

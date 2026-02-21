@@ -1,103 +1,123 @@
 {
   "game": {
-    "defaultCash": 5000000,
+    "defaultCash": 10000000,
     "defaultHoldings": 100,
-    "chartPointsPerTurn": 15
+    "chartPointsPerTurn": 20,
+    "turnTimerSec": 30,
+    "comboBonus": [0, 10, 25, 50, 100],
+    "timeBonus": {
+      "fast": { "sec": 8, "points": 30, "label": "⚡ 번개 판단!" },
+      "normal": { "sec": 18, "points": 15, "label": "👍 괜찮은 속도" },
+      "slow": { "sec": 30, "points": 5, "label": "⏰ 간신히!" }
+    }
   },
   "ui": {
     "turnEmoji": ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣"],
     "actionLabels": {
-      "buy": "매수",
-      "sell": "매도",
-      "hold": "넘기기"
+      "buy": "🛒 살래",
+      "sell": "💸 팔래",
+      "hold": "⏸️ 기다릴게"
     },
-    "ratioLabels": ["25%", "50%", "75%", "전량"],
+    "ratioLabels": ["조금", "반반", "많이", "전부"],
     "ratioValues": [0.25, 0.5, 0.75, 1.0],
+    "ratioDescriptions": ["25% 살짝만", "50% 반반", "75% 많이", "100% 전부 다!"],
     "portfolioLabels": {
-      "totalAsset": "총 자산",
+      "totalAsset": "내 돈",
       "profitRate": "수익률",
       "cash": "현금",
-      "holdings": "보유",
-      "avgPrice": "평단가",
-      "evalAmount": "평가금액",
-      "profitLoss": "평가손익"
+      "holdings": "주식",
+      "avgPrice": "산 가격",
+      "evalAmount": "지금 가치",
+      "profitLoss": "이익/손해"
     },
     "resultLabels": {
-      "replay": "다시 플레이",
-      "backToDetail": "시나리오 상세"
+      "replay": "🔄 다시 도전!",
+      "backToDetail": "← 돌아가기"
     }
   },
   "hints": {
     "buySignals": [
-      "이 가격대가 지지선 역할을 할 수 있습니다",
-      "과매도 구간 진입 — 반등 가능성",
-      "거래량 감소는 매도세 약화 신호",
-      "공포에 사는 것이 기회일 수 있습니다"
+      "여기가 바닥일 수 있어!",
+      "많이 떨어졌으니 반등 가능!",
+      "파는 사람이 줄어들고 있어",
+      "남들이 무서워할 때가 기회야!"
     ],
     "sellSignals": [
-      "과열 구간 — 차익 실현 검토 필요",
-      "RSI 70 이상은 위험 신호입니다",
-      "좋은 뉴스에 팔라 — 소문에 사서 뉴스에 팔기",
-      "급등 후 대량 매도 주의 구간"
+      "많이 올랐으니 쉬어갈 때야",
+      "너무 뜨거워! 이익 챙길 타이밍",
+      "좋은 뉴스 나왔을 때 팔아!",
+      "급등 후엔 급락이 올 수 있어"
     ],
     "holdSignals": [
-      "방향성이 불분명 — 관망이 최선일 수 있습니다",
-      "윗꼬리 양봉은 매도 압력 신호",
-      "추세 전환 확인 후 진입해도 늦지 않습니다",
-      "무리한 진입보다 기회를 기다리세요"
+      "어디로 갈지 모르겠어. 기다려",
+      "아직 방향이 안 나왔어",
+      "확인 후 들어가도 늦지 않아",
+      "무리하지 말고 기회를 기다려"
     ],
     "ratioGuide": {
-      "conservative": "전체 자산의 25% 이하만 투입하세요",
-      "moderate": "50% 비중이면 리스크와 수익의 균형입니다",
-      "aggressive": "확신이 있다면 75% 이상 베팅, 하지만 손절 기준을 잡으세요",
-      "allIn": "올인은 최후의 수단 — 손실 시 회복이 어렵습니다"
+      "conservative": "살짝만 넣어봐 (25%)",
+      "moderate": "반반이 안전해 (50%)",
+      "aggressive": "확신 있으면 많이! 근데 손절 기준은 잡아둬"
     }
   },
   "feedback": {
     "correct": {
-      "titles": ["완벽한 판단!", "훌륭합니다!", "프로 투자자!", "정확한 타이밍!", "냉철한 분석!"],
+      "titles": ["완벽! 🎯", "천재인데?!", "프로급 판단!", "정확해! ⭐", "대박 타이밍!"],
       "messages": [
-        "시장의 흐름을 정확히 읽었습니다",
-        "위기 대처 능력이 뛰어납니다!",
-        "냉정한 판단이 수익을 만듭니다",
-        "다른 투자자들이 놓친 기회를 잡았어요",
-        "이 타이밍에 이 결정은 최적입니다"
+        "시장 흐름을 꿰뚫었어!",
+        "위기 대처 능력 최고!",
+        "냉정한 판단이 돈을 벌어",
+        "다른 사람이 놓친 기회를 잡았어!",
+        "이 타이밍에 이 선택? 최고야!"
       ],
-      "emoji": "✨"
+      "emoji": "🎉",
+      "points": 100
     },
     "good": {
-      "titles": ["괜찮은 선택!", "나쁘지 않아요!", "안전한 판단!", "신중한 접근!"],
+      "titles": ["괜찮아! 👍", "나쁘지 않아!", "안전한 선택!", "신중한 접근!"],
       "messages": [
-        "리스크를 관리하는 좋은 자세입니다",
-        "신중한 접근이 장기적으로 유리합니다",
-        "무리하지 않는 것도 실력입니다",
-        "원금 보존은 투자의 첫 번째 원칙입니다"
+        "리스크 관리하는 좋은 자세야",
+        "신중한 접근이 장기적으로 유리해",
+        "무리 안 하는 것도 실력이야!",
+        "원금 보존이 제일 중요해"
       ],
-      "emoji": "👍"
+      "emoji": "👍",
+      "points": 50
     },
     "bad": {
-      "titles": ["아쉬운 선택...", "주의가 필요해요!", "위험한 판단!", "다시 생각해볼까요?"],
+      "titles": ["아쉽다... 😰", "조심해!", "위험한 판단!", "다시 생각해봐!"],
       "messages": [
-        "감정에 휘둘리지 않도록 주의하세요",
-        "차트의 신호를 다시 살펴보세요",
-        "다음번에는 더 신중하게 결정해보세요",
-        "FOMO에 빠지지 않았는지 점검하세요",
-        "손절은 부끄러운 것이 아닙니다"
+        "감정에 휘둘리지 마!",
+        "차트를 다시 살펴봐",
+        "다음엔 더 신중하게!",
+        "FOMO에 빠진 건 아니야?",
+        "손절은 부끄러운 게 아니야"
       ],
-      "emoji": "😰"
+      "emoji": "😰",
+      "points": 10
+    },
+    "timeout": {
+      "titles": ["시간 초과! ⏰", "너무 늦었어!", "결정장애?!"],
+      "messages": [
+        "실전에서는 빠른 판단이 필요해!",
+        "고민하는 사이에 기회가 지나갔어",
+        "30초 안에 결정하는 연습을 해봐"
+      ],
+      "emoji": "⏰",
+      "points": 0
     }
   },
   "grades": {
-    "S": { "label": "S", "title": "전설적 투자자", "color": "text-yellow-400", "minRate": 5, "emoji": "🏆" },
-    "A": { "label": "A", "title": "숙련된 투자자", "color": "text-green-400", "minRate": 0, "emoji": "⭐" },
-    "B": { "label": "B", "title": "견습 투자자", "color": "text-blue-400", "minRate": -5, "emoji": "📘" },
-    "C": { "label": "C", "title": "초보 투자자", "color": "text-orange-400", "minRate": -10, "emoji": "📙" },
-    "D": { "label": "D", "title": "학습이 필요해요", "color": "text-red-400", "minRate": -999, "emoji": "📕" }
+    "S": { "label": "S", "title": "전설적 투자자 👑", "color": "text-yellow-400", "minRate": 5, "emoji": "🏆" },
+    "A": { "label": "A", "title": "숙련된 투자자 ⭐", "color": "text-green-400", "minRate": 0, "emoji": "⭐" },
+    "B": { "label": "B", "title": "견습 투자자 📘", "color": "text-blue-400", "minRate": -5, "emoji": "📘" },
+    "C": { "label": "C", "title": "초보 투자자 📙", "color": "text-orange-400", "minRate": -10, "emoji": "📙" },
+    "D": { "label": "D", "title": "다시 도전해봐! 📕", "color": "text-red-400", "minRate": -999, "emoji": "📕" }
   },
   "sentiment": {
-    "positive": { "color": "text-red-400", "bg": "bg-red-500/10", "border": "border-red-500/20", "label": "호재", "icon": "🔥" },
-    "negative": { "color": "text-blue-400", "bg": "bg-blue-500/10", "border": "border-blue-500/20", "label": "악재", "icon": "💧" },
-    "neutral":  { "color": "text-gray-400", "bg": "bg-gray-500/10", "border": "border-gray-500/20", "label": "중립", "icon": "⚡" },
-    "shock":    { "color": "text-purple-400", "bg": "bg-purple-500/10", "border": "border-purple-500/20", "label": "충격", "icon": "💥" }
+    "positive": { "color": "text-red-400", "bg": "bg-red-500/10", "border": "border-red-500/20", "label": "호재 🔥", "icon": "🔥" },
+    "negative": { "color": "text-blue-400", "bg": "bg-blue-500/10", "border": "border-blue-500/20", "label": "악재 💧", "icon": "💧" },
+    "neutral":  { "color": "text-gray-400", "bg": "bg-gray-500/10", "border": "border-gray-500/20", "label": "중립 ⚡", "icon": "⚡" },
+    "shock":    { "color": "text-purple-400", "bg": "bg-purple-500/10", "border": "border-purple-500/20", "label": "충격 💥", "icon": "💥" }
   }
 }

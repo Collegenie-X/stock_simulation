@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react"
 import { ArrowLeft, Bot, TrendingUp, TrendingDown, Minus, Swords } from "lucide-react"
+import { formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
 import { LABELS } from "../config"
 import {
@@ -261,7 +262,7 @@ export const ProfitAnalysisModal = ({
                             {daySells.length > 0 && <span className="text-blue-400">매도 {daySells.length}건</span>}
                             {dayProfit !== 0 && (
                               <span className={dayProfit >= 0 ? "text-red-400" : "text-blue-400"}>
-                                {dayProfit >= 0 ? "+" : ""}{dayProfit.toLocaleString()}원
+                                {dayProfit >= 0 ? "+" : ""}{formatNumber(dayProfit)}원
                               </span>
                             )}
                           </div>
@@ -312,7 +313,7 @@ export const ProfitAnalysisModal = ({
                         {isUserProfit ? "+" : ""}{userProfitRate}%
                       </div>
                       <div className="text-[11px] text-gray-400 mt-1">
-                        {userTotalValue.toLocaleString()}원
+                        {formatNumber(userTotalValue)}원
                       </div>
                       {userWinning && (
                         <div className="mt-2 text-[10px] font-bold text-yellow-400 bg-yellow-500/10 inline-block px-2 py-0.5 rounded-full">
@@ -336,7 +337,7 @@ export const ProfitAnalysisModal = ({
                         {isAiProfit ? "+" : ""}{aiProfitRate.toFixed(1)}%
                       </div>
                       <div className="text-[11px] text-gray-400 mt-1">
-                        {aiTotalValue.toLocaleString()}원
+                        {formatNumber(aiTotalValue)}원
                       </div>
                       {!userWinning && userProfitRate !== aiProfitRate && (
                         <div className="mt-2 text-[10px] font-bold text-purple-400 bg-purple-500/10 inline-block px-2 py-0.5 rounded-full">
@@ -353,13 +354,13 @@ export const ProfitAnalysisModal = ({
                     <div>
                       <span className="text-gray-500">나의 수익금 </span>
                       <span className={cn("font-bold", isUserProfit ? "text-red-400" : "text-blue-400")}>
-                        {isUserProfit ? "+" : ""}{(userTotalValue - initialValue).toLocaleString()}원
+                        {isUserProfit ? "+" : ""}{formatNumber(userTotalValue - initialValue)}원
                       </span>
                     </div>
                     <div>
                       <span className="text-gray-500">AI 수익금 </span>
                       <span className={cn("font-bold", isAiProfit ? "text-red-400" : "text-blue-400")}>
-                        {isAiProfit ? "+" : ""}{(aiTotalValue - initialValue).toLocaleString()}원
+                        {isAiProfit ? "+" : ""}{formatNumber(aiTotalValue - initialValue)}원
                       </span>
                     </div>
                   </div>
@@ -415,13 +416,13 @@ export const ProfitAnalysisModal = ({
                               <div className="min-w-0">
                                 <div className="text-sm font-bold text-white truncate">{item.name}</div>
                                 <div className="text-[10px] text-gray-500">
-                                  {item.qty}주 · 평균 {Math.round(item.avg).toLocaleString()}원
+                                  {item.qty}주 · 평균 {formatNumber(Math.round(item.avg))}원
                                 </div>
                               </div>
                             </div>
                             <div className="text-right shrink-0">
                               <div className="text-sm font-bold text-white">
-                                {item.evalAmount.toLocaleString()}원
+                                {formatNumber(item.evalAmount)}원
                               </div>
                               <div className={cn(
                                 "text-[11px] font-bold flex items-center justify-end gap-0.5",
@@ -468,7 +469,7 @@ export const ProfitAnalysisModal = ({
                         </span>
                         <span className="text-[10px] text-gray-400 shrink-0">{a.quantity}주</span>
                         <span className="text-[10px] text-gray-500 shrink-0">
-                          @{a.price.toLocaleString()}원
+                          @{formatNumber(a.price)}원
                         </span>
                       </div>
                     ))}

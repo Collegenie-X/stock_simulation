@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { formatNumber } from "@/lib/format"
 import labelsData from "@/data/profit-analysis-labels.json"
 import type { TradeRecord } from "../../types"
 
@@ -33,7 +34,7 @@ export const TradeHistoryItem = ({ trade }: TradeHistoryItemProps) => {
         <div>
           <p className="text-sm font-semibold text-white">{trade.stockName}</p>
           <p className="text-xs text-gray-500">
-            {trade.quantity}주 × {trade.price.toLocaleString()}원
+            {trade.quantity}주 × {formatNumber(trade.price)}원
           </p>
         </div>
       </div>
@@ -46,7 +47,7 @@ export const TradeHistoryItem = ({ trade }: TradeHistoryItemProps) => {
             isBuy ? "text-red-400" : "text-blue-400",
           )}
         >
-          {isBuy ? "-" : "+"}{trade.totalAmount.toLocaleString()}원
+          {isBuy ? "-" : "+"}{formatNumber(trade.totalAmount)}원
         </p>
         {!isBuy && trade.profit !== undefined && (
           <p
@@ -56,7 +57,7 @@ export const TradeHistoryItem = ({ trade }: TradeHistoryItemProps) => {
             )}
           >
             {trade.profit >= 0 ? "+" : ""}
-            {trade.profit.toLocaleString()}원
+            {formatNumber(trade.profit)}원
             {trade.profitRate !== undefined && (
               <span className="ml-1">
                 ({trade.profitRate >= 0 ? "+" : ""}
