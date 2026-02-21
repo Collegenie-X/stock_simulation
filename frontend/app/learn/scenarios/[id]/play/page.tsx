@@ -528,8 +528,15 @@ function EventBullets({ description }: { description: string }) {
   )
 }
 
-function LiveChart({ points, animProg, isUp, height = 200, turnSize = 20 }: {
+const BADGE_ACTION_COLOR: Record<ActionType, string> = {
+  buy: "#ef4444",
+  sell: "#3b82f6",
+  hold: "#4b5563",
+}
+
+function LiveChart({ points, animProg, isUp, height = 200, turnSize = 20, trades }: {
   points: number[]; animProg: number; isUp: boolean; height?: number; turnSize?: number
+  trades?: TradeRecord[]
 }) {
   if (points.length < 2) return <div style={{ height }} className="bg-[#111118] rounded-2xl" />
   const visCount = Math.max(2, Math.ceil(points.length * animProg))
@@ -539,23 +546,28 @@ function LiveChart({ points, animProg, isUp, height = 200, turnSize = 20 }: {
   const range = max - min || 1
   const W = 400
   const PX = 6
+  // 거래 뱃지 표시 시 하단 여백 확보
   const PY = 16
-  const chartH = height - PY * 2
+  const BADGE_H = trades && trades.length > 0 ? 22 : 0
+  const chartH = height - PY * 2 - BADGE_H
   const toX = (i: number) => PX + (i / Math.max(points.length - 1, 1)) * (W - PX * 2)
   const toY = (p: number) => PY + chartH - ((p - min) / range) * chartH
   const pathD = visible.map((p, i) => `${i === 0 ? "M" : "L"}${toX(i)},${toY(p)}`).join(" ")
   const lx = toX(visible.length - 1)
   const ly = toY(visible[visible.length - 1])
-  const areaD = `${pathD} L${lx},${height - PY} L${PX},${height - PY} Z`
+  const areaD = `${pathD} L${lx},${PY + chartH} L${PX},${PY + chartH} Z`
   const stroke = isUp ? "#ef4444" : "#3b82f6"
   const startPrice = points[0]
   const startY = toY(startPrice)
 
-  const turnBoundaries: number[] = []
-  for (let t = 1; t <= 8; t++) {
-    const idx = t * turnSize
-    if (idx < points.length) turnBoundaries.push(idx)
-  }
+  // 각 거래 뱃지의 x 위치: 각 턴 끝 지점
+  const tradeBadges = (trades ?? []).map((trade, i) => {
+    const ptIdx = Math.min((i + 1) * turnSize, points.length - 1)
+    const bx = toX(ptIdx)
+    const by = PY + chartH + BADGE_H / 2 + 2 // 차트 하단 뱃지 영역 중앙
+    const color = BADGE_ACTION_COLOR[trade.action]
+    return { bx, by, color, num: i + 1, action: trade.action }
+  })
 
   const priceLabels = [min, min + range * 0.5, max].map(p => ({
     y: toY(p),
@@ -577,9 +589,12 @@ function LiveChart({ points, animProg, isUp, height = 200, turnSize = 20 }: {
             stroke="#ffffff" strokeOpacity="0.03" strokeDasharray="4 4" />
         ))}
 
-        {turnBoundaries.map((idx) => (
-          <line key={idx} x1={toX(idx)} x2={toX(idx)} y1={PY} y2={height - PY}
-            stroke="#ffffff" strokeOpacity="0.06" strokeDasharray="2 3" />
+        {/* 턴 구분선 + 뱃지 연결선 */}
+        {tradeBadges.map(({ bx, by, color, num }) => (
+          <g key={num}>
+            <line x1={bx} x2={bx} y1={PY} y2={by - 10}
+              stroke={color} strokeOpacity="0.25" strokeDasharray="2 3" />
+          </g>
         ))}
 
         <line x1={PX} x2={W - PX} y1={startY} y2={startY}
@@ -588,12 +603,14 @@ function LiveChart({ points, animProg, isUp, height = 200, turnSize = 20 }: {
         <path d={areaD} fill="url(#cg)" />
         <path d={pathD} fill="none" stroke={stroke} strokeWidth="2.5" strokeLinejoin="round" strokeLinecap="round" />
 
+        {/* 차트 끝점 pulse */}
         <circle cx={lx} cy={ly} r="4" fill={stroke} />
         <circle cx={lx} cy={ly} r="10" fill={stroke} fillOpacity="0.1">
           <animate attributeName="r" values="7;13;7" dur="1.5s" repeatCount="indefinite" />
           <animate attributeName="fill-opacity" values="0.15;0;0.15" dur="1.5s" repeatCount="indefinite" />
         </circle>
 
+        {/* 현재가 라벨 */}
         <rect x={lx - 38} y={ly - 20} width="76" height="16" rx="4" fill={stroke} fillOpacity="0.9" />
         <text x={lx} y={ly - 9} textAnchor="middle" fontSize="9" fontWeight="bold" fill="white">
           {formatNumber(Math.round(visible[visible.length - 1]))}
@@ -604,6 +621,21 @@ function LiveChart({ points, animProg, isUp, height = 200, turnSize = 20 }: {
         ))}
 
         <text x={PX + 2} y={startY - 4} textAnchor="start" fontSize="7" fill="#666">시작</text>
+
+        {/* 거래 번호 뱃지 */}
+        {tradeBadges.map(({ bx, by, color, num, action }) => (
+          <g key={num}>
+            {/* 차트 라인 위 점 */}
+            <circle cx={bx} cy={toY(points[Math.min((num - 1) * turnSize + (turnSize - 1), points.length - 1)])}
+              r="3" fill={color} stroke="#111118" strokeWidth="1.5" />
+            {/* 하단 번호 원 */}
+            <circle cx={bx} cy={by} r="9" fill={color} fillOpacity="0.9" />
+            <circle cx={bx} cy={by} r="9" fill="none" stroke="#111118" strokeWidth="1" />
+            <text x={bx} y={by + 4} textAnchor="middle" fontSize="9" fontWeight="bold" fill="white">
+              {num}
+            </text>
+          </g>
+        ))}
       </svg>
     </div>
   )
@@ -691,7 +723,7 @@ function ResultView({ scenario, total, rate, cash, holdings, price, trades, aiRe
       </div>
 
       <div className="px-4 py-4">
-        <LiveChart points={chartPts} animProg={1} isUp={rate >= 0} height={180} />
+        <LiveChart points={chartPts} animProg={1} isUp={rate >= 0} height={200} trades={trades} />
       </div>
 
       <div className="px-4 mb-4">

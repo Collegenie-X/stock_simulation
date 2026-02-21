@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState, useRef } from "react"
+import { useMemo, useRef } from "react"
 import { ArrowLeft, Heart, Bell, MoreHorizontal, Search, TrendingUp, TrendingDown, Newspaper } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatNumber } from "@/lib/format"
@@ -154,51 +154,7 @@ export const DetailView = ({
     })
   }, [isUp, change, stockNews, stockCategory, stockName, prevDayChange, prevDayIsUp, prevDayNews])
 
-  // 차트에 표시할 이벤트 마커 생성
-  const chartEvents = useMemo(() => {
-    if (!chartData || chartData.length === 0) return []
-    
-    let delayedCount = 0
-    let currentCount = 0
-    
-    return dailyEvents.map((evt, idx) => {
-      let eventIndex: number
-      
-      if (evt.isDelayed) {
-        // 전일 뉴스: 최근 여러 턴에 분산
-        eventIndex = Math.max(0, chartData.length - 2 - delayedCount)
-        delayedCount++
-      } else {
-        // 당일 뉴스: 마지막 턴 또는 그 근처
-        eventIndex = Math.max(0, chartData.length - 1 - currentCount)
-        currentCount++
-      }
-      
-      return {
-        index: eventIndex,
-        type: evt.type,
-        emoji: evt.emoji,
-        headline: evt.headline,
-      }
-    })
-  }, [dailyEvents, chartData])
-
-  const [selectedEventIndex, setSelectedEventIndex] = useState<number | null>(null)
-  const eventRefs = useRef<(HTMLDivElement | null)[]>([])
   const chartRef = useRef<HTMLDivElement>(null)
-
-  const handleNewsClick = (index: number) => {
-    setSelectedEventIndex(index)
-    
-    // 차트로 스크롤
-    chartRef.current?.scrollIntoView({ 
-      behavior: 'smooth', 
-      block: 'center' 
-    })
-    
-    // 3초 후 강조 해제
-    setTimeout(() => setSelectedEventIndex(null), 3000)
-  }
 
   return (
     <div className="min-h-screen bg-[#191919] text-white flex flex-col">
@@ -326,8 +282,6 @@ export const DetailView = ({
             color={isUp ? "red" : "blue"}
             showXAxis
             chartPeriod={chartPeriod}
-            events={chartEvents}
-            selectedEventIndex={selectedEventIndex}
           />
         </div>
 
@@ -368,30 +322,17 @@ export const DetailView = ({
                     {isUp ? "상승세" : "하락세"}
                   </span>
                 </div>
-                <p className="text-[10px] text-gray-500 flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-blue-500 inline-block animate-pulse" />
-                  뉴스를 클릭하면 차트에서 해당 구간을 확인할 수 있습니다
-                </p>
               </div>
               <div className="px-4 pb-4 space-y-0">
                 {dailyEvents.map((evt, idx) => (
-                  <div 
-                    key={idx} 
-                    ref={el => eventRefs.current[idx] = el}
-                    onClick={() => handleNewsClick(idx)}
-                    className={cn(
-                      "flex items-start gap-2.5 py-2.5 border-b border-gray-800/30 last:border-0 transition-all duration-300 cursor-pointer hover:bg-gray-800/30 rounded-lg",
-                      selectedEventIndex === idx && "bg-yellow-500/15 ring-2 ring-yellow-500/40 px-2 -mx-2"
-                    )}
+                  <div
+                    key={idx}
+                    className="flex items-start gap-2.5 py-2.5 border-b border-gray-800/30 last:border-0"
                   >
                     <div className={cn(
-                      "w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 relative",
+                      "w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5",
                       evt.type === "positive" ? "bg-red-500/15" : evt.type === "negative" ? "bg-blue-500/15" : "bg-gray-700/50"
                     )}>
-                      {/* 차트 마커 표시 */}
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center text-[8px] font-bold text-white">
-                        {idx + 1}
-                      </div>
                       {evt.type === "positive"
                         ? <TrendingUp className="w-3 h-3 text-red-400" />
                         : evt.type === "negative"
@@ -400,9 +341,7 @@ export const DetailView = ({
                       }
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <p className="text-[12px] text-gray-200 leading-relaxed">{evt.headline}</p>
-                      </div>
+                      <p className="text-[12px] text-gray-200 leading-relaxed">{evt.headline}</p>
                       {evt.detail && (
                         <p className="text-[10px] text-gray-500 mt-0.5">{evt.detail}</p>
                       )}
@@ -412,12 +351,7 @@ export const DetailView = ({
                         </span>
                       )}
                     </div>
-                    <div className="flex flex-col items-end gap-1 shrink-0">
-                      <span className="text-[9px] text-gray-600 mt-1">{evt.time}</span>
-                      <span className="text-[8px] text-blue-400 bg-blue-500/10 px-1.5 py-0.5 rounded flex items-center gap-0.5">
-                        📍 차트에서 보기
-                      </span>
-                    </div>
+                    <span className="text-[9px] text-gray-600 mt-1 shrink-0">{evt.time}</span>
                   </div>
                 ))}
               </div>

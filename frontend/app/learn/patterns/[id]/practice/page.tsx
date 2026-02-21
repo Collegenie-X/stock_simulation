@@ -8,29 +8,34 @@ import {
   getScenarioForRound,
   calculateRoundScore,
   getFinalResult,
-  calcPnl,
   getTurnFeedback,
   TOTAL_ROUNDS,
   TURNS_PER_ROUND,
   CANDLES_PER_TURN,
   INITIAL_REVEAL,
-  MAX_POSITION,
+  INITIAL_CASH,
   DECISION_TIMERS,
   type PatternScenario,
   type Candle,
   type RoundScore,
   type TradeLog,
   type TurnFeedback,
+  type TurnEval,
 } from '@/data/pattern-practice';
 import { cn } from '@/lib/utils';
 import {
-  TrendingUp, TrendingDown, RotateCcw, ChevronRight, Star, Play,
+  TrendingDown, RotateCcw, ChevronRight, ChevronDown, Star, Play,
   Trophy, Flame, Eye, X, ShoppingCart, BadgeDollarSign,
-  CheckCircle2, XCircle, MinusCircle, Package,
+  CheckCircle2, XCircle, MinusCircle, Package, Brain,
 } from 'lucide-react';
 
-// ─── 시작 주식 수 (표시용) ──────────────────────────────
-const INITIAL_SHARES = 5;
+// ─── 투자 비율 옵션 ──────────────────────────────────────
+const PCT_OPTIONS = [
+  { pct: 0.25, label: '조금', sub: '25%' },
+  { pct: 0.50, label: '반반', sub: '50%' },
+  { pct: 0.75, label: '많이', sub: '75%' },
+  { pct: 1.00, label: '전부', sub: '100%' },
+];
 
 // ═══════════════════════════════════════════════════════════
 // LineChart
@@ -43,7 +48,7 @@ function LineChart({
 }) {
   const visible = candles.slice(0, visibleCount);
   if (visible.length === 0) return null;
-  const W = 340; const H = 200; const MR = 50; const ML = 4; const MT = 16; const MB = 16;
+  const W = 400; const H = 260; const MR = 68; const ML = 8; const MT = 20; const MB = 20;
   const drawW = W - MR - ML; const drawH = H - MT - MB;
   const closes = visible.map(c => c.close);
   const maxP = Math.max(...closes); const minP = Math.min(...closes);
@@ -70,27 +75,27 @@ function LineChart({
       {gridPrices.map((p, i) => (
         <g key={i}>
           <line x1={ML} y1={pToY(p)} x2={ML + drawW + 5} y2={pToY(p)} stroke="#1a1a1a" strokeWidth="0.5"/>
-          <text x={ML + drawW + 10} y={pToY(p) + 4} fill="#555" fontSize="9" fontFamily="sans-serif">{Math.round(p / 1000)}K</text>
+          <text x={ML + drawW + 10} y={pToY(p) + 4} fill="#555" fontSize="9" fontFamily="sans-serif">{Math.round(p).toLocaleString('ko-KR')}</text>
         </g>
       ))}
       <polygon points={areaPoints} fill={`url(#${trendUp ? 'aU' : 'aD'})`}/>
-      <polyline points={linePoints} fill="none" stroke={lineColor} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <circle cx={iToX(visible.length - 1)} cy={pToY(last.close)} r="5" fill={lineColor} stroke="#0a0a0a" strokeWidth="2" filter="url(#dg)"/>
+      <polyline points={linePoints} fill="none" stroke={lineColor} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+      <circle cx={iToX(visible.length - 1)} cy={pToY(last.close)} r="6" fill={lineColor} stroke="#0a0a0a" strokeWidth="2.5" filter="url(#dg)"/>
       {buyTurns?.map(idx => idx < visibleCount ? (
         <g key={`b${idx}`}>
-          <circle cx={iToX(idx)} cy={pToY(candles[idx].close) - 14} r="8" fill="#22c55e" stroke="#0a0a0a" strokeWidth="2" filter="url(#glow)"/>
-          <text x={iToX(idx)} y={pToY(candles[idx].close) - 11} fill="white" fontSize="8" textAnchor="middle" fontWeight="bold">B</text>
+          <circle cx={iToX(idx)} cy={pToY(candles[idx].close) - 16} r="10" fill="#22c55e" stroke="#0a0a0a" strokeWidth="2" filter="url(#glow)"/>
+          <text x={iToX(idx)} y={pToY(candles[idx].close) - 12} fill="white" fontSize="10" textAnchor="middle" fontWeight="bold">B</text>
         </g>
       ) : null)}
       {sellTurns?.map(idx => idx < visibleCount ? (
         <g key={`s${idx}`}>
-          <circle cx={iToX(idx)} cy={pToY(candles[idx].close) - 14} r="8" fill="#ef4444" stroke="#0a0a0a" strokeWidth="2" filter="url(#glow)"/>
-          <text x={iToX(idx)} y={pToY(candles[idx].close) - 11} fill="white" fontSize="8" textAnchor="middle" fontWeight="bold">S</text>
+          <circle cx={iToX(idx)} cy={pToY(candles[idx].close) - 16} r="10" fill="#ef4444" stroke="#0a0a0a" strokeWidth="2" filter="url(#glow)"/>
+          <text x={iToX(idx)} y={pToY(candles[idx].close) - 12} fill="white" fontSize="10" textAnchor="middle" fontWeight="bold">S</text>
         </g>
       ) : null)}
-      <rect x={ML + drawW + 2} y={pToY(last.close) - 10} width={46} height={20} fill={lastUp ? '#22c55e' : '#ef4444'} rx="6" filter="url(#glow)"/>
-      <text x={ML + drawW + 25} y={pToY(last.close) + 4} fill="white" fontSize="9" fontFamily="sans-serif" textAnchor="middle" fontWeight="bold">
-        {(last.close / 1000).toFixed(1)}K
+      <rect x={ML + drawW + 2} y={pToY(last.close) - 12} width={64} height={24} fill={lastUp ? '#22c55e' : '#ef4444'} rx="6" filter="url(#glow)"/>
+      <text x={ML + drawW + 34} y={pToY(last.close) + 4} fill="white" fontSize="9.5" fontFamily="sans-serif" textAnchor="middle" fontWeight="bold">
+        {Math.round(last.close).toLocaleString('ko-KR')}
       </text>
     </svg>
   );
@@ -131,7 +136,10 @@ interface TurnHistoryEntry {
   turn: number;
   action: 'buy' | 'sell' | 'skip' | 'timeout';
   price: number;
-  sharesAfter: number;
+  shares: number;    // 거래 주수
+  amount: number;    // 거래 금액
+  sharesHeld: number; // 거래 후 보유 주수
+  profit?: number;   // 매도 시 실현 손익
 }
 
 function InGameHistory({ history }: { history: TurnHistoryEntry[] }) {
@@ -143,27 +151,28 @@ function InGameHistory({ history }: { history: TurnHistoryEntry[] }) {
       </div>
       <div className="divide-y divide-white/5">
         {history.map((h, i) => (
-          <div key={i} className="flex items-center gap-3 px-3 py-2.5">
-            <div className={cn('w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0',
+          <div key={i} className="flex items-center gap-2 px-3 py-2.5">
+            <div className={cn('w-10 h-6 rounded-md flex items-center justify-center text-[10px] font-black shrink-0',
               h.action === 'buy' ? 'bg-green-500/25 text-green-400' :
               h.action === 'sell' ? 'bg-red-500/25 text-red-400' : 'bg-white/5 text-gray-500',
             )}>
-              {h.action === 'buy' ? '↑' : h.action === 'sell' ? '↓' : '−'}
+              {h.action === 'buy' ? '매수' : h.action === 'sell' ? '매도' : '관망'}
             </div>
-            <div className="flex-1">
-              <span className="text-xs font-bold text-gray-300">턴 {h.turn + 1}</span>
-              {(h.action === 'buy' || h.action === 'sell') && (
-                <span className="text-xs text-gray-500 ml-2">{h.price.toLocaleString('ko-KR')}원</span>
+            <div className="flex-1 min-w-0">
+              <span className="text-xs font-bold text-gray-300">T{h.turn + 1}</span>
+              {(h.action === 'buy' || h.action === 'sell') && h.shares > 0 && (
+                <span className="text-[10px] text-gray-500 ml-1.5">{h.shares}주 · {h.amount.toLocaleString('ko-KR')}원</span>
               )}
             </div>
-            <div className="flex items-center gap-1.5">
+            {/* 매도 시 실현 손익 */}
+            {h.profit !== undefined && (
+              <span className={cn('text-xs font-black shrink-0', h.profit >= 0 ? 'text-green-400' : 'text-red-400')}>
+                {h.profit >= 0 ? '+' : ''}{h.profit.toLocaleString('ko-KR')}원
+              </span>
+            )}
+            <div className="flex items-center gap-1 shrink-0">
               <Package className="w-3 h-3 text-gray-600" />
-              <span className={cn('text-xs font-black',
-                h.action === 'buy' ? 'text-green-400' :
-                h.action === 'sell' ? 'text-red-400' : 'text-gray-500',
-              )}>{h.sharesAfter}주</span>
-              {h.action === 'buy' && <span className="text-[10px] text-green-600">+1</span>}
-              {h.action === 'sell' && <span className="text-[10px] text-red-600">-1</span>}
+              <span className="text-xs text-gray-500">{h.sharesHeld}주</span>
             </div>
           </div>
         ))}
@@ -175,19 +184,7 @@ function InGameHistory({ history }: { history: TurnHistoryEntry[] }) {
 // ═══════════════════════════════════════════════════════════
 // Round Result Trade History
 // ═══════════════════════════════════════════════════════════
-function TradeHistoryList({ trades, scenario }: { trades: TradeLog[]; scenario: PatternScenario }) {
-  const isBuy = scenario.signal === 'buy';
-  function evalTrade(t: TradeLog): { icon: React.ReactNode; label: string; color: string } {
-    if (t.action === 'skip' || t.action === 'timeout') {
-      return { icon: <MinusCircle className="w-4 h-4" />, label: t.action === 'timeout' ? '시간초과' : '관망', color: 'text-gray-500' };
-    }
-    const isCorrDir = (t.action === 'buy' && isBuy) || (t.action === 'sell' && !isBuy);
-    const isWrongDir = (t.action === 'buy' && !isBuy && trades.filter(x => x.action === 'sell').length === 0) ||
-      (t.action === 'sell' && isBuy && trades.filter(x => x.action === 'buy').length === 0);
-    if (isWrongDir) return { icon: <XCircle className="w-4 h-4" />, label: '방향 반대!', color: 'text-red-400' };
-    if (isCorrDir) return { icon: <CheckCircle2 className="w-4 h-4" />, label: '잘했어요!', color: 'text-green-400' };
-    return { icon: <CheckCircle2 className="w-4 h-4" />, label: '괜찮아요', color: 'text-blue-400' };
-  }
+function TradeHistoryList({ trades, turnEvals }: { trades: TradeLog[]; turnEvals?: TurnEval[] }) {
   if (trades.length === 0) {
     return (
       <div className="bg-[#111] rounded-2xl p-4 border border-white/5 text-center">
@@ -195,33 +192,53 @@ function TradeHistoryList({ trades, scenario }: { trades: TradeLog[]; scenario: 
       </div>
     );
   }
+  // 실거래만 필터
+  const activeTrades = trades.filter(t => t.action === 'buy' || t.action === 'sell');
+  if (activeTrades.length === 0) {
+    return (
+      <div className="bg-[#111] rounded-2xl p-4 border border-white/5 text-center">
+        <p className="text-gray-500 text-sm">이번 라운드에 매매가 없었어요</p>
+      </div>
+    );
+  }
   return (
     <div className="bg-[#111] rounded-2xl border border-white/5 overflow-hidden">
       <div className="px-4 py-2.5 border-b border-white/5">
-        <p className="text-xs font-bold text-gray-500">내 투자 기록</p>
+        <p className="text-xs font-bold text-gray-500">거래 기록 (수익/손실)</p>
       </div>
       <div className="divide-y divide-white/5">
-        {trades.map((t, i) => {
-          const ev = evalTrade(t);
+        {activeTrades.map((t, i) => {
+          const ev = turnEvals?.find(e => e.turn === t.turn);
+          const profit = ev?.turnPnl;
+          const isProfit = profit !== undefined && profit > 0;
+          const isLoss = profit !== undefined && profit < 0;
           return (
             <div key={i} className="flex items-center gap-3 px-4 py-3">
-              <div className={cn('w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shrink-0',
-                t.action === 'buy' ? 'bg-green-500/20 text-green-400' :
-                t.action === 'sell' ? 'bg-red-500/20 text-red-400' : 'bg-gray-500/10 text-gray-500',
+              <div className={cn('w-10 h-7 rounded-lg flex items-center justify-center text-[11px] font-black shrink-0',
+                t.action === 'buy' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400',
               )}>
-                {t.action === 'buy' ? '매수' : t.action === 'sell' ? '매도' : '관망'}
+                {t.action === 'buy' ? '매수' : '매도'}
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <p className="text-sm font-bold text-white">
-                  턴 {t.turn + 1}
-                  {(t.action === 'buy' || t.action === 'sell') && (
-                    <span className="text-xs text-gray-400 font-normal ml-2">{t.price.toLocaleString('ko-KR')}원</span>
-                  )}
+                  T{t.turn + 1}
+                  <span className="text-xs text-gray-400 font-normal ml-2">
+                    {t.shares}주 × {t.price.toLocaleString('ko-KR')}원
+                  </span>
                 </p>
+                <p className="text-[11px] text-gray-600">{t.amount.toLocaleString('ko-KR')}원</p>
               </div>
-              <div className={cn('flex items-center gap-1 text-xs font-bold shrink-0', ev.color)}>
-                {ev.icon}<span>{ev.label}</span>
-              </div>
+              {/* 수익/손실 표시 */}
+              {profit !== undefined ? (
+                <div className={cn('flex items-center gap-1 text-sm font-black shrink-0',
+                  isProfit ? 'text-green-400' : isLoss ? 'text-red-400' : 'text-gray-500',
+                )}>
+                  {isProfit ? <CheckCircle2 className="w-4 h-4" /> : isLoss ? <XCircle className="w-4 h-4" /> : <MinusCircle className="w-4 h-4" />}
+                  <span>{profit >= 0 ? '+' : ''}{profit.toLocaleString('ko-KR')}원</span>
+                </div>
+              ) : (
+                <MinusCircle className="w-4 h-4 text-gray-600 shrink-0" />
+              )}
             </div>
           );
         })}
@@ -263,10 +280,95 @@ function StarRating({ stars }: { stars: number }) {
 }
 
 // ═══════════════════════════════════════════════════════════
+// Turn Score List (8턴 개별 평가)
+// ═══════════════════════════════════════════════════════════
+function TurnScoreList({ turnEvals }: { turnEvals: TurnEval[] }) {
+  const total = turnEvals.reduce((s, e) => s + e.score, 0);
+  const correctCount = turnEvals.filter(e => e.correct).length;
+
+  return (
+    <div className="bg-gradient-to-b from-[#0d0d1a] to-[#111] rounded-2xl border border-indigo-500/20 overflow-hidden">
+      {/* 헤더 */}
+      <div className="px-4 py-3 border-b border-indigo-500/15 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Brain className="w-5 h-5 text-indigo-400" />
+          <span className="text-sm font-black text-indigo-300">AI 턴별 채점 리포트</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500">{correctCount}/{turnEvals.length} 정답</span>
+          <span className="text-sm font-black text-yellow-400 tabular-nums">{total.toFixed(1)}<span className="text-gray-600 text-xs">/20</span></span>
+        </div>
+      </div>
+
+      {/* 8턴 리스트 */}
+      <div className="divide-y divide-white/5">
+        {turnEvals.map((ev) => {
+          const pct = (ev.score / 2.5) * 100;
+          const barColor = ev.score >= 2.0 ? 'bg-green-500' : ev.score >= 1.0 ? 'bg-yellow-500' : 'bg-red-500';
+          const actionLabel = ev.action === 'buy' ? '매수' : ev.action === 'sell' ? '매도' : ev.action === 'timeout' ? '시간초과' : '관망';
+          const actionColor = ev.action === 'buy' ? 'bg-green-500/20 text-green-400 border-green-500/30'
+            : ev.action === 'sell' ? 'bg-red-500/20 text-red-400 border-red-500/30'
+            : ev.action === 'timeout' ? 'bg-orange-500/20 text-orange-400 border-orange-500/30'
+            : 'bg-white/5 text-gray-500 border-white/10';
+          return (
+            <div key={ev.turn} className="px-4 py-3">
+              <div className="flex items-center gap-3 mb-1.5">
+                {/* 턴 번호 */}
+                <span className="text-xs font-black text-gray-600 w-8 shrink-0">T{ev.turn + 1}</span>
+                {/* 행동 배지 */}
+                <span className={cn('text-[11px] font-black px-2 py-0.5 rounded-md border shrink-0', actionColor)}>
+                  {actionLabel}
+                </span>
+                {/* 가격 + 손익 */}
+                <div className="flex-1 min-w-0">
+                  <span className="text-[11px] text-gray-500">{ev.price.toLocaleString('ko-KR')}원</span>
+                  {(ev.action === 'buy' || ev.action === 'sell') && (
+                    <span className={cn('text-[11px] font-bold ml-2', ev.turnPnl > 0 ? 'text-green-400' : ev.turnPnl < 0 ? 'text-red-400' : 'text-gray-500')}>
+                      {ev.turnPnl > 0 ? '+' : ''}{ev.turnPnl.toLocaleString('ko-KR')}원
+                    </span>
+                  )}
+                </div>
+                {/* 점수 */}
+                <span className={cn('text-sm font-black tabular-nums shrink-0',
+                  ev.score >= 2.0 ? 'text-green-400' : ev.score >= 1.0 ? 'text-yellow-400' : 'text-red-400',
+                )}>{ev.score.toFixed(1)}<span className="text-gray-600 text-[10px]">/2.5</span></span>
+              </div>
+              {/* 점수 바 */}
+              <div className="flex items-center gap-2">
+                <div className="w-8 shrink-0" />
+                <div className="flex-1 h-1.5 bg-[#1a1a1a] rounded-full overflow-hidden">
+                  <div className={cn('h-full rounded-full transition-all duration-700', barColor)} style={{ width: `${pct}%` }} />
+                </div>
+                <p className="text-[10px] text-gray-500 leading-tight flex-1">{ev.verdict}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 요약 */}
+      <div className="px-4 py-3 border-t border-indigo-500/15 bg-[#0a0a15]">
+        <div className="flex items-center justify-between">
+          <span className="text-xs text-gray-500">턴당 평균</span>
+          <span className="text-sm font-black text-indigo-300">{(total / turnEvals.length).toFixed(2)}<span className="text-gray-600 text-xs">/2.5</span></span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════
 // Types
 // ═══════════════════════════════════════════════════════════
 type GamePhase = 'intro' | 'countdown' | 'revealing' | 'deciding' | 'feedback' | 'closing' | 'round-result' | 'final-result';
-interface RoundData { score: RoundScore; trades: TradeLog[]; netPosition: number; scenario: PatternScenario; }
+interface RoundData {
+  score: RoundScore;
+  trades: TradeLog[];
+  finalCash: number;
+  finalShares: number;
+  startingShares: number;
+  scenario: PatternScenario;
+}
 
 // ═══════════════════════════════════════════════════════════
 // Main
@@ -283,21 +385,30 @@ export default function PatternPracticePage() {
   const [totalScore, setTotalScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [showExitDialog, setShowExitDialog] = useState(false);
+  const [chartOpen, setChartOpen] = useState(true);
 
   const [scenario, setScenario] = useState<PatternScenario | null>(null);
   const [visibleCount, setVisibleCount] = useState(0);
   const [trades, setTrades] = useState<TradeLog[]>([]);
-  const [netPosition, setNetPosition] = useState(0);
-  // displayShares = INITIAL_SHARES + netPosition
+  // 포트폴리오 상태 (현금 + 주식 비율 방식)
+  const [cashRemaining, setCashRemaining] = useState(INITIAL_CASH);
+  const [sharesHeld, setSharesHeld] = useState(0);
+  const [avgCostBasis, setAvgCostBasis] = useState(0);
+  const [startingShares, setStartingShares] = useState(0); // 라운드 시작 시 보유 주수
   const [timer, setTimer] = useState(12);
   const [countdownVal, setCountdownVal] = useState(3);
   const [feedback, setFeedback] = useState<TurnFeedback | null>(null);
   const [turnHistory, setTurnHistory] = useState<TurnHistoryEntry[]>([]);
+  // 2단계 선택: null=첫화면, 'buy'=매수%, 'sell'=매도%
+  const [pendingAction, setPendingAction] = useState<'buy' | 'sell' | null>(null);
+
+  const [timerExpired, setTimerExpired] = useState(false);
 
   const revealRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   // Tracks which turn triggered the current feedback (prevents double-fire)
   const feedbackTurnRef = useRef(-1);
+  const decidedThisTurnRef = useRef(false);
 
   const confirmExit = useCallback(() => {
     if (revealRef.current) clearTimeout(revealRef.current);
@@ -314,12 +425,11 @@ export default function PatternPracticePage() {
   const totalCandles = scenario?.candles.length ?? 0;
   const currentPrice = scenario && visibleCount > 0 ? scenario.candles[visibleCount - 1].close : 0;
   const targetVisible = INITIAL_REVEAL + (currentTurn + 1) * CANDLES_PER_TURN;
-  const displayShares = INITIAL_SHARES + netPosition;
 
-  const pnl = useMemo(
-    () => trades.length === 0 ? 0 : calcPnl(trades, netPosition, currentPrice),
-    [trades, netPosition, currentPrice],
-  );
+  // 총 포트폴리오 가치 및 손익
+  const totalValue = cashRemaining + sharesHeld * currentPrice;
+  const pnl = totalValue - INITIAL_CASH;
+
   const buyIndices = useMemo(() => trades.filter(t => t.action === 'buy').map(t =>
     Math.min(INITIAL_REVEAL + (t.turn + 1) * CANDLES_PER_TURN - 1, totalCandles - 1)
   ), [trades, totalCandles]);
@@ -344,22 +454,29 @@ export default function PatternPracticePage() {
   // ── Decision timer ──────────────────────────────────────
   useEffect(() => {
     if (gamePhase !== 'deciding') return;
-    if (timer <= 0) { handleDecision('skip', true); return; }
+    if (timer <= 0) {
+      if (currentTurn >= TURNS_PER_ROUND - 1) {
+        setTimerExpired(true);
+        return;
+      }
+      handleDecision('skip', 0, true);
+      return;
+    }
     timerRef.current = setInterval(() => setTimer(v => v - 1), 1000);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gamePhase, timer]);
 
   // ── Feedback auto-dismiss ───────────────────────────────
-  // Only depends on gamePhase to avoid re-firing on currentTurn change.
-  // We capture the turn in feedbackTurnRef (set in handleDecision).
   useEffect(() => {
     if (gamePhase !== 'feedback') return;
     const capturedTurn = feedbackTurnRef.current;
     const t = setTimeout(() => {
+      setPendingAction(null); // 다음 턴 시작 시 선택 초기화
       if (capturedTurn >= TURNS_PER_ROUND - 1) {
         setGamePhase('closing');
       } else {
+        decidedThisTurnRef.current = false;
         setCurrentTurn(capturedTurn + 1);
         setGamePhase('revealing');
       }
@@ -381,15 +498,28 @@ export default function PatternPracticePage() {
   const startRound = useCallback((round: number) => {
     const s = getScenarioForRound(pattern?.id ?? '', round);
     if (!s) return;
+
+    // 초기 포트폴리오: 50% 현금 + 50% 주식 (총 100만원)
+    const initialPrice = s.candles[INITIAL_REVEAL - 1]?.close ?? s.candles[0].close;
+    const initShares = Math.floor(INITIAL_CASH * 0.5 / initialPrice);
+    const initCash = INITIAL_CASH - initShares * initialPrice;
+
     setScenario(s);
     setVisibleCount(INITIAL_REVEAL);
     setTrades([]);
-    setNetPosition(0);
+    setCashRemaining(initCash);
+    setSharesHeld(initShares);
+    setAvgCostBasis(initialPrice);
+    setStartingShares(initShares);
     setCurrentTurn(0);
     setFeedback(null);
     setTurnHistory([]);
     setTimer(DECISION_TIMERS[round] ?? 10);
+    setTimerExpired(false);
+    setChartOpen(true);
+    setPendingAction(null);
     feedbackTurnRef.current = -1;
+    decidedThisTurnRef.current = false;
     setGamePhase('countdown');
     setCountdownVal(3);
     let c = 3;
@@ -401,53 +531,85 @@ export default function PatternPracticePage() {
   }, [pattern]);
 
   // ── Handle decision ─────────────────────────────────────
-  const handleDecision = useCallback((action: 'buy' | 'sell' | 'skip', isTimeout = false) => {
+  const handleDecision = useCallback((action: 'buy' | 'sell' | 'skip', pct = 0, isTimeout = false) => {
+    if (decidedThisTurnRef.current) return;
+    decidedThisTurnRef.current = true;
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
+    setTimerExpired(false);
     if (!scenario) return;
     const price = currentPrice;
 
-    let newNetPos = netPosition;
-    if (action === 'buy') {
-      setTrades(prev => [...prev, { action: 'buy', price, turn: currentTurn }]);
-      newNetPos = netPosition + 1;
-      setNetPosition(newNetPos);
-    } else if (action === 'sell') {
-      setTrades(prev => [...prev, { action: 'sell', price, turn: currentTurn }]);
-      newNetPos = netPosition - 1;
-      setNetPosition(newNetPos);
+    let tradeShares = 0;
+    let tradeAmount = 0;
+    let newSharesHeld = sharesHeld;
+    let newCash = cashRemaining;
+    let newAvgCost = avgCostBasis;
+    let realizedProfit: number | undefined;
+
+    if (action === 'buy' && pct > 0) {
+      tradeShares = Math.floor(cashRemaining * pct / price);
+      if (tradeShares <= 0) { decidedThisTurnRef.current = false; return; }
+      tradeAmount = tradeShares * price;
+      newCash = cashRemaining - tradeAmount;
+      // 평균 매수가 업데이트
+      newAvgCost = sharesHeld > 0
+        ? (avgCostBasis * sharesHeld + price * tradeShares) / (sharesHeld + tradeShares)
+        : price;
+      newSharesHeld = sharesHeld + tradeShares;
+      setTrades(prev => [...prev, { action: 'buy', price, turn: currentTurn, shares: tradeShares, amount: tradeAmount, pct }]);
+      setCashRemaining(newCash);
+      setSharesHeld(newSharesHeld);
+      setAvgCostBasis(newAvgCost);
+
+    } else if (action === 'sell' && pct > 0) {
+      tradeShares = Math.max(1, Math.floor(sharesHeld * pct));
+      if (tradeShares <= 0 || sharesHeld <= 0) { decidedThisTurnRef.current = false; return; }
+      tradeAmount = tradeShares * price;
+      realizedProfit = (price - avgCostBasis) * tradeShares;
+      newCash = cashRemaining + tradeAmount;
+      newSharesHeld = sharesHeld - tradeShares;
+      newAvgCost = newSharesHeld <= 0 ? 0 : avgCostBasis; // 매도해도 평균 단가 유지
+      setTrades(prev => [...prev, { action: 'sell', price, turn: currentTurn, shares: tradeShares, amount: tradeAmount, pct }]);
+      setCashRemaining(newCash);
+      setSharesHeld(newSharesHeld);
+      setAvgCostBasis(newAvgCost);
     }
 
-    // Add to in-game history
+    // in-game 기록 추가
     setTurnHistory(prev => [...prev, {
       turn: currentTurn,
       action: isTimeout ? 'timeout' : action,
       price,
-      sharesAfter: INITIAL_SHARES + newNetPos,
+      shares: tradeShares,
+      amount: tradeAmount,
+      sharesHeld: newSharesHeld,
+      profit: action === 'sell' ? realizedProfit : undefined,
     }]);
 
     const fb = getTurnFeedback({
       action,
       candleIndex: visibleCount - 1,
       scenario,
-      netPosition: newNetPos,
+      sharesHeld: newSharesHeld,
       isTimeout,
     });
+    setPendingAction(null);
     setFeedback(fb);
-    feedbackTurnRef.current = currentTurn; // capture BEFORE state update
+    feedbackTurnRef.current = currentTurn;
     setGamePhase('feedback');
-  }, [currentPrice, currentTurn, scenario, visibleCount, netPosition]);
+  }, [currentPrice, currentTurn, scenario, visibleCount, sharesHeld, cashRemaining, avgCostBasis]);
 
   // ── End round ───────────────────────────────────────────
   const endRound = useCallback(() => {
     if (!scenario) return;
     const finalPrice = scenario.candles[totalCandles - 1].close;
-    const score = calculateRoundScore(trades, netPosition, finalPrice, scenario);
-    setRoundResults(prev => [...prev, { score, trades, netPosition, scenario }]);
+    const score = calculateRoundScore(trades, cashRemaining, sharesHeld, finalPrice, scenario, startingShares);
+    setRoundResults(prev => [...prev, { score, trades, finalCash: cashRemaining, finalShares: sharesHeld, startingShares, scenario }]);
     setTotalScore(prev => prev + score.total);
     setStreak(prev => score.total >= 8 ? prev + 1 : 0);
     setVisibleCount(totalCandles);
     setGamePhase('round-result');
-  }, [scenario, totalCandles, trades, netPosition]);
+  }, [scenario, totalCandles, trades, cashRemaining, sharesHeld, startingShares]);
 
   const handleNextRound = () => {
     const n = currentRound + 1;
@@ -478,11 +640,11 @@ export default function PatternPracticePage() {
           </section>
           <section className="mt-8 space-y-3">
             {[
-              { emoji: '📦', text: `${INITIAL_SHARES}주를 가지고 시작해요!`, color: 'from-indigo-500/20 to-indigo-600/20 border-indigo-500/30' },
+              { emoji: '💰', text: `${(INITIAL_CASH / 10000).toFixed(0)}만원으로 시작 (현금 50% + 주식 50%)`, color: 'from-indigo-500/20 to-indigo-600/20 border-indigo-500/30' },
               { emoji: '📈', text: '선 그래프가 자동으로 그려져요', color: 'from-blue-500/20 to-blue-600/20 border-blue-500/30' },
-              { emoji: '🎯', text: `${TURNS_PER_ROUND}턴 동안 사거나 팔거나 기다려요`, color: 'from-green-500/20 to-green-600/20 border-green-500/30' },
-              { emoji: '⏱️', text: '제한시간 안에 버튼을 누르세요!', color: 'from-yellow-500/20 to-yellow-600/20 border-yellow-500/30' },
-              { emoji: '🏆', text: '끝나면 얼마나 벌었는지 점수 매겨요!', color: 'from-red-500/20 to-red-600/20 border-red-500/30' },
+              { emoji: '🎯', text: `${TURNS_PER_ROUND}턴 동안 % 단위로 사거나 팔거나 기다려요`, color: 'from-green-500/20 to-green-600/20 border-green-500/30' },
+              { emoji: '⏱️', text: '조금(25%) / 반반(50%) / 많이(75%) / 전부(100%)', color: 'from-yellow-500/20 to-yellow-600/20 border-yellow-500/30' },
+              { emoji: '🏆', text: '끝나면 수익 + 올바른 판단에 따라 점수 매겨요!', color: 'from-red-500/20 to-red-600/20 border-red-500/30' },
             ].map((r, i) => (
               <div key={i} className={cn('flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r border', r.color)}>
                 <span className="text-3xl">{r.emoji}</span>
@@ -511,7 +673,7 @@ export default function PatternPracticePage() {
           <div className="text-[140px] font-black text-white leading-none">{countdownVal}</div>
           <div className="absolute inset-0 bg-indigo-500/30 blur-[60px] rounded-full -z-10" />
         </div>
-        <p className="text-base text-indigo-400 mt-6 font-bold">⏱️ 턴당 {DECISION_TIMERS[currentRound]}초 · 📦 {INITIAL_SHARES}주로 시작!</p>
+        <p className="text-base text-indigo-400 mt-6 font-bold">⏱️ 턴당 {DECISION_TIMERS[currentRound]}초 · 💰 {(INITIAL_CASH / 10000).toFixed(0)}만원 시작!</p>
       </div>
     );
   }
@@ -521,7 +683,8 @@ export default function PatternPracticePage() {
     const rd = roundResults[roundResults.length - 1];
     if (!rd || !scenario) return null;
     const s = rd.score;
-    const finalShares = INITIAL_SHARES + rd.netPosition;
+    const rdFinalPrice = rd.scenario.candles[rd.scenario.candles.length - 1].close;
+    const rdFinalValue = rd.finalCash + rd.finalShares * rdFinalPrice;
     return (
       <div className="min-h-screen bg-black pb-36">
         {showExitDialog && <ExitDialog onConfirm={confirmExit} onCancel={() => setShowExitDialog(false)} />}
@@ -541,47 +704,61 @@ export default function PatternPracticePage() {
             {streak >= 2 && <div className="mt-2 text-xl font-black text-orange-400 animate-pulse">🔥 {streak}연승!</div>}
           </div>
 
-          {/* Chart */}
-          <section className="mt-5 bg-[#0a0a0a] rounded-2xl border border-white/5 overflow-hidden">
-            <div className="h-40 p-1"><LineChart candles={scenario.candles} visibleCount={totalCandles} buyTurns={buyIndices} sellTurns={sellIndices} /></div>
-          </section>
-
-          {/* P&L + Shares (emphasized) */}
-          <section className="mt-4">
-            {/* P&L - big and prominent */}
-            <div className={cn('rounded-2xl p-5 border mb-3 text-center', s.userPnl >= 0 ? 'bg-green-500/15 border-green-500/30' : 'bg-red-500/15 border-red-500/30')}>
-              <p className="text-sm font-bold text-gray-400 mb-1">💰 내 손익</p>
+          {/* 최종 포트폴리오 */}
+          <section className="mt-4 space-y-3">
+            {/* 총 손익 */}
+            <div className={cn('rounded-2xl p-5 border text-center', s.userPnl >= 0 ? 'bg-green-500/15 border-green-500/30' : 'bg-red-500/15 border-red-500/30')}>
+              <p className="text-sm font-bold text-gray-400 mb-1">💰 최종 손익</p>
               <p className={cn('text-4xl font-black', s.userPnl >= 0 ? 'text-green-400' : 'text-red-400')}>{fmtPnl(s.userPnl)}</p>
-              <p className="text-xs text-gray-500 mt-1">최적 손익: {fmtPnl(s.optimalPnl)}</p>
+              <p className="text-xs text-gray-500 mt-1">최종 자산 {rdFinalValue.toLocaleString('ko-KR')}원 · 최적 수익: {fmtPnl(s.optimalPnl)}</p>
             </div>
-            {/* Shares card */}
-            <div className="bg-[#111] rounded-2xl px-4 py-3 border border-white/10 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Package className="w-5 h-5 text-indigo-400" />
-                <span className="text-sm font-bold text-gray-300">최종 보유 주식</span>
+            {/* 현금 + 주식 내역 */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-[#111] rounded-2xl px-4 py-3 border border-white/10 text-center">
+                <p className="text-[10px] text-gray-500 font-bold mb-1">💵 현금</p>
+                <p className="text-lg font-black text-white">{rd.finalCash.toLocaleString('ko-KR')}원</p>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-500">{INITIAL_SHARES}주 시작</span>
-                <span className="text-gray-600">→</span>
-                <span className="text-xl font-black text-white">{finalShares}주</span>
-                {rd.netPosition !== 0 && (
-                  <span className={cn('text-sm font-bold', rd.netPosition > 0 ? 'text-green-400' : 'text-red-400')}>
-                    ({rd.netPosition > 0 ? '+' : ''}{rd.netPosition})
-                  </span>
-                )}
+              <div className="bg-[#111] rounded-2xl px-4 py-3 border border-white/10 text-center">
+                <div className="flex items-center justify-center gap-1 mb-1">
+                  <Package className="w-3 h-3 text-indigo-400" />
+                  <p className="text-[10px] text-gray-500 font-bold">보유 주식</p>
+                </div>
+                <p className="text-lg font-black text-white">{rd.finalShares}주</p>
+                <p className="text-[10px] text-gray-600">{(rd.finalShares * rdFinalPrice).toLocaleString('ko-KR')}원</p>
               </div>
             </div>
           </section>
 
-          {/* Trade history */}
-          <section className="mt-3">
-            <TradeHistoryList trades={rd.trades} scenario={rd.scenario} />
+          {/* ── 차트 + 거래 기록 (펼치기/닫기) ── */}
+          <section className="mt-3 bg-[#0f0f0f] rounded-2xl border border-white/5 overflow-hidden">
+            <button
+              onClick={() => setChartOpen(v => !v)}
+              className="w-full flex items-center justify-between px-4 py-3 hover:bg-white/5 transition-colors"
+            >
+              <span className="text-sm font-black text-gray-300">📊 차트 &amp; 거래 기록</span>
+              <ChevronDown className={cn('w-5 h-5 text-gray-500 transition-transform duration-300', chartOpen ? 'rotate-180' : '')} />
+            </button>
+            {chartOpen && (
+              <>
+                <div className="h-56 px-2 pb-2">
+                  <LineChart candles={scenario.candles} visibleCount={totalCandles} buyTurns={buyIndices} sellTurns={sellIndices} />
+                </div>
+                <div className="border-t border-white/5">
+                  <TradeHistoryList trades={rd.trades} turnEvals={rd.score.turnEvals} />
+                </div>
+              </>
+            )}
           </section>
 
           {/* Cumulative score */}
           <section className="mt-3 bg-[#111] rounded-2xl p-4 border border-white/5 flex items-center justify-between">
             <span className="text-base text-gray-400 font-bold">누적 점수</span>
             <span className="text-2xl font-black text-yellow-400">{totalScore} <span className="text-sm text-gray-600">/ {TOTAL_ROUNDS * 20}</span></span>
+          </section>
+
+          {/* AI 턴별 채점 — 하단 */}
+          <section className="mt-3 mb-2">
+            <TurnScoreList turnEvals={s.turnEvals} />
           </section>
         </main>
         <div className="fixed bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black via-black to-transparent">
@@ -601,6 +778,9 @@ export default function PatternPracticePage() {
   // ═══════════════ FINAL RESULT ═══════════════════
   if (gamePhase === 'final-result') {
     const result = getFinalResult(totalScore);
+    const avgTurnScore = roundResults.length > 0
+      ? roundResults.reduce((s, r) => s + r.score.total, 0) / roundResults.length
+      : 0;
     return (
       <div className="min-h-screen bg-black pb-36">
         <main className="pt-8 px-5 max-w-md mx-auto">
@@ -610,42 +790,63 @@ export default function PatternPracticePage() {
             <p className="text-lg text-gray-400 mt-2">{result.sub}</p>
           </section>
           <section className="mt-6"><StarRating stars={result.stars} /></section>
+
+          {/* 총점 */}
           <section className="mt-6 bg-[#111] rounded-3xl p-6 border border-white/5 text-center">
             <p className="text-sm text-gray-500">최종 점수</p>
             <p className="text-6xl font-black text-white mt-1">{totalScore}<span className="text-xl text-gray-600">/{TOTAL_ROUNDS * 20}</span></p>
+            <p className="text-sm text-gray-500 mt-2">라운드 평균 {avgTurnScore.toFixed(1)}/20점</p>
           </section>
-          <section className="mt-5 space-y-3">
-            <h3 className="text-sm font-bold text-gray-400">라운드별 투자 기록</h3>
-            {roundResults.map((rd, i) => (
+
+          {/* 라운드별 요약 + 턴별 채점 */}
+          <section className="mt-5 space-y-5">
+            <h3 className="text-sm font-bold text-gray-400">라운드별 AI 채점 리포트</h3>
+            {roundResults.map((rd, i) => {
+              const rdBuyIdx = rd.trades.filter(t => t.action === 'buy').map(t =>
+                Math.min(INITIAL_REVEAL + (t.turn + 1) * CANDLES_PER_TURN - 1, rd.scenario.candles.length - 1));
+              const rdSellIdx = rd.trades.filter(t => t.action === 'sell').map(t =>
+                Math.min(INITIAL_REVEAL + (t.turn + 1) * CANDLES_PER_TURN - 1, rd.scenario.candles.length - 1));
+              return (
               <div key={i} className="bg-[#111] rounded-2xl border border-white/5 overflow-hidden">
+                {/* 라운드 헤더 */}
                 <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
                   <div className="w-8 h-8 rounded-full bg-[#1a1a1a] flex items-center justify-center text-base font-black text-gray-400">{i + 1}</div>
                   <span className="text-2xl">{rd.score.emoji}</span>
                   <span className={cn('text-sm font-black px-2 py-0.5 rounded-lg',
                     rd.score.grade === 'S' ? 'bg-yellow-500/20 text-yellow-300' : rd.score.grade === 'A' ? 'bg-green-500/20 text-green-300' :
-                    rd.score.grade === 'B' ? 'bg-blue-500/20 text-blue-300' : 'bg-gray-500/20 text-gray-400',
+                    rd.score.grade === 'B' ? 'bg-blue-500/20 text-blue-300' : rd.score.grade === 'C' ? 'bg-orange-500/20 text-orange-300' : 'bg-gray-500/20 text-gray-400',
                   )}>{rd.score.grade}</span>
                   <span className="text-lg font-black text-yellow-400 flex-1">{rd.score.total}점</span>
-                  <div className="text-right">
-                    <p className={cn('text-sm font-black', rd.score.userPnl >= 0 ? 'text-green-400' : 'text-red-400')}>{fmtPnl(rd.score.userPnl)}</p>
-                    <p className="text-xs text-gray-500">{INITIAL_SHARES}주→{INITIAL_SHARES + rd.netPosition}주</p>
-                  </div>
+                  <p className={cn('text-sm font-black', rd.score.userPnl >= 0 ? 'text-green-400' : 'text-red-400')}>{fmtPnl(rd.score.userPnl)}</p>
                 </div>
-                {rd.trades.filter(t => t.action === 'buy' || t.action === 'sell').length > 0 && (
-                  <div className="px-4 py-2 flex flex-wrap gap-2">
-                    {rd.trades.map((t, j) => (
-                      t.action === 'buy' || t.action === 'sell' ? (
-                        <span key={j} className={cn('text-xs font-bold px-2 py-1 rounded-lg',
-                          t.action === 'buy' ? 'bg-green-500/15 text-green-400' : 'bg-red-500/15 text-red-400',
-                        )}>
-                          {t.action === 'buy' ? '📈' : '📉'} T{t.turn + 1}
-                        </span>
-                      ) : null
-                    ))}
-                  </div>
-                )}
+                {/* 차트 */}
+                <div className="h-40 p-1">
+                  <LineChart candles={rd.scenario.candles} visibleCount={rd.scenario.candles.length} buyTurns={rdBuyIdx} sellTurns={rdSellIdx} />
+                </div>
+                {/* 턴별 점수 미니 표 */}
+                <div className="border-t border-white/5 divide-y divide-white/5">
+                  {rd.score.turnEvals.map((ev) => {
+                    const actionLabel = ev.action === 'buy' ? '매수' : ev.action === 'sell' ? '매도' : ev.action === 'timeout' ? '초과' : '관망';
+                    const actionColor = ev.action === 'buy' ? 'text-green-400' : ev.action === 'sell' ? 'text-red-400' : 'text-gray-500';
+                    return (
+                      <div key={ev.turn} className="flex items-center gap-2 px-3 py-1.5">
+                        <span className="text-[10px] text-gray-600 w-5 shrink-0">T{ev.turn + 1}</span>
+                        <span className={cn('text-[11px] font-bold w-7 shrink-0', actionColor)}>{actionLabel}</span>
+                        <div className="flex-1 h-1 bg-[#1a1a1a] rounded-full overflow-hidden">
+                          <div className={cn('h-full rounded-full',
+                            ev.score >= 2.0 ? 'bg-green-500' : ev.score >= 1.0 ? 'bg-yellow-500' : 'bg-red-500',
+                          )} style={{ width: `${(ev.score / 2.5) * 100}%` }} />
+                        </div>
+                        <span className={cn('text-[11px] font-black w-8 text-right shrink-0',
+                          ev.score >= 2.0 ? 'text-green-400' : ev.score >= 1.0 ? 'text-yellow-400' : 'text-red-400',
+                        )}>{ev.score.toFixed(1)}</span>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            ))}
+              );
+            })}
           </section>
         </main>
         <div className="fixed bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black via-black to-transparent">
@@ -668,8 +869,6 @@ export default function PatternPracticePage() {
   const isFeedback = gamePhase === 'feedback';
   const isRevealing = gamePhase === 'revealing';
   const isClosing = gamePhase === 'closing';
-  const canBuy = netPosition < MAX_POSITION;
-  const canSell = netPosition > -MAX_POSITION;
   const pnlColor = pnl > 0 ? 'text-green-400' : pnl < 0 ? 'text-red-400' : 'text-gray-400';
 
   return (
@@ -725,46 +924,46 @@ export default function PatternPracticePage() {
 
         {/* Chart */}
         <section className="mt-3 bg-[#0a0a0a] rounded-2xl border border-white/5 overflow-hidden">
-          <div className="h-48 p-1"><LineChart candles={scenario.candles} visibleCount={visibleCount} buyTurns={buyIndices} sellTurns={sellIndices} /></div>
+          <div className="h-64 p-2"><LineChart candles={scenario.candles} visibleCount={visibleCount} buyTurns={buyIndices} sellTurns={sellIndices} /></div>
         </section>
 
-        {/* ── Portfolio Card (emphasized) ── */}
+        {/* ── Portfolio Card ── */}
         <section className="mt-3">
-          <div className={cn('rounded-2xl px-4 py-3 border grid grid-cols-3 gap-2',
+          <div className={cn('rounded-2xl border overflow-hidden',
             pnl > 0 ? 'bg-green-500/8 border-green-500/20' :
             pnl < 0 ? 'bg-red-500/8 border-red-500/20' : 'bg-[#111] border-white/5',
           )}>
-            {/* Stock count */}
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1 mb-0.5">
-                <Package className="w-3.5 h-3.5 text-indigo-400" />
-                <p className="text-[10px] text-gray-500 font-bold">보유 주식</p>
+            {/* 총 자산 + 손익 */}
+            <div className="px-4 pt-3 pb-2 flex items-center justify-between">
+              <div>
+                <p className="text-[10px] text-gray-500 font-bold">총 자산</p>
+                <p className="text-xl font-black text-white leading-tight">{totalValue.toLocaleString('ko-KR')}원</p>
               </div>
-              <p className="text-2xl font-black text-white leading-none">{displayShares}<span className="text-sm text-gray-500">주</span></p>
-              {netPosition !== 0 && (
-                <p className={cn('text-xs font-bold', netPosition > 0 ? 'text-green-400' : 'text-red-400')}>
-                  {netPosition > 0 ? `+${netPosition}` : netPosition}주
-                </p>
-              )}
+              <div className="text-right">
+                <p className="text-[10px] text-gray-500 font-bold">손익</p>
+                <p className={cn('text-xl font-black', pnlColor)}>{fmtPnl(pnl)}</p>
+              </div>
             </div>
-            {/* Current price */}
-            <div className="text-center border-x border-white/5">
-              <p className="text-[10px] text-gray-500 font-bold mb-0.5">현재가</p>
-              <p className="text-base font-black text-white">{(currentPrice / 1000).toFixed(1)}<span className="text-xs text-gray-500">K</span></p>
-            </div>
-            {/* P&L */}
-            <div className="text-center">
-              <p className="text-[10px] text-gray-500 font-bold mb-0.5">💰 손익</p>
-              {trades.length > 0 ? (
-                <>
-                  <p className={cn('text-lg font-black leading-none', pnlColor)}>
-                    {pnl >= 0 ? '+' : ''}{Math.round(pnl / 1000)}K
-                  </p>
-                  <p className={cn('text-[10px] font-bold', pnlColor)}>{fmtPnl(pnl)}</p>
-                </>
-              ) : (
-                <p className="text-lg font-black text-gray-700 leading-none">—</p>
-              )}
+            {/* 현금 + 주식 + 현재가 */}
+            <div className="grid grid-cols-3 divide-x divide-white/5 border-t border-white/5">
+              <div className="px-2 py-2 text-center">
+                <p className="text-[9px] text-gray-500 font-bold mb-0.5">💵 현금</p>
+                <p className="text-[11px] font-black text-white">{cashRemaining.toLocaleString('ko-KR')}원</p>
+              </div>
+              <div className="px-2 py-2 text-center">
+                <div className="flex items-center justify-center gap-0.5 mb-0.5">
+                  <Package className="w-2.5 h-2.5 text-indigo-400" />
+                  <p className="text-[9px] text-gray-500 font-bold">보유 주식</p>
+                </div>
+                <p className="text-lg font-black text-white">{sharesHeld}<span className="text-xs text-gray-400">주</span></p>
+                {sharesHeld > 0 && avgCostBasis > 0 && (
+                  <p className="text-[9px] text-gray-600">평균 {Math.round(avgCostBasis).toLocaleString('ko-KR')}원</p>
+                )}
+              </div>
+              <div className="px-2 py-2 text-center">
+                <p className="text-[9px] text-gray-500 font-bold mb-0.5">현재가</p>
+                <p className="text-[11px] font-black text-white">{currentPrice.toLocaleString('ko-KR')}원</p>
+              </div>
             </div>
           </div>
         </section>
@@ -785,7 +984,7 @@ export default function PatternPracticePage() {
       <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/95 to-transparent pt-4 pb-6 px-4">
         <div className="max-w-md mx-auto space-y-2.5">
           {/* Timer bar */}
-          {isDeciding && (
+          {isDeciding && !timerExpired && (
             <div className="flex items-center gap-3">
               <span className="text-xl">⏱️</span>
               <div className="flex-1 h-2.5 bg-[#1a1a1a] rounded-full overflow-hidden">
@@ -798,50 +997,145 @@ export default function PatternPracticePage() {
               <span className={cn('text-2xl font-black w-8 text-right tabular-nums', timer > 3 ? 'text-yellow-400' : 'text-red-500 animate-pulse')}>{timer}</span>
             </div>
           )}
+          {isDeciding && timerExpired && (
+            <div className="text-center py-1.5 bg-red-500/20 rounded-xl border border-red-500/30 animate-pulse">
+              <p className="text-sm font-black text-red-400">⏰ 시간 초과! 마지막 턴이에요 — 선택해주세요!</p>
+            </div>
+          )}
 
           {isRevealing && <p className="text-center text-base text-gray-500 animate-pulse py-1">📈 차트 그리는 중...</p>}
           {isClosing && <p className="text-center text-base text-purple-400 animate-pulse py-1">⚡ 결과 집계 중...</p>}
 
-          {/* Action buttons */}
-          {isDeciding && (
+          {/* ── STEP 1: 행동 선택 ── */}
+          {isDeciding && !pendingAction && (
             <div className="grid grid-cols-3 gap-2">
+              {/* 살래 */}
               <button
-                onClick={() => handleDecision('buy')}
-                disabled={!canBuy}
+                onClick={() => setPendingAction('buy')}
+                disabled={cashRemaining < currentPrice}
                 className={cn(
-                  'flex flex-col items-center justify-center gap-1 h-[72px] rounded-2xl border-2 transition-all active:scale-95 select-none',
-                  canBuy
-                    ? 'bg-green-500/15 border-green-500/50 hover:bg-green-500/25 active:bg-green-500/35'
+                  'flex flex-col items-center justify-center gap-1 h-[70px] rounded-2xl border-2 transition-all active:scale-95 select-none',
+                  cashRemaining >= currentPrice
+                    ? 'bg-green-500/15 border-green-500/50 hover:bg-green-500/25'
                     : 'bg-[#111] border-white/5 opacity-25 cursor-not-allowed',
                 )}
               >
-                <ShoppingCart className="w-7 h-7 text-green-400" />
-                <span className="text-base font-black text-green-400">매수</span>
-                <span className="text-[10px] text-green-600 font-bold leading-none">+1주 사기</span>
+                <ShoppingCart className="w-6 h-6 text-green-400" />
+                <span className="text-base font-black text-green-400">살래</span>
+                <span className="text-[10px] text-green-600 font-bold">매수하기</span>
               </button>
 
+              {/* 팔래 */}
               <button
-                onClick={() => handleDecision('skip')}
-                className="flex flex-col items-center justify-center gap-1 h-[72px] rounded-2xl border-2 bg-[#111] border-white/10 hover:bg-white/5 active:bg-white/10 transition-all active:scale-95 select-none"
-              >
-                <Eye className="w-7 h-7 text-gray-400" />
-                <span className="text-base font-black text-gray-300">관망</span>
-                <span className="text-[10px] text-gray-600 font-bold leading-none">기다리기</span>
-              </button>
-
-              <button
-                onClick={() => handleDecision('sell')}
-                disabled={!canSell}
+                onClick={() => setPendingAction('sell')}
+                disabled={sharesHeld <= 0}
                 className={cn(
-                  'flex flex-col items-center justify-center gap-1 h-[72px] rounded-2xl border-2 transition-all active:scale-95 select-none',
-                  canSell
-                    ? 'bg-red-500/15 border-red-500/50 hover:bg-red-500/25 active:bg-red-500/35'
+                  'flex flex-col items-center justify-center gap-1 h-[70px] rounded-2xl border-2 transition-all active:scale-95 select-none',
+                  sharesHeld > 0
+                    ? 'bg-red-500/15 border-red-500/50 hover:bg-red-500/25'
                     : 'bg-[#111] border-white/5 opacity-25 cursor-not-allowed',
                 )}
               >
-                <BadgeDollarSign className="w-7 h-7 text-red-400" />
-                <span className="text-base font-black text-red-400">매도</span>
-                <span className="text-[10px] text-red-600 font-bold leading-none">-1주 팔기</span>
+                <BadgeDollarSign className="w-6 h-6 text-red-400" />
+                <span className="text-base font-black text-red-400">팔래</span>
+                <span className="text-[10px] text-red-600 font-bold">매도하기</span>
+              </button>
+
+              {/* 기다릴게 */}
+              <button
+                onClick={() => handleDecision('skip', 0)}
+                className="flex flex-col items-center justify-center gap-1 h-[70px] rounded-2xl border-2 bg-[#111] border-white/10 hover:bg-white/5 active:bg-white/10 transition-all active:scale-95 select-none"
+              >
+                <Eye className="w-6 h-6 text-gray-400" />
+                <span className="text-base font-black text-gray-300">기다릴게</span>
+                <span className="text-[10px] text-gray-600 font-bold">관망</span>
+              </button>
+            </div>
+          )}
+
+          {/* ── STEP 2: 매수 비율 선택 ── */}
+          {isDeciding && pendingAction === 'buy' && (
+            <div className="space-y-2">
+              {/* 헤더 */}
+              <div className="px-1">
+                <p className="text-base font-black text-white">얼마나 살까?</p>
+                <p className="text-xs text-gray-500">
+                  현금: {cashRemaining.toLocaleString('ko-KR')}원 · 살 수 있는 주식: {Math.floor(cashRemaining / currentPrice)}주
+                </p>
+              </div>
+              {/* 4개 옵션 */}
+              <div className="grid grid-cols-4 gap-2">
+                {PCT_OPTIONS.map(({ pct, label }) => {
+                  const shares = Math.floor(cashRemaining * pct / currentPrice);
+                  const canBuyPct = shares > 0;
+                  return (
+                    <button key={pct}
+                      onClick={() => handleDecision('buy', pct)}
+                      disabled={!canBuyPct}
+                      className={cn(
+                        'flex flex-col items-center justify-center gap-1 h-[76px] rounded-2xl border-2 transition-all active:scale-95 select-none',
+                        canBuyPct
+                          ? 'bg-green-500/15 border-green-500/40 hover:bg-green-500/25'
+                          : 'bg-[#111] border-white/5 opacity-30 cursor-not-allowed',
+                      )}
+                    >
+                      <span className="text-sm font-black text-green-300">{label}</span>
+                      <span className="text-base font-black text-white">{canBuyPct ? `${shares}주` : '—'}</span>
+                      <span className="text-[10px] text-green-600">{(pct * 100).toFixed(0)}% 투자</span>
+                    </button>
+                  );
+                })}
+              </div>
+              {/* 뒤로가기 */}
+              <button onClick={() => setPendingAction(null)} className="w-full flex items-center justify-center gap-1 h-9 rounded-xl text-gray-500 text-xs font-bold hover:text-gray-300 transition-colors">
+                ← 다시 선택
+              </button>
+            </div>
+          )}
+
+          {/* ── STEP 2: 매도 비율 선택 ── */}
+          {isDeciding && pendingAction === 'sell' && (
+            <div className="space-y-2">
+              {/* 헤더 */}
+              <div className="px-1">
+                <p className="text-base font-black text-white">얼마나 팔까?</p>
+                <p className="text-xs text-gray-500">
+                  갖고 있는 주식: {sharesHeld}주
+                  {avgCostBasis > 0 && ` · 평균 ${Math.round(avgCostBasis).toLocaleString('ko-KR')}원`}
+                </p>
+              </div>
+              {/* 4개 옵션 */}
+              <div className="grid grid-cols-4 gap-2">
+                {PCT_OPTIONS.map(({ pct, label }) => {
+                  const sharesToSell = Math.max(1, Math.floor(sharesHeld * pct));
+                  const profit = avgCostBasis > 0 ? (currentPrice - avgCostBasis) * sharesToSell : 0;
+                  return (
+                    <button key={pct}
+                      onClick={() => handleDecision('sell', pct)}
+                      disabled={sharesHeld <= 0}
+                      className={cn(
+                        'flex flex-col items-center justify-center gap-1 h-[76px] rounded-2xl border-2 transition-all active:scale-95 select-none',
+                        sharesHeld > 0
+                          ? 'bg-red-500/15 border-red-500/40 hover:bg-red-500/25'
+                          : 'bg-[#111] border-white/5 opacity-30 cursor-not-allowed',
+                      )}
+                    >
+                      <span className="text-sm font-black text-red-300">{label}</span>
+                      <span className="text-base font-black text-white">{sharesToSell}주</span>
+                      {avgCostBasis > 0 ? (
+                        <span className={cn('text-[10px] font-bold', profit >= 0 ? 'text-green-500' : 'text-red-500')}>
+                          {profit >= 0 ? '+' : ''}{Math.round(profit).toLocaleString('ko-KR')}원
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-red-700">{(pct * 100).toFixed(0)}% 매도</span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+              {/* 뒤로가기 */}
+              <button onClick={() => setPendingAction(null)} className="w-full flex items-center justify-center gap-1 h-9 rounded-xl text-gray-500 text-xs font-bold hover:text-gray-300 transition-colors">
+                ← 다시 선택
               </button>
             </div>
           )}

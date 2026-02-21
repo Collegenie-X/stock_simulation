@@ -18,6 +18,17 @@ export interface PatternScenario {
 
 export type Grade = 'S' | 'A' | 'B' | 'C' | 'D' | 'F';
 
+// ─── Per-turn evaluation ──────────────────────────────────
+export interface TurnEval {
+  turn: number;
+  action: 'buy' | 'sell' | 'skip' | 'timeout';
+  price: number;
+  turnPnl: number;    // 이 턴 단독 행동의 예상 손익 (최종가 기준)
+  score: number;      // 0.0 ~ 2.5
+  verdict: string;
+  correct: boolean;
+}
+
 export interface RoundScore {
   total: number;
   grade: Grade;
@@ -25,30 +36,34 @@ export interface RoundScore {
   message: string;
   userPnl: number;
   optimalPnl: number;
+  turnEvals: TurnEval[];
 }
 
 export interface TradeLog {
   action: 'buy' | 'sell' | 'skip' | 'timeout';
   price: number;
   turn: number;
+  shares: number;   // 거래 주식 수 (skip/timeout = 0)
+  amount: number;   // 총 금액 price × shares (skip/timeout = 0)
+  pct: number;      // 투자 비율 0.25/0.5/0.75/1.0 (skip/timeout = 0)
 }
 
 // ─── Constants ───────────────────────────────────────────
-export const TOTAL_ROUNDS = 5;
-export const TURNS_PER_ROUND = 3;
-export const CANDLES_PER_TURN = 5;
+export const TOTAL_ROUNDS = 3;
+export const TURNS_PER_ROUND = 8;
+export const CANDLES_PER_TURN = 2;
 export const INITIAL_REVEAL = 4;
-export const MAX_POSITION = 3;
-export const DECISION_TIMERS = [12, 10, 9, 8, 7];
-const TARGET_LENGTH = INITIAL_REVEAL + TURNS_PER_ROUND * CANDLES_PER_TURN + 2; // 21
+export const INITIAL_CASH = 1_000_000;   // 시작 자금 100만원 (현금 50% + 주식 50%)
+export const DECISION_TIMERS = [12, 10, 9];
+const TARGET_LENGTH = INITIAL_REVEAL + TURNS_PER_ROUND * CANDLES_PER_TURN + 2; // 22
 
 const GRADE_MAP: { min: number; grade: Grade; emoji: string; message: string }[] = [
-  { min: 17, grade: 'S', emoji: '🔥', message: '완벽한 매매!' },
-  { min: 13, grade: 'A', emoji: '💪', message: '뛰어난 판단!' },
-  { min: 9, grade: 'B', emoji: '👍', message: '좋은 감각!' },
-  { min: 5, grade: 'C', emoji: '🤔', message: '아쉬운 결과' },
-  { min: 1, grade: 'D', emoji: '😅', message: '더 연습해봐요' },
-  { min: 0, grade: 'F', emoji: '💤', message: '매매 기회를 놓쳤어요' },
+  { min: 18, grade: 'S', emoji: '🔥', message: '전설적인 매매!' },
+  { min: 15, grade: 'A', emoji: '💪', message: '상위 5% 수준!' },
+  { min: 11, grade: 'B', emoji: '👍', message: '평균 이상' },
+  { min: 7, grade: 'C', emoji: '🤔', message: '아쉬운 판단' },
+  { min: 3, grade: 'D', emoji: '😅', message: '많이 부족해요' },
+  { min: 0, grade: 'F', emoji: '💤', message: '매매를 못했어요' },
 ];
 
 // ─── OHLC generator ──────────────────────────────────────
@@ -352,7 +367,7 @@ const SCENARIOS: Record<string, ScenarioDef> = Object.fromEntries(
 
 // ─── Variation for multiple rounds ───────────────────────
 function addVariation(prices: number[], round: number): number[] {
-  const scales = [1.0, 0.88, 1.13, 0.94, 1.07];
+  const scales = [1.0, 0.88, 1.13];
   const s = scales[round % scales.length];
   return prices.map((p, i) => {
     const noise = 1 + Math.sin(round * 31 + i * 7.3) * 0.008;
@@ -384,7 +399,7 @@ export function getScenarioForRound(
 ): PatternScenario | null {
   const def = SCENARIOS[patternId];
   if (!def) return null;
-  const scales = [1.0, 0.88, 1.13, 0.94, 1.07];
+  const scales = [1.0, 0.88, 1.13];
   const s = scales[round % scales.length];
   return {
     candles: toOHLC(addVariation(def.prices, round), scaleOverrides(def.overrides, s)),
@@ -395,105 +410,305 @@ export function getScenarioForRound(
   };
 }
 
-// ─── Position / P&L calculation ──────────────────────────
-export function calcPnl(
-  trades: TradeLog[],
-  netPos: number,
-  currentPrice: number,
-): number {
-  let buys = 0;
-  let sells = 0;
-  for (const t of trades) {
-    if (t.action === 'buy') buys += t.price;
-    if (t.action === 'sell') sells += t.price;
-  }
-  return sells - buys + netPos * currentPrice;
+// ─── Trade Matching: FIFO 방식 매수-매도 매칭 ─────────────
+interface TradeOutcome {
+  profit: number;        // 실현/미실현 손익 (양수=수익, 음수=손실)
+  counterPrice: number;  // 매수→평균매도가, 매도→평균매수가
+  isPaired: boolean;     // 실제 반대 매매와 매칭됐는지
+  violatesBLSH: boolean; // "비쌀때팔고 쌀때사라" 원칙 위반
 }
 
-export function calcPnlPercent(
+interface ShareLot { price: number; shares: number; turn: number; }
+
+function computeTradeOutcomes(
   trades: TradeLog[],
-  netPos: number,
-  currentPrice: number,
-): number {
-  let buys = 0;
-  let totalInvested = 0;
-  for (const t of trades) {
-    if (t.action === 'buy') { buys += t.price; totalInvested += t.price; }
-    if (t.action === 'sell') { totalInvested += t.price; }
+  finalPrice: number,
+): Map<number, TradeOutcome> {
+  const outcomes = new Map<number, TradeOutcome>();
+  const queue: ShareLot[] = [];
+
+  interface BuyAccum {
+    totalShares: number;
+    totalProfit: number;
+    pairedShares: number;
+    weightedExitPrice: number;
   }
-  if (totalInvested === 0) return 0;
-  const pnl = calcPnl(trades, netPos, currentPrice);
-  return (pnl / (totalInvested / 2)) * 100;
+  const buyAccum = new Map<number, BuyAccum>();
+
+  const active = [...trades]
+    .filter(t => t.action === 'buy' || t.action === 'sell')
+    .sort((a, b) => a.turn - b.turn);
+
+  for (const trade of active) {
+    const n = trade.shares || 1; // fallback for old data
+
+    if (trade.action === 'buy') {
+      queue.push({ price: trade.price, shares: n, turn: trade.turn });
+      buyAccum.set(trade.turn, { totalShares: n, totalProfit: 0, pairedShares: 0, weightedExitPrice: 0 });
+
+    } else if (trade.action === 'sell') {
+      let remaining = n;
+      let totalSellProfit = 0;
+      let totalBuyPrice = 0;
+      let sharesMatched = 0;
+
+      while (remaining > 0 && queue.length > 0) {
+        const lot = queue[0];
+        const matching = Math.min(remaining, lot.shares);
+        const profit = (trade.price - lot.price) * matching;
+
+        const bt = buyAccum.get(lot.turn);
+        if (bt) {
+          bt.totalProfit += profit;
+          bt.pairedShares += matching;
+          bt.weightedExitPrice += trade.price * matching;
+        }
+        totalSellProfit += profit;
+        totalBuyPrice += lot.price * matching;
+        sharesMatched += matching;
+        lot.shares -= matching;
+        if (lot.shares <= 0) queue.shift();
+        remaining -= matching;
+      }
+
+      const avgBuy = sharesMatched > 0 ? totalBuyPrice / sharesMatched : trade.price;
+      outcomes.set(trade.turn, {
+        profit: totalSellProfit,
+        counterPrice: avgBuy,
+        isPaired: sharesMatched > 0,
+        violatesBLSH: totalSellProfit < 0,
+      });
+    }
+  }
+
+  // 남은 미매칭 매수 → 최종가 청산
+  for (const lot of queue) {
+    const bt = buyAccum.get(lot.turn);
+    if (bt) bt.totalProfit += (finalPrice - lot.price) * lot.shares;
+  }
+
+  // 매수 턴 결과 확정
+  for (const trade of active.filter(t => t.action === 'buy')) {
+    const bt = buyAccum.get(trade.turn);
+    if (!bt) continue;
+    const unpaired = bt.totalShares - bt.pairedShares;
+    const avgExit = bt.totalShares > 0
+      ? (bt.weightedExitPrice + finalPrice * unpaired) / bt.totalShares
+      : finalPrice;
+    outcomes.set(trade.turn, {
+      profit: bt.totalProfit,
+      counterPrice: avgExit,
+      isPaired: bt.pairedShares > 0,
+      violatesBLSH: bt.totalProfit < 0,
+    });
+  }
+
+  return outcomes;
 }
 
-// ─── Scoring ─────────────────────────────────────────────
+function fmtWon(n: number): string {
+  return (n >= 0 ? '+' : '') + Math.round(n).toLocaleString('ko-KR') + '원';
+}
+
+// ─── Per-Turn Scoring: 실제 수익 기반 ────────────────────
+function evaluateTurns(
+  trades: TradeLog[],
+  candles: Candle[],
+  scenario: PatternScenario,
+  finalPrice: number,
+  startingShares = 0,
+): TurnEval[] {
+  const outcomes = computeTradeOutcomes(trades, finalPrice);
+  const isBuySignal = scenario.signal === 'buy';
+  const evals: TurnEval[] = [];
+  let runningShares = startingShares;  // 현재 보유 주수 (초기 주식 포함)
+
+  for (let t = 0; t < TURNS_PER_ROUND; t++) {
+    const trade = trades.find(x => x.turn === t);
+    const action = (trade?.action ?? 'skip') as TurnEval['action'];
+    const sharesBefore = runningShares;
+    const candleIdx = Math.min(INITIAL_REVEAL + (t + 1) * CANDLES_PER_TURN - 1, candles.length - 1);
+    const currentPrice = candles[candleIdx].close;
+    const zone = getZone(candleIdx, scenario.optimalEntryIndex, scenario.optimalExitIndex);
+    const hasPosition = sharesBefore > 0;
+
+    let ev: TurnEval;
+
+    // ── TIMEOUT ──
+    if (action === 'timeout') {
+      ev = { turn: t, action, price: currentPrice, turnPnl: 0, score: 0, verdict: '⏰ 시간초과 — 기회 낭비', correct: false };
+
+    // ── BUY ──
+    } else if (action === 'buy') {
+      const outcome = outcomes.get(t);
+      const profit = outcome?.profit ?? 0;
+      const exitPrice = outcome?.counterPrice ?? finalPrice;
+      const blsh = outcome?.violatesBLSH ?? false;
+      const n = trade?.shares ?? 1;
+      const profitPerShare = n > 0 ? profit / n : 0;
+
+      if (isBuySignal) {
+        if (profit > 0) {
+          const pct = profitPerShare / currentPrice;
+          const score = pct >= 0.03 ? 2.5 : pct >= 0.01 ? 2.0 : 1.5;
+          ev = { turn: t, action, price: currentPrice, turnPnl: profit, score,
+            verdict: `✅ 싸게 매수 ${n}주 → 수익 ${fmtWon(profit)} (평균매도 ${Math.round(exitPrice).toLocaleString('ko-KR')}원)`,
+            correct: true };
+        } else if (blsh) {
+          ev = { turn: t, action, price: currentPrice, turnPnl: profit, score: 0,
+            verdict: `❌ 비쌀 때 매수 ${n}주! 손실 ${fmtWon(profit)} — "쌀 때 사라" 원칙 위반`,
+            correct: false };
+        } else {
+          ev = { turn: t, action, price: currentPrice, turnPnl: profit, score: 0,
+            verdict: `❌ 매수 ${n}주 손실 ${fmtWon(profit)}`,
+            correct: false };
+        }
+      } else {
+        if (profit > 0) {
+          ev = { turn: t, action, price: currentPrice, turnPnl: profit, score: 0.5,
+            verdict: `⚠️ 패턴 반대 방향이지만 수익 ${fmtWon(profit)} (운이 좋았어요)`,
+            correct: false };
+        } else {
+          ev = { turn: t, action, price: currentPrice, turnPnl: profit, score: 0,
+            verdict: `❌ 패턴 반대 방향 매수 ${n}주 손실 ${fmtWon(profit)}`,
+            correct: false };
+        }
+      }
+
+    // ── SELL ──
+    } else if (action === 'sell') {
+      const outcome = outcomes.get(t);
+      const profit = outcome?.profit ?? 0;
+      const avgBuyPrice = outcome?.counterPrice ?? currentPrice;
+      const blsh = outcome?.violatesBLSH ?? false;
+      const n = trade?.shares ?? 1;
+      const profitPerShare = n > 0 ? profit / n : 0;
+
+      if (!isBuySignal) {
+        // 하락 패턴 — 매도가 정방향
+        if (profit > 0) {
+          const pct = profitPerShare / currentPrice;
+          const score = pct >= 0.03 ? 2.5 : pct >= 0.01 ? 2.0 : 1.5;
+          ev = { turn: t, action, price: currentPrice, turnPnl: profit, score,
+            verdict: `✅ 고점 매도 ${n}주 → 수익 ${fmtWon(profit)} (평균매수 ${Math.round(avgBuyPrice).toLocaleString('ko-KR')}원)`,
+            correct: true };
+        } else if (blsh) {
+          ev = { turn: t, action, price: currentPrice, turnPnl: profit, score: 0,
+            verdict: `❌ 쌀 때 매도 ${n}주! 손실 ${fmtWon(profit)} — "비쌀 때 팔아라" 원칙 위반`,
+            correct: false };
+        } else {
+          ev = { turn: t, action, price: currentPrice, turnPnl: profit, score: 0,
+            verdict: `❌ 매도 ${n}주 손실 ${fmtWon(profit)}`,
+            correct: false };
+        }
+      } else {
+        // 상승 패턴 — 매도는 보유 청산
+        if (hasPosition) {
+          if (profit > 0) {
+            const pct = profitPerShare / avgBuyPrice;
+            const score = pct >= 0.03 ? 2.5 : pct >= 0.01 ? 2.0 : 1.5;
+            ev = { turn: t, action, price: currentPrice, turnPnl: profit, score,
+              verdict: `✅ 이익 실현 ${n}주 ${fmtWon(profit)} (매수 ${Math.round(avgBuyPrice).toLocaleString('ko-KR')}원 → 매도 ${currentPrice.toLocaleString('ko-KR')}원)`,
+              correct: true };
+          } else if (blsh) {
+            ev = { turn: t, action, price: currentPrice, turnPnl: profit, score: 0,
+              verdict: `❌ 쌀 때 청산 ${n}주! 손실 ${fmtWon(profit)} — "비쌀 때 팔아라" 원칙 위반`,
+              correct: false };
+          } else {
+            ev = { turn: t, action, price: currentPrice, turnPnl: profit, score: 0,
+              verdict: `❌ 청산 ${n}주 손실 ${fmtWon(profit)}`,
+              correct: false };
+          }
+        } else {
+          ev = { turn: t, action, price: currentPrice, turnPnl: 0, score: 0,
+            verdict: `❌ 보유 없이 매도 시도`,
+            correct: false };
+        }
+      }
+
+    // ── SKIP ──
+    } else {
+      if (zone === 'early')
+        ev = { turn: t, action, price: currentPrice, turnPnl: 0, score: 1.5, verdict: '👀 패턴 형성 전 — 올바른 관망', correct: true };
+      else if (zone === 'forming')
+        ev = { turn: t, action, price: currentPrice, turnPnl: 0, score: 1.0, verdict: '👀 패턴 확인 대기 중', correct: true };
+      else if (zone === 'entry')
+        ev = { turn: t, action, price: currentPrice, turnPnl: 0, score: 0, verdict: '😱 핵심 진입 타이밍을 놓쳤어요!', correct: false };
+      else if (zone === 'hold') {
+        if (hasPosition)
+          ev = { turn: t, action, price: currentPrice, turnPnl: 0, score: 1.5, verdict: '✅ 수익 구간 포지션 홀딩', correct: true };
+        else
+          ev = { turn: t, action, price: currentPrice, turnPnl: 0, score: 0.5, verdict: '⚠️ 수익 구간인데 포지션 없음', correct: false };
+      } else if (zone === 'exit') {
+        if (hasPosition)
+          ev = { turn: t, action, price: currentPrice, turnPnl: 0, score: 0, verdict: '💸 이익 실현 타이밍을 놓쳤어요!', correct: false };
+        else
+          ev = { turn: t, action, price: currentPrice, turnPnl: 0, score: 0.5, verdict: '관망 유지', correct: false };
+      } else {
+        if (hasPosition)
+          ev = { turn: t, action, price: currentPrice, turnPnl: 0, score: 1.0, verdict: '✅ 포지션 유지 중', correct: true };
+        else
+          ev = { turn: t, action, price: currentPrice, turnPnl: 0, score: 0.5, verdict: '관망', correct: false };
+      }
+    }
+
+    evals.push(ev);
+    const n = trade?.shares ?? 0;
+    if (action === 'buy') runningShares += n;
+    else if (action === 'sell') runningShares = Math.max(0, runningShares - n);
+  }
+
+  return evals;
+}
+
 export function calculateRoundScore(
   trades: TradeLog[],
-  netPosition: number,
+  finalCash: number,
+  finalShares: number,
   finalPrice: number,
   scenario: PatternScenario,
+  startingShares = 0,
 ): RoundScore {
-  const closeAll = [...trades];
-  let closedPos = netPosition;
-  if (closedPos > 0) {
-    for (let i = 0; i < closedPos; i++)
-      closeAll.push({ action: 'sell', price: finalPrice, turn: -1 });
-    closedPos = 0;
-  } else if (closedPos < 0) {
-    for (let i = 0; i < Math.abs(closedPos); i++)
-      closeAll.push({ action: 'buy', price: finalPrice, turn: -1 });
-    closedPos = 0;
-  }
+  const turnEvals = evaluateTurns(trades, scenario.candles, scenario, finalPrice, startingShares);
+  const rawTotal = turnEvals.reduce((sum, e) => sum + e.score, 0);
+  const total = Math.round(rawTotal);
 
-  const userPnl = calcPnl(closeAll, 0, finalPrice);
+  // 사용자 손익: 최종 포트폴리오 가치 - 초기 자금
+  const userPnl = (finalCash + finalShares * finalPrice) - INITIAL_CASH;
 
+  // 최적 전략 손익: 초기 자금으로 최적 구간에 전부 투자
   const optE = scenario.candles[scenario.optimalEntryIndex]?.close ?? 0;
   const optX = scenario.candles[scenario.optimalExitIndex]?.close ?? 0;
-  const optimalPnl =
-    scenario.signal === 'buy'
-      ? MAX_POSITION * (optX - optE)
-      : MAX_POSITION * (optE - optX);
-
-  let total = 0;
-  if (optimalPnl > 0 && userPnl > 0) {
-    const ratio = userPnl / optimalPnl;
-    if (ratio >= 0.8) total = 20;
-    else if (ratio >= 0.6) total = 16;
-    else if (ratio >= 0.4) total = 12;
-    else if (ratio >= 0.2) total = 8;
-    else total = 4;
-  } else if (userPnl > 0) {
-    total = 4;
-  }
+  const optimalShares = optE > 0 ? Math.floor(INITIAL_CASH * 0.8 / Math.min(optE, optX)) : 10;
+  const optimalPnl = scenario.signal === 'buy'
+    ? (optX - optE) * optimalShares
+    : (optE - optX) * optimalShares;
 
   const g = getGrade(total);
-  return {
-    total,
-    ...g,
-    userPnl,
-    optimalPnl,
-  };
+  return { total, ...g, userPnl, optimalPnl, turnEvals };
 }
 
 function getGrade(score: number): { grade: Grade; emoji: string; message: string } {
   for (const g of GRADE_MAP) {
     if (score >= g.min) return { grade: g.grade, emoji: g.emoji, message: g.message };
   }
-  return { grade: 'F', emoji: '💤', message: '매매 기회를 놓쳤어요' };
+  return { grade: 'F', emoji: '💤', message: '매매를 못했어요' };
 }
 
 export function getFinalResult(totalScore: number) {
   const maxScore = TOTAL_ROUNDS * 20;
   const pct = (totalScore / maxScore) * 100;
-  if (pct >= 90)
-    return { stars: 3, emoji: '🏆', title: '전설적인 트레이더!', sub: '패턴 마스터입니다!' };
-  if (pct >= 70)
-    return { stars: 3, emoji: '🎉', title: '뛰어난 실력!', sub: '실전에서도 통할 거예요!' };
-  if (pct >= 50)
-    return { stars: 2, emoji: '👏', title: '좋은 감각!', sub: '조금만 더 연습하면 완벽!' };
-  if (pct >= 30)
-    return { stars: 1, emoji: '💪', title: '성장하고 있어요!', sub: '패턴 복습 후 다시 도전!' };
-  return { stars: 0, emoji: '📚', title: '복습이 필요해요', sub: '패턴 설명을 다시 읽어보세요!' };
+  if (pct >= 95)
+    return { stars: 3, emoji: '🏆', title: '전설적인 트레이더!', sub: '상위 1% — 패턴 마스터입니다!' };
+  if (pct >= 80)
+    return { stars: 3, emoji: '🎉', title: '상위 5% 실력!', sub: '실전에서도 통할 수 있어요!' };
+  if (pct >= 60)
+    return { stars: 2, emoji: '👏', title: '평균 이상', sub: '타이밍 개선이 필요합니다!' };
+  if (pct >= 40)
+    return { stars: 1, emoji: '💪', title: '아직 부족해요', sub: '패턴 복습 후 다시 도전!' };
+  if (pct >= 20)
+    return { stars: 0, emoji: '📚', title: '기초부터 다시', sub: '패턴 설명을 정독하세요!' };
+  return { stars: 0, emoji: '😰', title: '전략이 없어요', sub: '학습 후 다시 도전하세요!' };
 }
 
 // ─── Smart Turn Feedback ─────────────────────────────────
@@ -522,15 +737,15 @@ export function getTurnFeedback(params: {
   action: 'buy' | 'sell' | 'skip';
   candleIndex: number;
   scenario: PatternScenario;
-  netPosition: number;
+  sharesHeld: number;
   isTimeout: boolean;
 }): TurnFeedback {
-  const { action, candleIndex, scenario, netPosition, isTimeout } = params;
+  const { action, candleIndex, scenario, sharesHeld, isTimeout } = params;
   const zone = getZone(candleIndex, scenario.optimalEntryIndex, scenario.optimalExitIndex);
   const isBuySignal = scenario.signal === 'buy';
   const entryAction = isBuySignal ? 'buy' : 'sell';
   const exitAction = isBuySignal ? 'sell' : 'buy';
-  const hasPosition = isBuySignal ? netPosition > 0 : netPosition < 0;
+  const hasPosition = sharesHeld > 0;
 
   if (isTimeout) {
     return zone === 'entry'

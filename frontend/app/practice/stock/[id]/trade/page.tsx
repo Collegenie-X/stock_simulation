@@ -133,9 +133,13 @@ export default function TradePage() {
     </div>
   }
 
-  const currentTurn = session.currentTurn
-  const currentPrice = stock.turns[currentTurn].price
-  const prevPrice = currentTurn > 0 ? stock.turns[currentTurn - 1].price : stock.initialPrice
+  const currentTurn = Math.min(
+    session.currentTurn ?? 0,
+    stock.turns.length - 1
+  )
+  const currentTurnData = stock.turns[currentTurn]
+  const currentPrice = currentTurnData?.price ?? stock.initialPrice ?? 0
+  const prevPrice = currentTurn > 0 ? (stock.turns[currentTurn - 1]?.price ?? stock.initialPrice ?? 0) : (stock.initialPrice ?? 0)
   const change = (((currentPrice - prevPrice) / prevPrice) * 100).toFixed(1)
   const isUp = Number.parseFloat(change) >= 0
 

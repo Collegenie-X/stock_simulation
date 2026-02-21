@@ -50,6 +50,12 @@ export function getInitialState(stock: StockInfo): GameState {
   }
 }
 
+// SSR/클라이언트 hydration 불일치 방지를 위해 시드 기반 결정론적 노이즈 사용
+function seededNoise(seed: number): number {
+  const x = Math.sin(seed * 127.1 + 311.7) * 43758.5453
+  return (x - Math.floor(x)) * 2 - 1 // -1 ~ 1
+}
+
 function interpolate(start: number, end: number, count: number, vol: number): number[] {
   const pts: number[] = [start]
   const diff = end - start
@@ -57,7 +63,7 @@ function interpolate(start: number, end: number, count: number, vol: number): nu
     const t = i / (count - 1)
     const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
     const base = start + diff * eased
-    const noise = base * vol * (Math.random() * 2 - 1)
+    const noise = base * vol * seededNoise(start + end * 0.01 + i)
     pts.push(Math.round(base + noise))
   }
   pts.push(end)
