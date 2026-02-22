@@ -1,6 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { AbilityScores, AssessmentMode, PersonalityScores, PersonalityType } from "../types";
 import { ABILITY_META, PERSONALITY_META, LABELS } from "../config";
 
@@ -20,11 +21,63 @@ function getDominantTypes(scores: PersonalityScores): [PersonalityType, Personal
   return [primary, secondary];
 }
 
+// 성향 → 투자 스타일 변환
+function toInvestmentStyle(p: PersonalityType): string {
+  if (p === "challenger") return "aggressive";
+  if (p === "conservative") return "conservative";
+  return "moderate";
+}
+
+// 성향 → 파동 패턴 변환
+function toWavePattern(p: PersonalityType): string {
+  if (p === "challenger" || p === "emotional") return "wave3Focus";
+  if (p === "analyst") return "correction";
+  if (p === "systematic") return "earlyEntry";
+  return "topCapture";
+}
+
+// 성향 점수 → 도전자 점수 (0~100)
+function toChallengerScore(scores: PersonalityScores): number {
+  const total = Object.values(scores).reduce((a, b) => a + b, 0) || 1;
+  return Math.min(95, Math.round(30 + (scores.challenger / total) * 130));
+}
+
+// 성향 → 파동 스탯 기본값
+function toWaveStats(p: PersonalityType) {
+  const base = {
+    challenger:  { wave1Capture: 78, wave3Focus: 95, wave5Exit: 72, correctionHandling: 55, avgHoldDays: 2.8, avgBuyTiming: "상승 초기", avgSellTiming: "고점 근처", bestWave: "3파", weakPoint: "조정파 대응" },
+    analyst:     { wave1Capture: 85, wave3Focus: 80, wave5Exit: 88, correctionHandling: 90, avgHoldDays: 4.5, avgBuyTiming: "조정 완료 후", avgSellTiming: "목표가 도달", bestWave: "조정파", weakPoint: "5파 조기 이탈" },
+    systematic:  { wave1Capture: 92, wave3Focus: 82, wave5Exit: 78, correctionHandling: 85, avgHoldDays: 5.1, avgBuyTiming: "1파 시작", avgSellTiming: "계획 목표가", bestWave: "1파", weakPoint: "변동성 대응" },
+    conservative:{ wave1Capture: 70, wave3Focus: 65, wave5Exit: 92, correctionHandling: 80, avgHoldDays: 6.2, avgBuyTiming: "안전 확인 후", avgSellTiming: "5파 꼭대기", bestWave: "5파 탈출", weakPoint: "초기 진입 망설임" },
+    emotional:   { wave1Capture: 82, wave3Focus: 88, wave5Exit: 65, correctionHandling: 62, avgHoldDays: 3.1, avgBuyTiming: "감각적 타이밍", avgSellTiming: "고점 근처", bestWave: "3파", weakPoint: "데이터 검증 부족" },
+  };
+  return base[p] ?? base.challenger;
+}
+
 export default function ResultScreen({ personalityScores, abilities, totalQuestions, mode = "detailed" }: ResultScreenProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo");
   const [primary, secondary] = getDominantTypes(personalityScores);
   const primaryMeta = PERSONALITY_META[primary];
   const secondaryMeta = secondary ? PERSONALITY_META[secondary] : null;
+
+  // 결과를 localStorage에 저장 (compete DNA 업데이트용)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const dnaResult = {
+      primaryPersonality: primary,
+      secondaryPersonality: secondary,
+      personalityScores,
+      abilities,
+      investmentStyle: toInvestmentStyle(primary),
+      wavePatternType: toWavePattern(primary),
+      challengerScore: toChallengerScore(personalityScores),
+      wavePatternStats: toWaveStats(primary),
+      updatedAt: new Date().toISOString(),
+    };
+    localStorage.setItem("compete_dna_result", JSON.stringify(dnaResult));
+  }, [primary, secondary, personalityScores, abilities]);
 
   const maxAbility = Math.max(...Object.values(abilities), 1);
   const sortedAbilities = (Object.keys(abilities) as (keyof AbilityScores)[]).sort(
@@ -174,14 +227,38 @@ export default function ResultScreen({ personalityScores, abilities, totalQuesti
         </div>
       )}
 
+      {/* compete 반환 버튼 */}
+      {returnTo === "compete" && (
+        <div
+          className="rounded-2xl bg-gradient-to-r from-yellow-500/15 to-orange-500/15 border border-yellow-500/30 p-4 animate-slideUp"
+          style={{ animationDelay: mode === "quick" ? "900ms" : "700ms" }}
+        >
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-xl">🏆</span>
+            <div>
+              <p className="text-sm font-black text-yellow-300">경쟁 페이지에 반영 완료!</p>
+              <p className="text-xs text-white/50">투자 DNA가 새 결과로 업데이트됐어요</p>
+            </div>
+          </div>
+          <button
+            onClick={() => router.push("/compete")}
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-sm font-black hover:scale-[1.01] active:scale-[0.98] transition-all shadow-lg shadow-yellow-500/25"
+          >
+            경쟁 페이지로 돌아가기 →
+          </button>
+        </div>
+      )}
+
       {/* action buttons */}
       <div className="flex flex-col gap-2 mt-2 animate-slideUp" style={{ animationDelay: mode === "quick" ? "1000ms" : "800ms" }}>
-        <button
-          onClick={() => router.push("/")}
-          className="w-full py-3.5 rounded-2xl bg-white/10 border border-white/15 text-white/85 text-sm font-bold hover:bg-white/15 hover:scale-[1.01] active:scale-[0.98] transition-all"
-        >
-          {LABELS.homeBtn}
-        </button>
+        {returnTo !== "compete" && (
+          <button
+            onClick={() => router.push("/")}
+            className="w-full py-3.5 rounded-2xl bg-white/10 border border-white/15 text-white/85 text-sm font-bold hover:bg-white/15 hover:scale-[1.01] active:scale-[0.98] transition-all"
+          >
+            {LABELS.homeBtn}
+          </button>
+        )}
         <button
           onClick={() => window.location.reload()}
           className="w-full py-3 rounded-2xl border border-white/8 text-white/40 text-sm font-semibold hover:text-white/60 active:scale-[0.98] transition-all"

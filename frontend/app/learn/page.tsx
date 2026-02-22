@@ -42,7 +42,7 @@ export default function LearnPage() {
 
   return (
     <div className="min-h-screen-mobile bg-[#191919] pb-24">
-      <MobileHeader title="학습" showBack showSettings />
+      <MobileHeader title="학습" showSettings />
 
       <main className="pt-16 px-5 max-w-md mx-auto">
         <InvestorDNAHero userPersonality={userPersonality} progress={progress} />

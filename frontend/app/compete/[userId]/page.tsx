@@ -418,7 +418,7 @@ export default function CompeteDetailPage() {
                     return (
                       <ReferenceLine 
                         key={`buy-${index}`}
-                        x={entry.day} 
+                        x={entry.time} 
                         stroke="#FF3D00" 
                         strokeWidth={2}
                         strokeDasharray="3 3"
@@ -435,7 +435,7 @@ export default function CompeteDetailPage() {
                     return (
                       <ReferenceLine 
                         key={`sell-${index}`}
-                        x={entry.day} 
+                        x={entry.time} 
                         stroke="#00C853" 
                         strokeWidth={2}
                         strokeDasharray="3 3"

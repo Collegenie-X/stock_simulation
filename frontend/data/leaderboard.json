@@ -1,4 +1,12 @@
 {
+  "weeklyChallenge": {
+    "title": "Week 3 완주",
+    "goal": "+8% 이상",
+    "participants": 2847,
+    "timeRemaining": "3일 12시간",
+    "progressPercent": 65,
+    "reward": "500XP + 황금 파도 뱃지"
+  },
   "rankings": [
     {
       "rank": 1,
@@ -7,7 +15,11 @@
       "profitRate": 45.8,
       "totalAssets": 14580000,
       "badges": ["🏆", "💎", "⭐"],
-      "level": 15
+      "level": 15,
+      "style": "공격형",
+      "portfolio": 7,
+      "trades": 31,
+      "waveType": "3파 집중형"
     },
     {
       "rank": 2,
@@ -16,7 +28,11 @@
       "profitRate": 38.2,
       "totalAssets": 13820000,
       "badges": ["🥈", "💡"],
-      "level": 12
+      "level": 12,
+      "style": "균형형",
+      "portfolio": 5,
+      "trades": 23,
+      "waveType": "선점형"
     },
     {
       "rank": 3,
@@ -25,7 +41,11 @@
       "profitRate": 35.6,
       "totalAssets": 13560000,
       "badges": ["🥉", "📊"],
-      "level": 14
+      "level": 14,
+      "style": "공격형",
+      "portfolio": 6,
+      "trades": 28,
+      "waveType": "꼭대기형"
     },
     {
       "rank": 4,
@@ -34,7 +54,11 @@
       "profitRate": 32.1,
       "totalAssets": 13210000,
       "badges": ["🌊"],
-      "level": 11
+      "level": 11,
+      "style": "공격형",
+      "portfolio": 4,
+      "trades": 19,
+      "waveType": "3파 집중형"
     },
     {
       "rank": 5,
@@ -43,7 +67,64 @@
       "profitRate": 28.9,
       "totalAssets": 12890000,
       "badges": ["🛡️"],
-      "level": 10
+      "level": 10,
+      "style": "안정형",
+      "portfolio": 8,
+      "trades": 14,
+      "waveType": "조정파 활용형"
+    },
+    {
+      "rank": 6,
+      "userId": "user_006",
+      "nickname": "반도체킹",
+      "profitRate": 26.4,
+      "totalAssets": 12640000,
+      "badges": ["🔧"],
+      "level": 9,
+      "style": "공격형",
+      "portfolio": 3,
+      "trades": 22,
+      "waveType": "선점형"
+    },
+    {
+      "rank": 7,
+      "userId": "user_007",
+      "nickname": "AI트레이더",
+      "profitRate": 24.1,
+      "totalAssets": 12410000,
+      "badges": ["🤖"],
+      "level": 11,
+      "style": "균형형",
+      "portfolio": 5,
+      "trades": 17,
+      "waveType": "3파 집중형"
+    },
+    {
+      "rank": 8,
+      "userId": "user_008",
+      "nickname": "야간매매왕",
+      "profitRate": 21.7,
+      "totalAssets": 12170000,
+      "badges": ["🌙"],
+      "level": 8,
+      "style": "공격형",
+      "portfolio": 4,
+      "trades": 35,
+      "waveType": "꼭대기형"
     }
-  ]
+  ],
+  "levelDistribution": [
+    { "level": "1단계", "count": 847, "color": "bg-green-500" },
+    { "level": "2단계", "count": 652, "color": "bg-blue-500" },
+    { "level": "3단계", "count": 521, "color": "bg-purple-500" },
+    { "level": "4단계", "count": 432, "color": "bg-orange-500" },
+    { "level": "5단계", "count": 285, "color": "bg-red-500" },
+    { "level": "6단계", "count": 110, "color": "bg-yellow-500" }
+  ],
+  "realtimeStats": {
+    "totalParticipants": 2847,
+    "todayNew": 142,
+    "weeklyAvgReturn": 6.4,
+    "topReturnThisWeek": 45.8
+  }
 }
