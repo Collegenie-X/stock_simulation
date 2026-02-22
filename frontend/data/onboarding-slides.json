@@ -1,0 +1,62 @@
+[
+  {
+    "id": "chart-training",
+    "badge": "CHART TRAINING",
+    "accent": "green",
+    "title": "차트로 읽는\n시장의 흐름",
+    "desc": "실전과 동일한 차트를 보며\n매수·매도 타이밍을 직접 판단하세요",
+    "preview": {
+      "type": "chart-trading",
+      "currentPrice": "56,200원",
+      "pnl": "+3,200원",
+      "buttons": ["살래", "팔래", "기다릴게"]
+    }
+  },
+  {
+    "id": "event-scenario",
+    "badge": "EVENT SCENARIO",
+    "accent": "yellow",
+    "title": "돌발 이벤트!\n당신의 판단은?",
+    "desc": "급등, 폭락, 실적 발표 —\n상황별 대응 능력을 훈련합니다",
+    "preview": {
+      "type": "event-news",
+      "newsEmoji": "🚨",
+      "newsLabel": "긴급 뉴스",
+      "newsText": "A사 실적 쇼크, 예상치 40% 하회",
+      "choices": [
+        { "label": "즉시 매도", "color": "red" },
+        { "label": "일부 매도", "color": "yellow" },
+        { "label": "홀딩", "color": "blue" }
+      ]
+    }
+  },
+  {
+    "id": "real-data",
+    "badge": "REAL DATA",
+    "accent": "cyan",
+    "title": "AI·로봇주\n실전 데이터로 연습",
+    "desc": "가장 핫한 테마주의 실제 1년 데이터로\n주식 파동의 흐름을 타는 연습",
+    "preview": {
+      "type": "stock-list",
+      "stocks": [
+        { "name": "레인보우로보틱스", "pct": "+18.5%" },
+        { "name": "두산로보틱스", "pct": "+12.3%" },
+        { "name": "엔비디아(NVDA)", "pct": "+45.2%" }
+      ],
+      "footer": "실제 1년 데이터 기반 시뮬레이션"
+    }
+  },
+  {
+    "id": "ai-battle",
+    "badge": "AI BATTLE",
+    "accent": "indigo",
+    "title": "나와 비슷한 AI와\n대결하며 배우기",
+    "desc": "투자 DNA를 분석하고\nAI 코멘트와 비교하며 실력 향상",
+    "preview": {
+      "type": "ai-vs",
+      "player": { "emoji": "🧑", "label": "나", "pct": "+8.2%" },
+      "ai": { "emoji": "🤖", "label": "AI 멘토", "pct": "+11.5%" },
+      "comment": "3턴에서 매도 타이밍을 놓쳤어요. 저항선 근처에서 일부 매도가 더 좋았을 거예요"
+    }
+  }
+]

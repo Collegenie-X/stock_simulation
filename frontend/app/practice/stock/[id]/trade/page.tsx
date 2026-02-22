@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useParams, useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, ChevronDown, Target, Lock, ArrowRight, MoreHorizontal, Minus, Plus } from "lucide-react"
@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 import { storage } from "@/lib/storage"
 import scenariosData from "@/data/game-scenarios.json"
 import scenarios100DaysData from "@/data/stock-100days-data.json"
+import { generateAIStocks, generateRobotAutoStocks } from "../utils/stockDataUtils"
 
 export default function TradePage() {
   const params = useParams()
@@ -73,19 +74,58 @@ export default function TradePage() {
     }
   }, [scenarioId, router])
 
-  // 시나리오 및 주식 정보 확인 (100일 데이터 포함)
+  // 시나리오 및 주식 정보 확인 (100일 데이터 포함 + AI/로봇 주식 동적 생성)
   const allScenarios = [...scenariosData.scenarios, scenarios100DaysData]
-  const scenario = allScenarios.find((s) => s.id === scenarioId)
-  
-  console.log("🔍 시나리오 검색:", {
-    scenarioId,
-    allScenariosCount: allScenarios.length,
-    found: !!scenario,
-    scenarioIds: allScenarios.map(s => s.id)
-  })
+  const rawScenario = allScenarios.find((s) => s.id === scenarioId)
+
+  const scenario = useMemo(() => {
+    if (!rawScenario) return null
+
+    const settings = storage.getGameSettings()
+    const speedMode = settings?.speedMode
+    let requiredTurns = 100
+    if (speedMode === "sprint") requiredTurns = 30
+    else if (speedMode === "standard") requiredTurns = 100
+    else if (speedMode === "marathon") requiredTurns = 200
+
+    const currentTurns = rawScenario.totalTurns || 10
+    const extended = { ...rawScenario, totalTurns: Math.max(currentTurns, requiredTurns) }
+
+    let extendedStocks = rawScenario.stocks.map((stock: any) => {
+      const existingTurns = stock.turns || []
+      if (existingTurns.length >= requiredTurns) return stock
+
+      const lastTurn = existingTurns[existingTurns.length - 1]
+      const lastPrice = lastTurn?.price || stock.initialPrice
+      const lastDate = lastTurn?.date || "2010.01.01"
+      const newTurns = [...existingTurns]
+      let currentPrice = lastPrice
+      const [year, month, day] = lastDate.split(".").map(Number)
+      let currentDate = new Date(year, month - 1, day)
+
+      for (let i = existingTurns.length; i < requiredTurns; i++) {
+        const change = (Math.random() - 0.5) * 0.06
+        currentPrice = Math.max(1000, Math.round(currentPrice * (1 + change)))
+        currentDate.setDate(currentDate.getDate() + 1)
+        const dateStr = `${currentDate.getFullYear()}.${String(currentDate.getMonth() + 1).padStart(2, "0")}.${String(currentDate.getDate()).padStart(2, "0")}`
+        newTurns.push({
+          turn: i + 1,
+          date: dateStr,
+          price: currentPrice,
+          news: ["거래량 증가 추세", "안정적인 흐름 유지", "시장 평균 수준 유지", "투자 심리 회복", "변동성 확대"][Math.floor(Math.random() * 5)],
+        })
+      }
+      return { ...stock, turns: newTurns }
+    })
+
+    const aiStocks = generateAIStocks(10, 50000, extended.totalTurns)
+    const robotAutoStocks = generateRobotAutoStocks(10, 30000, extended.totalTurns)
+    extended.stocks = [...extendedStocks, ...aiStocks, ...robotAutoStocks]
+
+    return extended
+  }, [rawScenario])
   
   if (!scenario) {
-    console.error("❌ 시나리오를 찾을 수 없음:", scenarioId)
     return <div className="min-h-screen bg-[#191919] text-white flex items-center justify-center">
       <div className="text-center">
         <div className="text-2xl mb-4">❌</div>
@@ -474,38 +514,71 @@ export default function TradePage() {
       <div className="flex-1 flex flex-col px-5 pb-4">
         {orderType === "market" ? (
           <>
-            <div className="mb-6">
+            {/* 현재가 + 종목명 */}
+            <div className="mb-4">
               <div className="flex items-center gap-2 text-sm text-gray-400 mb-1">
                 <span>{isBuy ? "구매할 가격" : "판매할 가격"}</span>
                 <span className="text-gray-600">|</span>
-                <span>현재가</span>
-                <span className="text-gray-600">|</span>
-                <span>시장가</span>
+                <span>현재가 · 시장가</span>
               </div>
-              <div className="text-4xl font-bold text-white mb-1">{formatNumber(currentPrice)}원</div>
-              <div className={cn("text-sm font-medium", isUp ? "text-red-500" : "text-blue-500")}>
-                {stock.name} {isUp ? "+" : ""}
-                {change}%
+              <div className="flex items-end justify-between">
+                <div className="text-4xl font-bold text-white">{formatNumber(currentPrice)}원</div>
+                <div className={cn("text-sm font-medium", isUp ? "text-red-500" : "text-blue-500")}>
+                  {stock.name} {isUp ? "+" : ""}{change}%
+                </div>
               </div>
             </div>
 
-            <div className="bg-[#252525] rounded-3xl p-6 flex-1 flex flex-col relative mb-6">
+            {/* 보유 현황 요약 카드 */}
+            <div className="bg-[#252525] rounded-2xl p-4 mb-4 grid grid-cols-2 gap-x-4 gap-y-3">
+              <div>
+                <div className="text-xs text-gray-500 mb-0.5">보유 수량</div>
+                <div className="text-base font-bold text-white">{formatNumber(myQty)}주</div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 mb-0.5">주식 평가금액</div>
+                <div className="text-base font-bold text-white">{formatNumber(myQty * currentPrice)}원</div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 mb-0.5">남은 현금</div>
+                <div className="text-base font-bold text-white">{formatNumber(cash)}원</div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 mb-0.5">평가 손익</div>
+                {myQty > 0 && myAvg > 0 ? (
+                  <div className={cn("text-base font-bold", isProfit ? "text-red-400" : "text-blue-400")}>
+                    {isProfit ? "+" : ""}{formatNumber(Math.round((currentPrice - myAvg) * myQty))}원
+                    <span className="text-xs ml-1">({myReturn}%)</span>
+                  </div>
+                ) : (
+                  <div className="text-base font-bold text-gray-500">-</div>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-[#252525] rounded-3xl p-6 flex-1 flex flex-col relative mb-4">
               <div className="text-sm font-bold text-white mb-4">수량</div>
 
               <div className="flex-1 flex flex-col items-center justify-center">
                 {inputValue ? (
                   <>
-                    <div className={cn("text-7xl font-bold mb-4", isBuy ? "text-red-500" : "text-blue-500")}>
+                    <div className={cn("text-7xl font-bold mb-2", isBuy ? "text-red-500" : "text-blue-500")}>
                       {formatNumber(Number.parseInt(inputValue))}주
                     </div>
-                    <div className="text-xl text-white font-medium mb-2">{formatNumber(totalAmount)}원</div>
+                    <div className="text-xl text-white font-medium mb-1">{formatNumber(totalAmount)}원</div>
+                    {/* 거래 후 예상 현금 */}
+                    <div className="text-sm text-gray-400">
+                      {isBuy
+                        ? `거래 후 현금: ${formatNumber(cash - totalAmount)}원`
+                        : `거래 후 현금: ${formatNumber(cash + totalAmount)}원`}
+                    </div>
                   </>
                 ) : (
                   <div className="text-4xl font-bold text-gray-600 text-center mb-4">
                     몇 주 {isBuy ? "구매" : "판매"}할까요?
                   </div>
                 )}
-                <div className="text-center text-sm text-gray-500">
+                <div className="text-center text-sm text-gray-500 mt-2">
                   {isBuy ? `구매가능 최대 ${Math.floor(cash / currentPrice)}주` : `판매가능 최대 ${myQty}주`}
                 </div>
               </div>

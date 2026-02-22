@@ -1,0 +1,85 @@
+{
+  "speedModes": {
+    "sprint": {
+      "icon": "⚡",
+      "name": "스프린트",
+      "time": "~5분",
+      "period": "1개월",
+      "decisions": "22회",
+      "timer": 10,
+      "simulationMonths": 1,
+      "color": "orange",
+      "desc": "점심시간에 딱! 빠르게 체험",
+      "scenarioId": "scenario-1",
+      "details": [
+        { "label": "시뮬레이션", "value": "1개월 (20거래일)" },
+        { "label": "결정 타이머", "value": "10초" },
+        { "label": "하루 기회", "value": "2회 (☀️ 아침 / 🌙 저녁)" },
+        { "label": "이벤트 날", "value": "~11일 (55%)" },
+        { "label": "분당 결정", "value": "4.4회 (듀오링고 수준)" }
+      ]
+    },
+    "standard": {
+      "icon": "🏃",
+      "name": "스탠다드",
+      "time": "~10분",
+      "period": "3개월",
+      "decisions": "33회",
+      "timer": 15,
+      "simulationMonths": 3,
+      "color": "blue",
+      "desc": "출퇴근길에 딱! 균형 잡힌 학습",
+      "scenarioId": "scenario-100days",
+      "details": [
+        { "label": "시뮬레이션", "value": "3개월 (60거래일)" },
+        { "label": "결정 타이머", "value": "15초" },
+        { "label": "하루 기회", "value": "2~3회 (유연)" },
+        { "label": "핵심 플레이 주", "value": "6주 / 12주" },
+        { "label": "분당 결정", "value": "3.3회" }
+      ]
+    },
+    "marathon": {
+      "icon": "🏔️",
+      "name": "마라톤",
+      "time": "~30분",
+      "period": "12개월",
+      "decisions": "66회",
+      "timer": 20,
+      "simulationMonths": 12,
+      "color": "purple",
+      "desc": "주말 카페에서! 1년 풀 체험",
+      "scenarioId": "scenario-100days",
+      "details": [
+        { "label": "시뮬레이션", "value": "12개월 (240거래일)" },
+        { "label": "결정 타이머", "value": "20초" },
+        { "label": "하루 기회", "value": "3회 (☀️ 아침 / 🍚 점심 / 🌙 저녁)" },
+        { "label": "위기 이벤트", "value": "연 2회 (블랙스완)" },
+        { "label": "분당 결정", "value": "2.2회" }
+      ]
+    }
+  },
+  "dailyOptions": [
+    {
+      "value": 2,
+      "icons": ["sun", "moon"],
+      "label": "2회",
+      "desc": "아침 / 저녁",
+      "sub": "빠르게 진행"
+    },
+    {
+      "value": 3,
+      "icons": ["sun", "rice", "moon"],
+      "label": "3회",
+      "desc": "아침 / 점심 / 저녁",
+      "sub": "더 상세하게"
+    }
+  ],
+  "moneyOptions": [
+    { "value": 5000000, "label": "500만원", "tier": "basic" },
+    { "value": 10000000, "label": "1,000만원", "tier": "basic" },
+    { "value": 50000000, "label": "5,000만원", "tier": "basic" },
+    { "value": 100000000, "label": "1억원", "tier": "mid" },
+    { "value": 300000000, "label": "3억원", "tier": "advanced" },
+    { "value": 500000000, "label": "5억원", "tier": "advanced" }
+  ]
+}

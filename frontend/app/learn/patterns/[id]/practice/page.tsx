@@ -366,6 +366,7 @@ interface RoundData {
   trades: TradeLog[];
   finalCash: number;
   finalShares: number;
+  finalAvgCost: number;  // 최종 보유 주식 평균 단가
   startingShares: number;
   scenario: PatternScenario;
 }
@@ -604,7 +605,7 @@ export default function PatternPracticePage() {
     if (!scenario) return;
     const finalPrice = scenario.candles[totalCandles - 1].close;
     const score = calculateRoundScore(trades, cashRemaining, sharesHeld, finalPrice, scenario, startingShares);
-    setRoundResults(prev => [...prev, { score, trades, finalCash: cashRemaining, finalShares: sharesHeld, startingShares, scenario }]);
+    setRoundResults(prev => [...prev, { score, trades, finalCash: cashRemaining, finalShares: sharesHeld, finalAvgCost: avgCostBasis, startingShares, scenario }]);
     setTotalScore(prev => prev + score.total);
     setStreak(prev => score.total >= 8 ? prev + 1 : 0);
     setVisibleCount(totalCandles);
@@ -685,6 +686,13 @@ export default function PatternPracticePage() {
     const s = rd.score;
     const rdFinalPrice = rd.scenario.candles[rd.scenario.candles.length - 1].close;
     const rdFinalValue = rd.finalCash + rd.finalShares * rdFinalPrice;
+    // 평가 손익 (보유 주식 평균 단가 대비)
+    const unrealizedPnl = rd.finalAvgCost > 0 ? (rdFinalPrice - rd.finalAvgCost) * rd.finalShares : 0;
+    const unrealizedPct = rd.finalAvgCost > 0 ? ((rdFinalPrice - rd.finalAvgCost) / rd.finalAvgCost) * 100 : 0;
+    // 실현 손익 = 총 손익 - 평가 손익
+    const realizedPnl = s.userPnl - unrealizedPnl;
+    // 원금 대비 수익률
+    const totalReturnPct = (s.userPnl / INITIAL_CASH) * 100;
     return (
       <div className="min-h-screen bg-black pb-36">
         {showExitDialog && <ExitDialog onConfirm={confirmExit} onCancel={() => setShowExitDialog(false)} />}
@@ -704,27 +712,89 @@ export default function PatternPracticePage() {
             {streak >= 2 && <div className="mt-2 text-xl font-black text-orange-400 animate-pulse">🔥 {streak}연승!</div>}
           </div>
 
-          {/* 최종 포트폴리오 */}
-          <section className="mt-4 space-y-3">
-            {/* 총 손익 */}
-            <div className={cn('rounded-2xl p-5 border text-center', s.userPnl >= 0 ? 'bg-green-500/15 border-green-500/30' : 'bg-red-500/15 border-red-500/30')}>
-              <p className="text-sm font-bold text-gray-400 mb-1">💰 최종 손익</p>
-              <p className={cn('text-4xl font-black', s.userPnl >= 0 ? 'text-green-400' : 'text-red-400')}>{fmtPnl(s.userPnl)}</p>
-              <p className="text-xs text-gray-500 mt-1">최종 자산 {rdFinalValue.toLocaleString('ko-KR')}원 · 최적 수익: {fmtPnl(s.optimalPnl)}</p>
-            </div>
-            {/* 현금 + 주식 내역 */}
-            <div className="grid grid-cols-2 gap-2">
-              <div className="bg-[#111] rounded-2xl px-4 py-3 border border-white/10 text-center">
-                <p className="text-[10px] text-gray-500 font-bold mb-1">💵 현금</p>
-                <p className="text-lg font-black text-white">{rd.finalCash.toLocaleString('ko-KR')}원</p>
-              </div>
-              <div className="bg-[#111] rounded-2xl px-4 py-3 border border-white/10 text-center">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <Package className="w-3 h-3 text-indigo-400" />
-                  <p className="text-[10px] text-gray-500 font-bold">보유 주식</p>
+          {/* ── 손익 요약 ── */}
+          <section className="mt-4 space-y-2">
+
+            {/* 총 손익 (메인) */}
+            <div className={cn('rounded-2xl px-5 py-4 border', s.userPnl >= 0 ? 'bg-green-500/12 border-green-500/30' : 'bg-red-500/12 border-red-500/30')}>
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <p className="text-xs font-bold text-gray-400">💰 총 손익 (원금 대비)</p>
+                  <p className={cn('text-3xl font-black mt-0.5', s.userPnl >= 0 ? 'text-green-400' : 'text-red-400')}>
+                    {fmtPnl(s.userPnl)}
+                  </p>
                 </div>
-                <p className="text-lg font-black text-white">{rd.finalShares}주</p>
-                <p className="text-[10px] text-gray-600">{(rd.finalShares * rdFinalPrice).toLocaleString('ko-KR')}원</p>
+                <div className="text-right">
+                  <p className="text-xs text-gray-500">최종 자산</p>
+                  <p className="text-base font-black text-white">{rdFinalValue.toLocaleString('ko-KR')}원</p>
+                  <p className={cn('text-sm font-black mt-0.5', s.userPnl >= 0 ? 'text-green-400' : 'text-red-400')}>
+                    {totalReturnPct >= 0 ? '+' : ''}{totalReturnPct.toFixed(2)}%
+                  </p>
+                </div>
+              </div>
+              {/* 실현 손익 vs 평가 손익 분리 */}
+              <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/10">
+                <div className="bg-black/30 rounded-xl px-3 py-2.5">
+                  <p className="text-[10px] text-gray-500 font-bold mb-1">✅ 실현 손익</p>
+                  <p className="text-[10px] text-gray-600 mb-1">매도 완료된 수익</p>
+                  <p className={cn('text-base font-black', realizedPnl >= 0 ? 'text-green-400' : 'text-red-400')}>
+                    {fmtPnl(realizedPnl)}
+                  </p>
+                </div>
+                <div className="bg-black/30 rounded-xl px-3 py-2.5">
+                  <p className="text-[10px] text-gray-500 font-bold mb-1">📊 평가 손익</p>
+                  <p className="text-[10px] text-gray-600 mb-1">보유 주식 현재 평가</p>
+                  {rd.finalShares > 0 ? (
+                    <p className={cn('text-base font-black', unrealizedPnl >= 0 ? 'text-blue-400' : 'text-red-400')}>
+                      {fmtPnl(unrealizedPnl)}
+                    </p>
+                  ) : (
+                    <p className="text-base font-black text-gray-600">보유 없음</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* 보유 주식 상세 (있을 때만) */}
+            {rd.finalShares > 0 && (
+              <div className="bg-[#111] rounded-2xl border border-indigo-500/20 overflow-hidden">
+                <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/5">
+                  <Package className="w-4 h-4 text-indigo-400" />
+                  <span className="text-sm font-black text-indigo-300">보유 주식</span>
+                  <span className="text-sm font-black text-white ml-auto">{rd.finalShares}주</span>
+                </div>
+                <div className="grid grid-cols-3 divide-x divide-white/5 text-center">
+                  <div className="py-3 px-2">
+                    <p className="text-[10px] text-gray-500 mb-1">평균 단가</p>
+                    <p className="text-xs font-black text-gray-300">{Math.round(rd.finalAvgCost).toLocaleString('ko-KR')}원</p>
+                  </div>
+                  <div className="py-3 px-2">
+                    <p className="text-[10px] text-gray-500 mb-1">종가</p>
+                    <p className="text-xs font-black text-white">{rdFinalPrice.toLocaleString('ko-KR')}원</p>
+                  </div>
+                  <div className="py-3 px-2">
+                    <p className="text-[10px] text-gray-500 mb-1">평가 손익</p>
+                    <p className={cn('text-xs font-black', unrealizedPnl >= 0 ? 'text-blue-400' : 'text-red-400')}>
+                      {unrealizedPct >= 0 ? '+' : ''}{unrealizedPct.toFixed(1)}%
+                    </p>
+                    <p className={cn('text-[9px] font-bold', unrealizedPnl >= 0 ? 'text-blue-500' : 'text-red-500')}>
+                      {fmtPnl(unrealizedPnl)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 현금 잔고 + 최적 매매 수익 */}
+            <div className="grid grid-cols-2 gap-2">
+              <div className="bg-[#111] rounded-2xl px-4 py-3 border border-white/10">
+                <p className="text-[10px] text-gray-500 font-bold mb-1">💵 현금 잔고</p>
+                <p className="text-sm font-black text-white">{rd.finalCash.toLocaleString('ko-KR')}원</p>
+              </div>
+              <div className="bg-[#111] rounded-2xl px-4 py-3 border border-yellow-500/20">
+                <p className="text-[10px] text-yellow-600 font-bold mb-1">🎯 완벽 전략 수익</p>
+                <p className="text-sm font-black text-yellow-400">{fmtPnl(s.optimalPnl)}</p>
+                <p className="text-[9px] text-gray-600">최적 타이밍 매매 시</p>
               </div>
             </div>
           </section>
@@ -806,18 +876,39 @@ export default function PatternPracticePage() {
                 Math.min(INITIAL_REVEAL + (t.turn + 1) * CANDLES_PER_TURN - 1, rd.scenario.candles.length - 1));
               const rdSellIdx = rd.trades.filter(t => t.action === 'sell').map(t =>
                 Math.min(INITIAL_REVEAL + (t.turn + 1) * CANDLES_PER_TURN - 1, rd.scenario.candles.length - 1));
+              const rdFp = rd.scenario.candles[rd.scenario.candles.length - 1].close;
+              const rdUnrealized = rd.finalAvgCost > 0 ? (rdFp - rd.finalAvgCost) * rd.finalShares : 0;
+              const rdRealized = rd.score.userPnl - rdUnrealized;
+              const rdReturnPct = (rd.score.userPnl / INITIAL_CASH) * 100;
               return (
               <div key={i} className="bg-[#111] rounded-2xl border border-white/5 overflow-hidden">
                 {/* 라운드 헤더 */}
-                <div className="flex items-center gap-3 px-4 py-3 border-b border-white/5">
-                  <div className="w-8 h-8 rounded-full bg-[#1a1a1a] flex items-center justify-center text-base font-black text-gray-400">{i + 1}</div>
-                  <span className="text-2xl">{rd.score.emoji}</span>
-                  <span className={cn('text-sm font-black px-2 py-0.5 rounded-lg',
-                    rd.score.grade === 'S' ? 'bg-yellow-500/20 text-yellow-300' : rd.score.grade === 'A' ? 'bg-green-500/20 text-green-300' :
-                    rd.score.grade === 'B' ? 'bg-blue-500/20 text-blue-300' : rd.score.grade === 'C' ? 'bg-orange-500/20 text-orange-300' : 'bg-gray-500/20 text-gray-400',
-                  )}>{rd.score.grade}</span>
-                  <span className="text-lg font-black text-yellow-400 flex-1">{rd.score.total}점</span>
-                  <p className={cn('text-sm font-black', rd.score.userPnl >= 0 ? 'text-green-400' : 'text-red-400')}>{fmtPnl(rd.score.userPnl)}</p>
+                <div className="px-4 py-3 border-b border-white/5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-7 h-7 rounded-full bg-[#1a1a1a] flex items-center justify-center text-sm font-black text-gray-400">{i + 1}</div>
+                    <span className="text-xl">{rd.score.emoji}</span>
+                    <span className={cn('text-sm font-black px-2 py-0.5 rounded-lg',
+                      rd.score.grade === 'S' ? 'bg-yellow-500/20 text-yellow-300' : rd.score.grade === 'A' ? 'bg-green-500/20 text-green-300' :
+                      rd.score.grade === 'B' ? 'bg-blue-500/20 text-blue-300' : rd.score.grade === 'C' ? 'bg-orange-500/20 text-orange-300' : 'bg-gray-500/20 text-gray-400',
+                    )}>{rd.score.grade}</span>
+                    <span className="text-base font-black text-yellow-400">{rd.score.total}점</span>
+                    <span className={cn('text-sm font-black ml-auto', rd.score.userPnl >= 0 ? 'text-green-400' : 'text-red-400')}>
+                      {fmtPnl(rd.score.userPnl)} ({rdReturnPct >= 0 ? '+' : ''}{rdReturnPct.toFixed(1)}%)
+                    </span>
+                  </div>
+                  {/* 실현/평가 손익 분리 */}
+                  <div className="grid grid-cols-2 gap-1.5">
+                    <div className="bg-[#0a0a0a] rounded-lg px-2.5 py-1.5">
+                      <p className="text-[9px] text-gray-600">✅ 실현 손익</p>
+                      <p className={cn('text-xs font-black', rdRealized >= 0 ? 'text-green-400' : 'text-red-400')}>{fmtPnl(rdRealized)}</p>
+                    </div>
+                    <div className="bg-[#0a0a0a] rounded-lg px-2.5 py-1.5">
+                      <p className="text-[9px] text-gray-600">📊 평가 손익 ({rd.finalShares}주)</p>
+                      <p className={cn('text-xs font-black', rdUnrealized >= 0 ? 'text-blue-400' : 'text-red-400')}>
+                        {rd.finalShares > 0 ? fmtPnl(rdUnrealized) : '보유 없음'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
                 {/* 차트 */}
                 <div className="h-40 p-1">

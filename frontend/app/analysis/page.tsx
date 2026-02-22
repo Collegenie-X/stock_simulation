@@ -1,628 +1,316 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { CheckCircle2, ChevronRight, Zap, TrendingUp } from "lucide-react"
-import { formatNumber } from "@/lib/format"
-import { storage } from "@/lib/storage"
-import { cn } from "@/lib/utils"
+import { useState, useEffect, useCallback, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
+import type {
+  AnyQuestion,
+  AssessmentMode,
+  TheoryQuestion,
+  ChartQuestion,
+  TheoryOption,
+  ChartOption,
+  AbilityScores,
+  PersonalityScores,
+  PersonalityType,
+} from "./types";
+import {
+  FEEDBACK_AUTO_ADVANCE_MS,
+  RESULT_DELAY_MS,
+  LABELS,
+  POINTS_PER_SELECTION,
+  QUICK_QUESTION_IDS,
+  ASSESSMENT_MODE_CONFIG,
+} from "./config";
+import questionsData from "@/data/analysis-questions.json";
+import QuestionHeader from "./components/QuestionHeader";
+import TheoryCard from "./components/TheoryCard";
+import ChartCard from "./components/ChartCard";
+import ResultScreen from "./components/ResultScreen";
+import { ParticleBurst, ScorePop, ScreenFlash, FeedbackTimer } from "./components/GameEffects";
 
-/**
- * 투자 성향 분석 페이지
- * - 다크 테마 모바일 최적화
- * - 12가지 질문으로 투자 DNA 심층 분석
- *   (이론 7문항 + 실전 차트 5문항)
- * - 5가지 능력 지표: 리스크 감수, 분석력, 감정 통제, 대처 능력, 정보 판별
- */
-
-type AbilityKey = "riskTolerance" | "analysis" | "emotionControl" | "coping" | "infoJudgment"
-
-interface TheoryOption {
-  text: string
-  score: number
-  type: string
-  emoji: string
-  best?: boolean
-  abilities: Partial<Record<AbilityKey, number>>
+function isChartQuestion(q: AnyQuestion): q is ChartQuestion {
+  return "title" in q;
 }
 
-interface ChartOption {
-  text: string
-  emotion: string
-  result: string
-  score: number
-  emoji: string
-  best?: boolean
-  abilities: Partial<Record<AbilityKey, number>>
-}
+const ALL_QUESTIONS: AnyQuestion[] = [
+  ...questionsData.theory,
+  ...questionsData.chart,
+] as AnyQuestion[];
 
-interface TheoryQuestion {
-  id: number
-  category: string
-  question: string
-  options: TheoryOption[]
-}
+const INITIAL_ABILITIES: AbilityScores = {
+  riskTolerance: 0,
+  analysis: 0,
+  emotionControl: 0,
+  coping: 0,
+  infoJudgment: 0,
+};
 
-interface ChartQuestion {
-  id: number
-  title: string
-  stock: string
-  situation: string
-  currentPrice: number
-  change?: string
-  volume?: string
-  news?: string
-  aiWarning?: string
-  question: string
-  options: ChartOption[]
-}
+const INITIAL_PERSONALITY: PersonalityScores = {
+  analyst: 0,
+  challenger: 0,
+  conservative: 0,
+  emotional: 0,
+  systematic: 0,
+};
 
-const analysisData: { theory: TheoryQuestion[]; chart: ChartQuestion[] } = {
-  theory: [
-    {
-      id: 1,
-      category: "risk_tolerance",
-      question: "보유 주식이 -10% 하락했습니다. 어떻게 하시겠습니까?",
-      options: [
-        { text: "즉시 손절한다", score: 10, type: "리스크 회피형", emoji: "😰", abilities: { riskTolerance: 10, emotionControl: 15 } },
-        { text: "추가 매수를 고려한다", score: 30, type: "공격형", emoji: "💪", abilities: { riskTolerance: 35, coping: 20 } },
-        { text: "분석 후 결정한다 ⭐", score: 20, type: "신중형", emoji: "🤔", best: true, abilities: { riskTolerance: 20, analysis: 30, emotionControl: 25 } },
-        { text: "그냥 기다린다", score: 15, type: "장기 투자형", emoji: "😌", abilities: { riskTolerance: 15, emotionControl: 10 } },
-      ],
-    },
-    {
-      id: 2,
-      category: "analysis_style",
-      question: "투자 결정을 내릴 때 가장 중요한 요소는?",
-      options: [
-        { text: "빠른 직감 (감각형)", score: 10, type: "분석력", emoji: "⚡", abilities: { analysis: 10, coping: 15 } },
-        { text: "차트 패턴 분석 (기술적) ⭐", score: 30, type: "분석력", emoji: "📊", best: true, abilities: { analysis: 35, infoJudgment: 20 } },
-        { text: "뉴스와 재무제표 (기본적)", score: 25, type: "분석력", emoji: "📰", abilities: { analysis: 25, infoJudgment: 25 } },
-        { text: "전문가 의견 (추종형)", score: 15, type: "분석력", emoji: "👨‍🏫", abilities: { analysis: 15, infoJudgment: 10 } },
-      ],
-    },
-    {
-      id: 3,
-      category: "period",
-      question: "선호하는 투자 기간은?",
-      options: [
-        { text: "당일~1주 (단타형)", score: 30, type: "거래빈도", emoji: "🏃", abilities: { riskTolerance: 30, coping: 25 } },
-        { text: "1주~1개월 (스윙형) ⭐", score: 20, type: "거래빈도", emoji: "🏄", best: true, abilities: { riskTolerance: 20, analysis: 20 } },
-        { text: "1개월~3개월 (중기형)", score: 15, type: "거래빈도", emoji: "🚶", abilities: { riskTolerance: 15, emotionControl: 20 } },
-        { text: "3개월 이상 (장기형)", score: 10, type: "거래빈도", emoji: "🧘", abilities: { emotionControl: 30, riskTolerance: 10 } },
-      ],
-    },
-    {
-      id: 4,
-      category: "return_risk",
-      question: "예상 수익률과 리스크 선호는?",
-      options: [
-        { text: "연 5~10% / 낮은 리스크", score: 10, type: "리스크", emoji: "🛡️", abilities: { riskTolerance: 10, emotionControl: 25 } },
-        { text: "연 10~30% / 중간 리스크 ⭐", score: 20, type: "리스크", emoji: "⚖️", best: true, abilities: { riskTolerance: 20, analysis: 20 } },
-        { text: "연 30~100% / 높은 리스크", score: 30, type: "리스크", emoji: "🎲", abilities: { riskTolerance: 30, coping: 15 } },
-        { text: "연 100%+ / 매우 높은 리스크", score: 40, type: "리스크", emoji: "🚀", abilities: { riskTolerance: 40, emotionControl: 5 } },
-      ],
-    },
-    {
-      id: 5,
-      category: "failure_response",
-      question: "투자 실패 시 어떻게 대응하나요?",
-      options: [
-        { text: "바로 분석해서 원인 찾기 ⭐", score: 30, type: "학습력", emoji: "🔍", best: true, abilities: { coping: 35, analysis: 25 } },
-        { text: "잠시 쉬었다가 다시", score: 20, type: "학습력", emoji: "☕", abilities: { emotionControl: 25, coping: 15 } },
-        { text: "전략을 완전히 바꾼다", score: 15, type: "학습력", emoji: "🔄", abilities: { coping: 20, emotionControl: 10 } },
-        { text: "더 신중하게 움직인다", score: 25, type: "학습력", emoji: "🐢", abilities: { emotionControl: 20, coping: 25 } },
-      ],
-    },
-    {
-      id: 6,
-      category: "emotion_control",
-      question: "시장이 3일 연속 급락! 포트폴리오 -15%. 당신의 행동은?",
-      options: [
-        { text: "잠을 못 자고 계속 주가 확인", score: 10, type: "감정통제", emoji: "😰", abilities: { emotionControl: 5, coping: 10 } },
-        { text: "미리 정한 손절 라인대로 실행 ⭐", score: 30, type: "감정통제", emoji: "🎯", best: true, abilities: { emotionControl: 35, coping: 30 } },
-        { text: "뉴스와 커뮤니티를 계속 탐색", score: 15, type: "감정통제", emoji: "📱", abilities: { emotionControl: 10, infoJudgment: 15 } },
-        { text: "앱을 끄고 일상에 집중한다", score: 20, type: "감정통제", emoji: "🧘", abilities: { emotionControl: 25, coping: 10 } },
-      ],
-    },
-    {
-      id: 7,
-      category: "info_judgment",
-      question: "SNS에서 '확실한 내부 정보'라며 특정 종목 추천! 당신의 반응은?",
-      options: [
-        { text: "빨리 매수 (기회를 놓칠까 봐)", score: 5, type: "정보판별", emoji: "🏃", abilities: { infoJudgment: 5, emotionControl: 5 } },
-        { text: "재무제표·차트 직접 분석 후 판단 ⭐", score: 30, type: "정보판별", emoji: "🔍", best: true, abilities: { infoJudgment: 35, analysis: 25 } },
-        { text: "주변 지인에게 물어본다", score: 15, type: "정보판별", emoji: "💬", abilities: { infoJudgment: 15, emotionControl: 15 } },
-        { text: "무시한다 (출처 불명은 위험)", score: 25, type: "정보판별", emoji: "🚫", abilities: { infoJudgment: 30, emotionControl: 25 } },
-      ],
-    },
-  ],
-  chart: [
-    {
-      id: 8,
-      title: "급등주 포착",
-      stock: "에코프로",
-      situation: "3일간 +25% 급등 후 현재 시점",
-      currentPrice: 195000,
-      change: "+28%",
-      volume: "+380%",
-      news: "정부 2차전지 지원 발표",
-      question: "당신의 선택은?",
-      options: [
-        { text: "지금 즉시 매수!", emotion: "욕심 80%", result: "-15%", score: 10, emoji: "🤑", abilities: { emotionControl: 5, infoJudgment: 10 } },
-        { text: "조정 올 때까지 대기 ⭐", emotion: "이성 70%", result: "+8%", score: 30, emoji: "🧠", best: true, abilities: { emotionControl: 30, analysis: 25 } },
-        { text: "절반만 매수", emotion: "균형 50%", result: "+2%", score: 20, emoji: "⚖️", abilities: { emotionControl: 20, coping: 20 } },
-        { text: "매수 안 함", emotion: "두려움 80%", result: "0%", score: 15, emoji: "😨", abilities: { emotionControl: 15, riskTolerance: 5 } },
-      ],
-    },
-    {
-      id: 9,
-      title: "하락장 대응",
-      stock: "삼성바이오",
-      situation: "850,000원에 매수 후 현재 -8% 손실",
-      currentPrice: 782000,
-      question: "당신의 감정과 선택은?",
-      options: [
-        { text: "즉시 손절!", emotion: "공포 90%", result: "-8%", score: 10, emoji: "😱", abilities: { emotionControl: 10, coping: 10 } },
-        { text: "물타기", emotion: "억울함 60%", result: "-15%", score: 5, emoji: "😤", abilities: { emotionControl: 5, coping: 5 } },
-        { text: "기다리며 분석 ⭐", emotion: "침착 70%", result: "+3%", score: 30, emoji: "😌", best: true, abilities: { emotionControl: 30, analysis: 25, coping: 30 } },
-        { text: "그냥 기다림", emotion: "무기력 60%", result: "-18%", score: 15, emoji: "😐", abilities: { emotionControl: 10, coping: 5 } },
-      ],
-    },
-    {
-      id: 10,
-      title: "B파 함정 회피",
-      stock: "셀트리온",
-      situation: "하락 후 반등 시작, B파 의심 구간",
-      currentPrice: 168000,
-      change: "+5%",
-      volume: "-20%",
-      aiWarning: "거래량 부족. B파 함정 가능성 80%",
-      question: "당신의 감정과 선택은?",
-      options: [
-        { text: "매수! (반등 기회)", emotion: "탐욕 80%", result: "-12%", score: 5, emoji: "🤑", abilities: { infoJudgment: 5, emotionControl: 5 } },
-        { text: "저항선 돌파 확인 후", emotion: "신중 60%", result: "0%", score: 25, emoji: "🤔", abilities: { analysis: 25, infoJudgment: 20 } },
-        { text: "진입 안 함 ⭐", emotion: "이성 90%", result: "0%", score: 30, emoji: "🧠", best: true, abilities: { infoJudgment: 35, emotionControl: 30 } },
-        { text: "소량만 매수", emotion: "반신반의", result: "-12%", score: 15, emoji: "😅", abilities: { coping: 15, emotionControl: 10 } },
-      ],
-    },
-    {
-      id: 11,
-      title: "갭하락 긴급 대응",
-      stock: "카카오",
-      situation: "미국 기술주 급락 여파, 장 시작 -5% 갭하락",
-      currentPrice: 47500,
-      change: "-5%",
-      volume: "+250%",
-      news: "미국 나스닥 -3.2% 급락 영향",
-      question: "장 시작 직후, 당신의 선택은?",
-      options: [
-        { text: "패닉 매도! 더 빠지기 전에", emotion: "공포 90%", result: "-5%", score: 10, emoji: "😱", abilities: { emotionControl: 5, coping: 5 } },
-        { text: "30분 관망 후 지지선 확인 ⭐", emotion: "침착 80%", result: "+2%", score: 30, emoji: "🧠", best: true, abilities: { emotionControl: 30, analysis: 30, coping: 35 } },
-        { text: "저가 매수 기회! 바로 매수", emotion: "탐욕 70%", result: "-3%", score: 15, emoji: "🤑", abilities: { riskTolerance: 30, coping: 15 } },
-        { text: "손절 라인 설정 후 보유 유지", emotion: "계획적 70%", result: "+1%", score: 25, emoji: "📋", abilities: { coping: 25, emotionControl: 25 } },
-      ],
-    },
-    {
-      id: 12,
-      title: "수익 실현 타이밍",
-      stock: "현대차",
-      situation: "매수 후 +20% 수익 중, 목표가 근접",
-      currentPrice: 264000,
-      change: "+20%",
-      volume: "+50%",
-      news: "글로벌 EV 시장 확대 전망",
-      question: "수익 실현을 어떻게 하시겠습니까?",
-      options: [
-        { text: "전량 매도! 수익 확보가 최우선", emotion: "만족 60%", result: "+20%", score: 20, emoji: "💰", abilities: { emotionControl: 20, coping: 15 } },
-        { text: "분할 매도 (50% 먼저) ⭐", emotion: "이성 70%", result: "+25%", score: 30, emoji: "📊", best: true, abilities: { analysis: 25, coping: 30, emotionControl: 25 } },
-        { text: "더 오를 것 같아 전량 홀딩", emotion: "욕심 80%", result: "-10%", score: 10, emoji: "🎰", abilities: { emotionControl: 5, infoJudgment: 10 } },
-        { text: "트레일링 스탑 걸고 보유", emotion: "계획적 70%", result: "+15%", score: 25, emoji: "📈", abilities: { coping: 25, analysis: 20, emotionControl: 20 } },
-      ],
-    },
-  ],
-}
-
-const ABILITY_LABELS: Record<AbilityKey, { label: string; emoji: string; gradient: string }> = {
-  riskTolerance: { label: "리스크 감수", emoji: "🎲", gradient: "from-red-500 to-orange-500" },
-  analysis: { label: "분석력", emoji: "📊", gradient: "from-blue-500 to-cyan-500" },
-  emotionControl: { label: "감정 통제", emoji: "🧘", gradient: "from-green-500 to-emerald-500" },
-  coping: { label: "대처 능력", emoji: "⚡", gradient: "from-yellow-500 to-orange-500" },
-  infoJudgment: { label: "정보 판별", emoji: "🔍", gradient: "from-purple-500 to-violet-500" },
-}
-
-function computeAbilities(allQuestions: (TheoryQuestion | ChartQuestion)[], chosenIndices: number[]) {
-  const totals: Record<AbilityKey, number> = {
-    riskTolerance: 0,
-    analysis: 0,
-    emotionControl: 0,
-    coping: 0,
-    infoJudgment: 0,
-  }
-  const counts: Record<AbilityKey, number> = { ...totals }
-
-  chosenIndices.forEach((optIdx, qIdx) => {
-    const q = allQuestions[qIdx]
-    const opt = q.options[optIdx] as TheoryOption | ChartOption
-    if (opt.abilities) {
-      for (const [key, val] of Object.entries(opt.abilities)) {
-        const k = key as AbilityKey
-        totals[k] += val!
-        counts[k] += 1
-      }
-    }
-  })
-
-  const result: Record<AbilityKey, number> = { ...totals }
-  for (const key of Object.keys(result) as AbilityKey[]) {
-    const maxPossible = counts[key] > 0 ? counts[key] * 35 : 1
-    result[key] = Math.min(Math.round((totals[key] / maxPossible) * 100), 100)
-  }
-  return result
-}
+type Phase = "intro" | "quiz" | "result";
 
 export default function AnalysisPage() {
-  const router = useRouter()
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [answers, setAnswers] = useState<number[]>([])
-  const [chosenIndices, setChosenIndices] = useState<number[]>([])
-  const [selectedOption, setSelectedOption] = useState<number | null>(null)
-  const [showFeedback, setShowFeedback] = useState(false)
-  const [totalScore, setTotalScore] = useState(0)
-  const [showResult, setShowResult] = useState(false)
+  const searchParams = useSearchParams();
+  const mode: AssessmentMode = searchParams.get("mode") === "quick" ? "quick" : "detailed";
+  const modeConfig = ASSESSMENT_MODE_CONFIG[mode];
 
-  const allQuestions = [...analysisData.theory, ...analysisData.chart]
-  const currentQuestion = allQuestions[currentIndex]
-  const isTheory = currentIndex < analysisData.theory.length
-  const progressPercent = (currentIndex / allQuestions.length) * 100
-
-  const handleAnswer = (optionIndex: number) => {
-    const option = currentQuestion.options[optionIndex]
-    const score = (option as TheoryOption | ChartOption).score
-
-    setSelectedOption(optionIndex)
-    setShowFeedback(true)
-    setTotalScore(totalScore + score)
-    setAnswers([...answers, score])
-    setChosenIndices([...chosenIndices, optionIndex])
-
-    setTimeout(() => {
-      if (currentIndex < allQuestions.length - 1) {
-        setCurrentIndex(currentIndex + 1)
-        setSelectedOption(null)
-        setShowFeedback(false)
-      } else {
-        const avgScore = Math.round((totalScore + score) / allQuestions.length)
-        let investorType = "신중한 기술적 분석가"
-        if (avgScore < 15) investorType = "보수적 안정형 투자자"
-        else if (avgScore > 25) investorType = "공격적 도전형 투자자"
-
-        const finalChoices = [...chosenIndices, optionIndex]
-        const abilities = computeAbilities(allQuestions, finalChoices)
-
-        storage.saveUserProfile({
-          investorType,
-          analysisScore: avgScore,
-          abilities,
-          completedAt: new Date().toISOString(),
-        })
-        storage.setOnboardingComplete()
-        storage.setGuideComplete()
-
-        setTimeout(() => {
-          setShowResult(true)
-        }, 1000)
-      }
-    }, 1500)
-  }
-
-  // 결과 화면
-  if (showResult) {
-    const avgScore = Math.round(totalScore / allQuestions.length)
-    const abilities = computeAbilities(allQuestions, chosenIndices)
-
-    let investorType = "신중한 기술적 분석가"
-    let description = "차트 분석 능력이 우수하며, 이성적인 판단이 가능합니다."
-    let emoji = "📊"
-    let tips: string[] = ["기술적 분석 학습을 깊이 있게 진행하세요", "감정보다 데이터에 기반한 결정을 유지하세요"]
-
-    if (avgScore < 15) {
-      investorType = "보수적 안정형 투자자"
-      description = "리스크를 최소화하며 안정적인 투자를 선호합니다. 원금 보존에 탁월합니다."
-      emoji = "🛡️"
-      tips = ["안정적인 배당주 중심 포트폴리오를 구성해 보세요", "점진적으로 리스크 허용 범위를 넓혀보세요"]
-    } else if (avgScore > 25) {
-      investorType = "공격적 도전형 투자자"
-      description = "높은 수익을 위해 적극적으로 투자합니다. 기회 포착력이 뛰어납니다."
-      emoji = "⚡"
-      tips = ["손절 라인을 반드시 설정하고 지키세요", "감정이 아닌 전략에 기반한 매매를 연습하세요"]
+  const allQuestions = useMemo(() => {
+    if (mode === "quick") {
+      return ALL_QUESTIONS.filter((q) => QUICK_QUESTION_IDS.includes(q.id));
     }
+    return ALL_QUESTIONS;
+  }, [mode]);
 
-    const abilityKeys = Object.keys(ABILITY_LABELS) as AbilityKey[]
-    const avgAbility = Math.round(abilityKeys.reduce((sum, k) => sum + abilities[k], 0) / abilityKeys.length)
-    const strongestKey = abilityKeys.reduce((best, k) => abilities[k] > abilities[best] ? k : best, abilityKeys[0])
-    const weakestKey = abilityKeys.reduce((worst, k) => abilities[k] < abilities[worst] ? k : worst, abilityKeys[0])
+  const theoryCount = useMemo(
+    () => allQuestions.filter((q) => !isChartQuestion(q)).length,
+    [allQuestions]
+  );
 
+  const [phase, setPhase] = useState<Phase>("intro");
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackType, setFeedbackType] = useState<PersonalityType | null>(null);
+  const [feedbackInsight, setFeedbackInsight] = useState("");
+  const [abilities, setAbilities] = useState<AbilityScores>(INITIAL_ABILITIES);
+  const [personalityScores, setPersonalityScores] = useState<PersonalityScores>(INITIAL_PERSONALITY);
+  const [showResult, setShowResult] = useState(false);
+  const [chartTrigger, setChartTrigger] = useState(0);
+
+  // game effects
+  const [particleTrigger, setParticleTrigger] = useState(0);
+  const [showScorePop, setShowScorePop] = useState(false);
+  const [canAdvance, setCanAdvance] = useState(false);
+
+  const currentQ = allQuestions[currentIdx];
+  const total = allQuestions.length;
+  const isChart = currentQ ? isChartQuestion(currentQ) : false;
+
+  // reset on question change
+  useEffect(() => {
+    setChartTrigger((t) => t + 1);
+    setSelected(null);
+    setShowFeedback(false);
+    setFeedbackType(null);
+    setFeedbackInsight("");
+    setShowScorePop(false);
+    setCanAdvance(false);
+  }, [currentIdx]);
+
+  const advanceToNext = useCallback(() => {
+    const next = currentIdx + 1;
+    if (next >= total) {
+      setPhase("result");
+      setTimeout(() => setShowResult(true), RESULT_DELAY_MS);
+    } else {
+      setCurrentIdx(next);
+    }
+  }, [currentIdx, total]);
+
+  const handleSelect = useCallback(
+    (index: number, option: TheoryOption | ChartOption) => {
+      if (showFeedback) return;
+      setSelected(index);
+      setShowFeedback(true);
+      setFeedbackType(option.personalityType);
+      setFeedbackInsight(option.insight);
+
+      // game effects
+      setParticleTrigger((t) => t + 1);
+      setShowScorePop(true);
+      setTimeout(() => setShowScorePop(false), 2000);
+
+      // accumulate personality
+      setPersonalityScores((prev) => ({
+        ...prev,
+        [option.personalityType]: prev[option.personalityType] + POINTS_PER_SELECTION,
+      }));
+
+      // accumulate abilities
+      setAbilities((prev) => {
+        const next = { ...prev };
+        for (const [k, v] of Object.entries(option.abilities)) {
+          const key = k as keyof AbilityScores;
+          next[key] = (next[key] ?? 0) + (v ?? 0);
+        }
+        return next;
+      });
+
+      // enable manual advance and set auto-advance timer
+      setCanAdvance(true);
+    },
+    [showFeedback]
+  );
+
+  // auto-advance after feedback time
+  useEffect(() => {
+    if (!canAdvance) return;
+    const t = setTimeout(advanceToNext, FEEDBACK_AUTO_ADVANCE_MS);
+    return () => clearTimeout(t);
+  }, [canAdvance, advanceToNext]);
+
+  const handleSkipFeedback = useCallback(() => {
+    if (canAdvance) {
+      setCanAdvance(false);
+      advanceToNext();
+    }
+  }, [canAdvance, advanceToNext]);
+
+  // ── intro screen ────────────────────────────────────────────────────────────
+  if (phase === "intro") {
     return (
-      <div className="min-h-screen-mobile bg-gradient-to-b from-blue-600 to-purple-700 px-5 py-8 flex flex-col items-center">
-        <div className="max-w-md w-full animate-slide-up">
-          <div className="text-center mb-6">
-            <div className="text-7xl mb-4 animate-bounce">{emoji}</div>
-            <div className="inline-flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-6 py-2 mb-3">
-              <Zap className="w-5 h-5 text-yellow-300" />
-              <span className="text-white font-bold text-lg">{totalScore} 점</span>
-            </div>
-            <h1 className="text-3xl font-bold text-white mb-2">분석 완료!</h1>
-            <p className="text-blue-100 text-lg">당신의 투자 DNA는...</p>
+      <main className="min-h-screen bg-black flex flex-col items-center justify-center px-5 py-12 relative overflow-hidden">
+        {/* ambient glow */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 rounded-full bg-indigo-600/20 blur-3xl" />
+
+        <div className="w-full max-w-sm flex flex-col items-center gap-6 animate-fadeUp relative z-10">
+          <div className="text-7xl animate-float">🎮</div>
+
+          <div className="text-center">
+            <h1 className="text-2xl font-black text-white mb-2">{LABELS.pageTitle}</h1>
+            <p className="text-white/45 text-sm">{modeConfig.subtitle}</p>
+            {mode === "quick" && (
+              <span className="inline-block mt-2 text-[11px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1 rounded-full">
+                ⚡ 간략 측정
+              </span>
+            )}
+            {mode === "detailed" && (
+              <span className="inline-block mt-2 text-[11px] font-bold text-purple-400 bg-purple-500/10 border border-purple-500/30 px-3 py-1 rounded-full">
+                🔬 세부 측정
+              </span>
+            )}
           </div>
 
-          <div className="bg-[#252525] rounded-3xl p-6 shadow-2xl mb-4 border border-white/10">
-            <h2 className="text-2xl font-bold text-white mb-2 text-center">{investorType}</h2>
-            <p className="text-gray-400 text-center leading-relaxed mb-5 text-sm">{description}</p>
-
-            <div className="bg-[#1a1a1a] rounded-2xl p-4 mb-5">
-              <h3 className="text-sm font-bold text-gray-300 mb-3 flex items-center gap-2">
-                🧬 5대 투자 능력 지표
-              </h3>
-              <div className="space-y-3">
-                {abilityKeys.map((key, i) => {
-                  const { label, emoji: abilityEmoji, gradient } = ABILITY_LABELS[key]
-                  const value = abilities[key]
-                  return (
-                    <div key={key}>
-                      <div className="flex justify-between text-sm mb-1.5">
-                        <span className="text-gray-400 flex items-center gap-1.5">
-                          <span>{abilityEmoji}</span>
-                          {label}
-                        </span>
-                        <span className="font-bold text-white">{value}%</span>
-                      </div>
-                      <div className="h-2.5 bg-gray-700 rounded-full overflow-hidden">
-                        <div
-                          className={cn("h-full bg-gradient-to-r rounded-full transition-all duration-1000", gradient)}
-                          style={{ width: `${value}%`, transitionDelay: `${i * 150}ms` }}
-                        />
-                      </div>
-                    </div>
-                  )
-                })}
+          <div className="w-full rounded-2xl bg-white/[0.04] border border-white/8 p-4 flex flex-col gap-4">
+            {[
+              { emoji: "🎭", text: "다양한 상황에서 네 감정을 솔직하게 골라봐!", delay: 0 },
+              { emoji: "📈", text: "실전 차트를 보면서 네 반응을 체크해!", delay: 100 },
+              { emoji: "🎯", text: "정답은 없어! 네 성향을 발견하는 게 목표야", delay: 200 },
+              { emoji: "🏆", text: "선택할 때마다 점수와 특수효과가 빵빵!", delay: 300 },
+            ].map(({ emoji, text, delay }) => (
+              <div
+                key={text}
+                className="flex items-start gap-3 animate-slideUp"
+                style={{ animationDelay: `${delay}ms` }}
+              >
+                <span className="text-xl flex-shrink-0">{emoji}</span>
+                <p className="text-white/65 text-sm leading-relaxed">{text}</p>
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 mb-5">
-              <div className="bg-green-500/10 rounded-xl p-3 border border-green-500/20 text-center">
-                <p className="text-xs text-green-400 mb-1">가장 강한 능력</p>
-                <p className="text-lg">{ABILITY_LABELS[strongestKey].emoji}</p>
-                <p className="text-sm font-bold text-white">{ABILITY_LABELS[strongestKey].label}</p>
-              </div>
-              <div className="bg-orange-500/10 rounded-xl p-3 border border-orange-500/20 text-center">
-                <p className="text-xs text-orange-400 mb-1">보완 필요 능력</p>
-                <p className="text-lg">{ABILITY_LABELS[weakestKey].emoji}</p>
-                <p className="text-sm font-bold text-white">{ABILITY_LABELS[weakestKey].label}</p>
-              </div>
-            </div>
-
-            <div className="bg-blue-500/10 rounded-xl p-4 border border-blue-500/20">
-              <h4 className="text-sm font-bold text-blue-300 mb-2">💡 맞춤 성장 팁</h4>
-              <ul className="space-y-1.5">
-                {tips.map((tip, i) => (
-                  <li key={i} className="text-sm text-gray-300 flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
-                    {tip}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            ))}
           </div>
 
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 mb-4 text-center border border-white/10">
-            <p className="text-sm text-white/70">종합 투자 역량</p>
-            <p className="text-4xl font-black text-white">{avgAbility}<span className="text-lg text-white/60">점</span></p>
-          </div>
-
-          <Button
-            className="w-full h-16 bg-white hover:bg-gray-100 text-blue-600 rounded-2xl text-xl font-bold shadow-2xl"
-            onClick={() => {
-              storage.setGuideComplete()
-              router.push("/home")
-            }}
+          <button
+            onClick={() => setPhase("quiz")}
+            className="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-black text-base shadow-[0_0_32px_rgba(99,102,241,0.45)] hover:shadow-[0_0_44px_rgba(99,102,241,0.65)] hover:scale-[1.02] active:scale-[0.98] transition-all"
           >
-            홈으로 이동
-            <ChevronRight className="ml-2 w-6 h-6" />
-          </Button>
+            {LABELS.startCta}
+          </button>
+
+          <p className="text-white/20 text-xs text-center">
+            답변은 저장되지 않아. 편하게 골라!
+          </p>
         </div>
-      </div>
-    )
+      </main>
+    );
   }
 
-  // 질문 화면
-  return (
-    <div className="min-h-screen-mobile bg-gradient-to-b from-blue-600 to-purple-700 flex flex-col">
-      {/* 헤더 */}
-      <div className="bg-white/10 backdrop-blur-sm border-b border-white/20 px-5 py-4">
-        <div className="max-w-md mx-auto">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <span className="text-2xl">{isTheory ? "🧠" : "📈"}</span>
-              </div>
-              <div>
-                <p className="text-xs text-blue-100">{isTheory ? "투자 성향 분석" : "실전 차트 테스트"}</p>
-                <p className="text-sm font-bold text-white">
-                  {currentIndex + 1} / {allQuestions.length}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2">
-              <Zap className="w-4 h-4 text-yellow-300" />
-              <span className="text-white font-bold">{totalScore}</span>
-            </div>
-          </div>
-          <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-white rounded-full transition-all duration-300"
-              style={{ width: `${progressPercent}%` }}
+  // ── result screen ───────────────────────────────────────────────────────────
+  if (phase === "result") {
+    return (
+      <main className="min-h-screen bg-black overflow-y-auto relative">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-72 h-72 rounded-full bg-purple-600/15 blur-3xl" />
+        <div className="w-full max-w-sm mx-auto pt-4 relative z-10">
+          {showResult ? (
+            <ResultScreen
+              personalityScores={personalityScores}
+              abilities={abilities}
+              totalQuestions={total}
+              mode={mode}
             />
-          </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+              <div className="text-6xl animate-bounceIn">🔮</div>
+              <p className="text-white/50 text-sm animate-pulse">너의 성향을 분석하는 중...</p>
+            </div>
+          )}
         </div>
-      </div>
+      </main>
+    );
+  }
 
-      {/* 질문 내용 */}
-      <div className="flex-1 px-5 py-6 max-w-md mx-auto w-full">
-        {isTheory ? (
-          <div className="animate-slide-up">
-            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 mb-6 border border-white/20">
-              <h2 className="text-2xl font-bold text-white leading-relaxed text-center">{currentQuestion.question}</h2>
-            </div>
+  // ── quiz screen ─────────────────────────────────────────────────────────────
+  return (
+    <main className="min-h-screen bg-black overflow-y-auto relative">
+      {/* game effects */}
+      <ScreenFlash personalityType={feedbackType} trigger={particleTrigger} />
+      <ParticleBurst personalityType={feedbackType} trigger={particleTrigger} />
+      <ScorePop show={showScorePop} personalityType={feedbackType} />
 
-            <div className="space-y-3">
-              {currentQuestion.options.map((option, index) => {
-                const isSelected = selectedOption === index
-                const isBest = (option as any).best
-                const showResult = showFeedback && isSelected
+      <div className="w-full max-w-sm mx-auto flex flex-col relative z-10">
+        <QuestionHeader
+          current={currentIdx + 1}
+          total={total}
+          score={Object.values(personalityScores).reduce((a, b) => a + b, 0)}
+          isChart={isChart}
+        />
 
-                return (
-                  <button
-                    key={index}
-                    onClick={() => !showFeedback && handleAnswer(index)}
-                    disabled={showFeedback}
-                    className={cn(
-                      "w-full p-5 rounded-2xl text-left transition-all duration-300 transform touch-feedback",
-                      showFeedback ? "cursor-not-allowed" : "",
-                      isSelected && showResult
-                        ? isBest
-                          ? "bg-green-500 border-2 border-green-400 shadow-lg shadow-green-500/50"
-                          : "bg-blue-500 border-2 border-blue-400 shadow-lg shadow-blue-500/50"
-                        : "bg-white/90 backdrop-blur-sm border-2 border-white/50 hover:bg-white hover:border-white"
-                    )}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="text-4xl">{(option as any).emoji}</div>
-                      <div className="flex-1">
-                        <p className={cn("font-bold text-lg mb-1", showResult ? "text-white" : "text-gray-900")}>
-                          {option.text}
-                        </p>
-                        <p className={cn("text-sm", showResult ? "text-white/80" : "text-gray-600")}>
-                          {(option as any).type}
-                        </p>
-                        {showResult && (
-                          <div className="mt-2 flex items-center gap-2">
-                            {isBest ? (
-                              <>
-                                <CheckCircle2 className="w-5 h-5 text-white" />
-                                <span className="text-white font-bold">최고의 선택!</span>
-                              </>
-                            ) : (
-                              <span className="text-white font-bold">+{(option as any).score}점</span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
+        {currentIdx === theoryCount && theoryCount > 0 && (
+          <div className="mx-4 my-3 flex items-center gap-2 animate-fadeUp">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
+            <span className="text-xs text-emerald-400/70 font-bold px-3">📈 실전 차트 구간!</span>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
           </div>
-        ) : (
-          <div className="animate-slide-up">
-            <div className="bg-[#252525] rounded-3xl p-6 mb-4 shadow-xl border border-white/10">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-xl font-bold text-white mb-1">{(currentQuestion as any).title}</h3>
-                  <p className="text-sm text-gray-400">{(currentQuestion as any).stock}</p>
-                </div>
-                <div className="text-4xl">📊</div>
-              </div>
+        )}
 
-              <div className="bg-gray-800/50 rounded-2xl p-4 mb-4">
-                <div className="flex items-baseline justify-between mb-3">
-                  <span className="text-sm text-gray-400">현재가</span>
-                  <span className="text-3xl font-bold text-white">
-                    {(currentQuestion as any)formatNumber(.currentPrice)}
-                  </span>
-                </div>
-                <div className="flex gap-4 text-sm">
-                  <div className="flex items-center gap-1">
-                    <TrendingUp className="w-4 h-4 text-red-500" />
-                    <span className="text-gray-400">등락:</span>
-                    <span className="font-bold text-red-500">{(currentQuestion as any).change}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <TrendingUp className="w-4 h-4 text-blue-500" />
-                    <span className="text-gray-400">거래량:</span>
-                    <span className="font-bold text-blue-500">{(currentQuestion as any).volume}</span>
-                  </div>
-                </div>
-              </div>
-
-              {(currentQuestion as any).aiWarning && (
-                <div className="bg-yellow-500/10 border-2 border-yellow-500/30 rounded-xl p-3 mb-4">
-                  <p className="text-sm font-semibold text-yellow-400">⚠️ {(currentQuestion as any).aiWarning}</p>
-                </div>
-              )}
-
-              <p className="text-gray-400 text-sm">{(currentQuestion as any).situation}</p>
-            </div>
-
-            <h2 className="text-xl font-bold text-white mb-4 text-center">{currentQuestion.question}</h2>
-
-            <div className="space-y-3">
-              {currentQuestion.options.map((option, index) => {
-                const isSelected = selectedOption === index
-                const isBest = (option as any).best
-                const showResult = showFeedback && isSelected
-
-                return (
-                  <button
-                    key={index}
-                    onClick={() => !showFeedback && handleAnswer(index)}
-                    disabled={showFeedback}
-                    className={cn(
-                      "w-full p-5 rounded-2xl text-left transition-all duration-300 transform touch-feedback",
-                      showFeedback ? "cursor-not-allowed" : "",
-                      isSelected && showResult
-                        ? isBest
-                          ? "bg-green-500 border-2 border-green-400 shadow-lg shadow-green-500/50"
-                          : "bg-blue-500 border-2 border-blue-400 shadow-lg shadow-blue-500/50"
-                        : "bg-white/90 backdrop-blur-sm border-2 border-white/50 hover:bg-white hover:border-white"
-                    )}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="text-4xl">{(option as any).emoji}</div>
-                      <div className="flex-1">
-                        <p className={cn("font-bold text-lg mb-2", showResult ? "text-white" : "text-gray-900")}>
-                          {option.text}
-                        </p>
-                        <div
-                          className={cn("flex items-center gap-3 text-sm", showResult ? "text-white/80" : "text-gray-600")}
-                        >
-                          <span>{(option as any).emotion}</span>
-                          <span>•</span>
-                          <span>예상: {(option as any).result}</span>
-                        </div>
-                        {showResult && (
-                          <div className="mt-3 flex items-center gap-2">
-                            {isBest ? (
-                              <>
-                                <CheckCircle2 className="w-5 h-5 text-white" />
-                                <span className="text-white font-bold">완벽한 판단!</span>
-                              </>
-                            ) : (
-                              <span className="text-white font-bold">+{(option as any).score}점</span>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                )
-              })}
+        {!isChart && (currentQ as TheoryQuestion).scenarioGroup && (
+          <div className="mx-4 mb-2 animate-fadeUp">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-gradient-to-r from-red-500/10 to-orange-500/10 border border-red-500/20">
+              <span className="text-sm">📖</span>
+              <span className="text-xs font-bold text-red-300">
+                시나리오 {(currentQ as TheoryQuestion).scenarioStep}/{(currentQ as TheoryQuestion).scenarioTotal}
+              </span>
+              <span className="text-xs text-white/40">|</span>
+              <span className="text-xs text-white/50">{(currentQ as TheoryQuestion).scenarioTitle}</span>
             </div>
           </div>
         )}
+
+        {isChart ? (
+          <ChartCard
+            question={currentQ as ChartQuestion}
+            selected={selected}
+            showFeedback={showFeedback}
+            feedbackType={feedbackType}
+            feedbackInsight={feedbackInsight}
+            trigger={chartTrigger}
+            onSelect={(i, opt) => handleSelect(i, opt as ChartOption)}
+          />
+        ) : (
+          <TheoryCard
+            question={currentQ as TheoryQuestion}
+            selected={selected}
+            showFeedback={showFeedback}
+            feedbackType={feedbackType}
+            feedbackInsight={feedbackInsight}
+            chartTrigger={chartTrigger}
+            onSelect={(i, opt) => handleSelect(i, opt as TheoryOption)}
+          />
+        )}
+
+        {/* manual advance button */}
+        <FeedbackTimer
+          show={showFeedback && canAdvance}
+          durationMs={FEEDBACK_AUTO_ADVANCE_MS}
+          personalityType={feedbackType}
+          onSkip={handleSkipFeedback}
+        />
       </div>
-    </div>
-  )
+    </main>
+  );
 }

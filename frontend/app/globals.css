@@ -430,8 +430,120 @@ button {
   animation: fadeIn 0.2s ease-out;
 }
 
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
+.animate-fadeUp {
+  animation: fadeUp 0.4s ease-out both;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Game effects */
+@keyframes particleBurst {
+  0%   { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); }
+  100% { opacity: 0; transform: translate(var(--vx, 80px), var(--vy, -120px)) scale(0.2) rotate(360deg); }
+}
+
+@keyframes scorePop {
+  0%   { opacity: 0; transform: translate(-50%, 30px) scale(0.5); }
+  20%  { opacity: 1; transform: translate(-50%, 0) scale(1.1); }
+  40%  { transform: translate(-50%, 0) scale(1); }
+  80%  { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -20px) scale(0.9); }
+}
+
+@keyframes screenFlash {
+  0%   { opacity: 0.15; }
+  100% { opacity: 0; }
+}
+
+@keyframes shrinkWidth {
+  0%   { width: 100%; }
+  100% { width: 0%; }
+}
+
+@keyframes bounceIn {
+  0%   { opacity: 0; transform: scale(0.3); }
+  50%  { opacity: 1; transform: scale(1.08); }
+  70%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+@keyframes slideUp {
+  0%   { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+  20%, 40%, 60%, 80% { transform: translateX(3px); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(255,255,255,0.1); }
+  50%      { box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+}
+
+.animate-particleBurst {
+  animation: particleBurst 1.2s ease-out forwards;
+}
+
+.animate-scorePop {
+  animation: scorePop 1.8s ease-out forwards;
+}
+
+.animate-screenFlash {
+  animation: screenFlash 0.4s ease-out forwards;
+}
+
+.animate-bounceIn {
+  animation: bounceIn 0.5s ease-out both;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.4s ease-out both;
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+.animate-glowPulse {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
 .animate-pulse-glow {
   animation: pulse-glow 2s infinite;
+}
+
+/* Scanning line animation */
+@keyframes scanLine {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+@keyframes pingSlow {
+  0%   { transform: scale(1); opacity: 1; }
+  75%, 100% { transform: scale(1.5); opacity: 0; }
+}
+
+.animate-scan {
+  animation: scanLine 1.5s ease-in-out infinite;
+}
+
+.animate-ping-slow {
+  animation: pingSlow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
 /* 스태거 애니메이션 */

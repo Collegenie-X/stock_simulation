@@ -1,14 +1,14 @@
 {
   "game": {
     "defaultCash": 10000000,
-    "defaultHoldings": 100,
+    "defaultHoldings": 0,
     "chartPointsPerTurn": 20,
     "turnTimerSec": 30,
-    "comboBonus": [0, 10, 25, 50, 100],
+    "comboBonus": [0, 8, 20, 40, 80],
     "timeBonus": {
-      "fast": { "sec": 8, "points": 30, "label": "⚡ 번개 판단!" },
-      "normal": { "sec": 18, "points": 15, "label": "👍 괜찮은 속도" },
-      "slow": { "sec": 30, "points": 5, "label": "⏰ 간신히!" }
+      "fast": { "sec": 8, "points": 20, "label": "⚡ 번개 판단!" },
+      "normal": { "sec": 18, "points": 8, "label": "👍 신중한 판단" },
+      "slow": { "sec": 30, "points": 0, "label": "⏰ 더 빠르게!" }
     }
   },
   "ui": {
@@ -71,7 +71,7 @@
         "이 타이밍에 이 선택? 최고야!"
       ],
       "emoji": "🎉",
-      "points": 100
+      "points": 60
     },
     "good": {
       "titles": ["괜찮아! 👍", "나쁘지 않아!", "안전한 선택!", "신중한 접근!"],
@@ -82,7 +82,7 @@
         "원금 보존이 제일 중요해"
       ],
       "emoji": "👍",
-      "points": 50
+      "points": 20
     },
     "bad": {
       "titles": ["아쉽다... 😰", "조심해!", "위험한 판단!", "다시 생각해봐!"],
@@ -94,7 +94,7 @@
         "손절은 부끄러운 게 아니야"
       ],
       "emoji": "😰",
-      "points": 10
+      "points": 0
     },
     "timeout": {
       "titles": ["시간 초과! ⏰", "너무 늦었어!", "결정장애?!"],
@@ -104,14 +104,14 @@
         "30초 안에 결정하는 연습을 해봐"
       ],
       "emoji": "⏰",
-      "points": 0
+      "points": -15
     }
   },
   "grades": {
-    "S": { "label": "S", "title": "전설적 투자자 👑", "color": "text-yellow-400", "minRate": 5, "emoji": "🏆" },
-    "A": { "label": "A", "title": "숙련된 투자자 ⭐", "color": "text-green-400", "minRate": 0, "emoji": "⭐" },
-    "B": { "label": "B", "title": "견습 투자자 📘", "color": "text-blue-400", "minRate": -5, "emoji": "📘" },
-    "C": { "label": "C", "title": "초보 투자자 📙", "color": "text-orange-400", "minRate": -10, "emoji": "📙" },
+    "S": { "label": "S", "title": "전설적 투자자 👑", "color": "text-yellow-400", "minRate": 15, "emoji": "🏆" },
+    "A": { "label": "A", "title": "숙련된 투자자 ⭐", "color": "text-green-400", "minRate": 5, "emoji": "⭐" },
+    "B": { "label": "B", "title": "견습 투자자 📘", "color": "text-blue-400", "minRate": 0, "emoji": "📘" },
+    "C": { "label": "C", "title": "초보 투자자 📙", "color": "text-orange-400", "minRate": -5, "emoji": "📙" },
     "D": { "label": "D", "title": "다시 도전해봐! 📕", "color": "text-red-400", "minRate": -999, "emoji": "📕" }
   },
   "sentiment": {
