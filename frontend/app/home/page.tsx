@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { MobileNav } from "@/components/mobile-nav"
 import { storage } from "@/lib/storage"
-import { Settings, Target, Trophy, Gamepad2 } from "lucide-react"
+import { Settings, Target } from "lucide-react"
 import HeroChart from "./components/HeroChart"
 import GameModeCards from "./components/GameModeCards"
 import PlayerStats from "./components/PlayerStats"
@@ -125,26 +125,6 @@ export default function HomePage() {
 
         {/* Game Mode Selection */}
         <GameModeCards />
-
-        {/* Other Modes */}
-        <div className="px-5 grid grid-cols-2 gap-2.5">
-          <button
-            onClick={() => (window.location.href = "/practice")}
-            className="bg-[#1e1e2e] rounded-2xl p-4 border border-white/5 active:bg-[#252535] transition-colors text-left"
-          >
-            <Gamepad2 className="w-6 h-6 text-cyan-400 mb-2" />
-            <div className="font-bold text-sm text-white">커리어 모드</div>
-            <div className="text-[11px] text-gray-500 mt-0.5">1~6단계 전체 도전</div>
-          </button>
-          <button
-            onClick={() => (window.location.href = "/compete")}
-            className="bg-[#1e1e2e] rounded-2xl p-4 border border-white/5 active:bg-[#252535] transition-colors text-left"
-          >
-            <Trophy className="w-6 h-6 text-yellow-400 mb-2" />
-            <div className="font-bold text-sm text-white">랭킹전</div>
-            <div className="text-[11px] text-gray-500 mt-0.5">AI와 수익률 대결</div>
-          </button>
-        </div>
 
         {/* Daily Missions - Compact */}
         <div className="mx-5 bg-[#1e1e2e] rounded-2xl p-4 border border-white/5">
