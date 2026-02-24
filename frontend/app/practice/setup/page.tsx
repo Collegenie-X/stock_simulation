@@ -251,7 +251,7 @@ export default function GameSetupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#191919] text-white pb-28">
+    <div className="min-h-screen bg-[#191919] text-white pb-36">
       {/* Header */}
       <div className="pt-safe-top px-5 py-4 flex items-center gap-3">
         <button
@@ -286,19 +286,21 @@ export default function GameSetupPage() {
       </div>
 
       {/* Start Button */}
-      <div className="fixed bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-[#191919] via-[#191919] to-transparent">
-        <button
-          onClick={handleStart}
-          className={cn(
-            "w-full py-4 rounded-2xl font-bold text-lg shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2",
-            mode === "sprint" && "bg-orange-600 hover:bg-orange-500 shadow-orange-900/20",
-            mode === "standard" && "bg-blue-600 hover:bg-blue-500 shadow-blue-900/20",
-            mode === "marathon" && "bg-purple-600 hover:bg-purple-500 shadow-purple-900/20"
-          )}
-        >
-          <Play className="w-5 h-5 fill-current" />
-          {LABELS.startButton(currentMode.icon, currentMode.name, currentMode.time)}
-        </button>
+      <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-[#191919] via-[#191919] to-transparent" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}>
+        <div className="px-5 pt-4 pb-1">
+          <button
+            onClick={handleStart}
+            className={cn(
+              "w-full py-4 rounded-2xl font-bold text-lg shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2",
+              mode === "sprint" && "bg-orange-600 hover:bg-orange-500 shadow-orange-900/20",
+              mode === "standard" && "bg-blue-600 hover:bg-blue-500 shadow-blue-900/20",
+              mode === "marathon" && "bg-purple-600 hover:bg-purple-500 shadow-purple-900/20"
+            )}
+          >
+            <Play className="w-5 h-5 fill-current" />
+            {LABELS.startButton(currentMode.icon, currentMode.name, currentMode.time)}
+          </button>
+        </div>
       </div>
     </div>
   )

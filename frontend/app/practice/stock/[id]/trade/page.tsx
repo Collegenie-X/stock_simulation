@@ -451,7 +451,7 @@ export default function TradePage() {
   }
 
   const Keypad = ({ onInput, onDelete }: { onInput: (val: string) => void; onDelete: () => void }) => (
-    <div className="grid grid-cols-3 gap-y-6 mt-auto pb-8 px-8">
+    <div className="grid grid-cols-3 gap-y-6 mt-auto px-8" style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}>
       {[1, 2, 3, 4, 5, 6, 7, 8, 9, "00", 0].map((num) => (
         <button
           key={num}
@@ -601,11 +601,11 @@ export default function TradePage() {
               </div>
             </div>
 
-            <div className="mt-auto">
+            <div className="mt-auto" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
               <Keypad onInput={handleNumberInput} onDelete={handleDelete} />
 
-              <div className="flex gap-3 mt-4">
-                <button className="flex items-center justify-center px-6 py-4 bg-[#252525] rounded-2xl text-gray-300 font-bold">
+              <div className="flex gap-3 mt-4 pb-2">
+                <button className="flex items-center justify-center px-6 py-4 bg-[#252525] rounded-2xl text-gray-300 font-bold active:scale-[0.98] transition-transform">
                   <MoreHorizontal className="w-6 h-6" />
                   <span className="sr-only">호가</span>
                 </button>
@@ -616,7 +616,7 @@ export default function TradePage() {
                     (quantity < 1 || (isBuy ? cash < currentPrice * quantity : myQty < quantity))
                   }
                   className={cn(
-                    "flex-1 h-16 text-xl font-bold rounded-2xl",
+                    "flex-1 h-16 text-xl font-bold rounded-2xl active:scale-[0.98] transition-transform",
                     isBuy ? "bg-red-500 hover:bg-red-600" : "bg-blue-600 hover:bg-blue-700",
                   )}
                 >
@@ -809,11 +809,11 @@ export default function TradePage() {
               </div>
             </div>
 
-            <div className="mt-auto">
+            <div className="mt-auto" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
               <Button
                 onClick={handleAction}
                 disabled={takeProfit === null && stopLoss === null}
-                className="w-full h-14 text-xl font-bold rounded-2xl bg-blue-600 hover:bg-blue-700 disabled:bg-gray-800 disabled:text-gray-600"
+                className="w-full h-14 text-xl font-bold rounded-2xl bg-blue-600 hover:bg-blue-700 disabled:bg-gray-800 disabled:text-gray-600 active:scale-[0.98] transition-transform"
               >
                 설정하기
               </Button>

@@ -283,6 +283,29 @@ a,
   width: 100%;
 }
 
+/* Practice 섹션 전용 모바일 컨테이너 */
+.practice-mobile-container {
+  max-width: 428px;
+  margin: 0 auto;
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: #191919;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/*
+ * 핵심: position:fixed 요소도 428px 내로 제한
+ * fixed 요소는 부모 max-width를 무시하므로,
+ * 직접 max-width + margin:auto 로 중앙 고정
+ */
+.practice-mobile-container .fixed {
+  max-width: 428px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
 /* ========================================
    입력 필드 모바일 최적화
    ======================================== */

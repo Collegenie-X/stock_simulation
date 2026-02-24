@@ -59,7 +59,7 @@ export const StockListSection = ({
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      <div className="flex-1 overflow-y-auto px-5 py-3 pb-44 space-y-4">
+      <div className="flex-1 overflow-y-auto px-5 py-3 pb-36 space-y-4">
 
         {/* ── 내 주식 ── */}
         {myStocks.length > 0 && (

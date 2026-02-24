@@ -239,7 +239,7 @@ export const DetailView = ({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto pb-24">
+      <div className="flex-1 overflow-y-auto pb-32">
         {/* 가격 정보 */}
         <div className="px-5 pt-2 pb-4">
           <div className="flex items-center gap-2 mb-1">
@@ -479,22 +479,24 @@ export const DetailView = ({
       </div>
 
       {/* 하단 매매 버튼 */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[#191919] border-t border-gray-800 p-4 pb-6 z-20">
-        <div className="flex gap-3">
-          <button
-            onClick={onSell}
-            disabled={currentHoldings === 0}
-            className="flex-1 h-14 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-800 disabled:text-gray-600 text-white rounded-2xl font-bold text-lg transition-colors"
-          >
-            {LABELS.actions.sell}
-          </button>
-          <button
-            onClick={onBuy}
-            disabled={cash < currentPrice}
-            className="flex-1 h-14 bg-red-500 hover:bg-red-600 disabled:bg-gray-800 disabled:text-gray-600 text-white rounded-2xl font-bold text-lg transition-colors"
-          >
-            {LABELS.actions.buy}
-          </button>
+      <div className="fixed bottom-0 left-0 right-0 bg-[#191919] border-t border-gray-800 z-20" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+        <div className="px-4 pt-3 pb-1">
+          <div className="flex gap-3">
+            <button
+              onClick={onSell}
+              disabled={currentHoldings === 0}
+              className="flex-1 h-14 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-800 disabled:text-gray-600 text-white rounded-2xl font-bold text-lg transition-colors active:scale-[0.98]"
+            >
+              {LABELS.actions.sell}
+            </button>
+            <button
+              onClick={onBuy}
+              disabled={cash < currentPrice}
+              className="flex-1 h-14 bg-red-500 hover:bg-red-600 disabled:bg-gray-800 disabled:text-gray-600 text-white rounded-2xl font-bold text-lg transition-colors active:scale-[0.98]"
+            >
+              {LABELS.actions.buy}
+            </button>
+          </div>
         </div>
       </div>
     </div>
