@@ -26,6 +26,7 @@ import {
   ProfitAnalysisModal,
   DetailView,
   FloatingExitButton,
+  BottomActionBar,
 } from "./components"
 import { useLivePrices } from "./components/hooks/useLivePrices"
 import { useAICompetitor } from "./components/hooks/useAICompetitor"
@@ -1110,6 +1111,9 @@ export default function GamePlayPage() {
     // 타이머 프로그레스
     const timerProgress = decisionTimer / DECISION_TIMER_SECONDS
     
+    // 남은 결정 횟수 계산
+    const remainingDecisions = Math.max(0, totalDays * DECISIONS_PER_DAY - totalDecisions)
+    
     // 카테고리별 그룹화 (allStocksData는 useMemo로 컴포넌트 레벨에서 관리)
     const stocksByCategory = allStocksData.reduce((acc, stock) => {
       const category = (stock as any).category || "기타"
@@ -1181,7 +1185,7 @@ export default function GamePlayPage() {
           nextReportDay={Math.ceil(currentDay / AI_REPORT_INTERVAL) * AI_REPORT_INTERVAL}
           decisionTimer={decisionTimer}
           totalDecisions={totalDecisions}
-          remainingDecisions={Math.max(0, totalDays * DECISIONS_PER_DAY - totalDecisions)}
+          remainingDecisions={remainingDecisions}
           isTimerPaused={isTimerPaused}
           isWaitingForDecision={isWaitingForDecision && !showQuickTrade}
           onTogglePause={() => setIsTimerPaused(prev => !prev)}
@@ -1255,7 +1259,19 @@ export default function GamePlayPage() {
           </div>
         )}
 
-
+        {/* 하단 고정 바 (타이머 + 다음 시간으로) */}
+        <BottomActionBar
+          decisionTimer={decisionTimer}
+          totalDecisions={totalDecisions}
+          remainingDecisions={remainingDecisions}
+          isTimerPaused={isTimerPaused}
+          currentPhaseInDay={currentPhaseInDay}
+          currentDayPhase={currentDayPhase}
+          currentDay={currentDay}
+          isWaitingForDecision={isWaitingForDecision && !showQuickTrade}
+          onTogglePause={() => setIsTimerPaused(prev => !prev)}
+          onSkip={() => handleDecision("skip")}
+        />
       </div>
     )
   }

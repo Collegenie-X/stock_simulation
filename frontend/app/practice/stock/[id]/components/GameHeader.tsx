@@ -28,107 +28,11 @@ export const GameHeader = ({
   onExitClick,
   onProfitClick,
 }: GameHeaderProps) => {
-  const timerProgress = decisionTimer / 30
-
-  const currentPhaseInDay = (totalDecisions - 1) % DECISIONS_PER_DAY
-
   const userWinning = profitRate >= aiProfitRate
   const daysUntilReport = nextReportDay - currentDay
 
   return (
     <>
-      {/* 자유 거래 타임 - 최상단 Sticky */}
-      {isWaitingForDecision && (
-        <div className="sticky top-0 z-20 bg-[#191919]/95 backdrop-blur-sm border-b border-gray-700/50">
-          <div className="px-4 py-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-sm">⏱️</span>
-                <span className="text-xs font-bold text-white">{LABELS.timer.label}</span>
-                <button
-                  onClick={onTogglePause}
-                  className={cn(
-                    "p-1 rounded-full transition-colors",
-                    isTimerPaused
-                      ? "bg-green-500/20 hover:bg-green-500/30"
-                      : "bg-gray-700/50 hover:bg-gray-700"
-                  )}
-                >
-                  {isTimerPaused ? (
-                    <Play className="w-3.5 h-3.5 text-green-400" />
-                  ) : (
-                    <Pause className="w-3.5 h-3.5 text-yellow-400" />
-                  )}
-                </button>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <span className="text-[10px] text-gray-400 font-bold">
-                  {totalDecisions}번째 · 남은 {remainingDecisions}회
-                </span>
-                <div
-                  className={cn(
-                    "text-2xl font-black tabular-nums min-w-[2ch] text-right leading-none",
-                    isTimerPaused
-                      ? "text-yellow-400/60"
-                      : decisionTimer > 20
-                      ? "text-green-400"
-                      : decisionTimer > 10
-                      ? "text-yellow-400"
-                      : "text-red-400 animate-pulse"
-                  )}
-                >
-                  {decisionTimer}
-                </div>
-              </div>
-            </div>
-
-            {/* 진행 바 + 페이즈 표시 */}
-            <div className="flex items-center gap-2 mt-1.5">
-              <span className="text-xs font-black text-blue-400 shrink-0">
-                {currentDayPhase} {currentDay}{LABELS.header.dayLabel}
-              </span>
-              <div className="flex items-center gap-0.5 shrink-0">
-                {DAY_PHASES.map((phase, idx) => (
-                  <div
-                    key={phase}
-                    className={cn(
-                      "w-5 h-1.5 rounded-full transition-all",
-                      idx < currentPhaseInDay
-                        ? "bg-blue-500"
-                        : idx === currentPhaseInDay
-                        ? "bg-blue-400 animate-pulse"
-                        : "bg-gray-700"
-                    )}
-                  />
-                ))}
-              </div>
-              <div className="flex-1 bg-gray-700 rounded-full h-1.5 overflow-hidden">
-                <div
-                  className={cn(
-                    "h-1.5 rounded-full transition-all duration-1000",
-                    decisionTimer > 20
-                      ? "bg-green-500"
-                      : decisionTimer > 10
-                      ? "bg-yellow-500"
-                      : "bg-red-500"
-                  )}
-                  style={{ width: `${timerProgress * 100}%` }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* 일시정지 안내 */}
-          {isTimerPaused && (
-            <div className="px-4 pb-2">
-              <div className="text-[10px] text-yellow-400/80 font-bold text-center animate-pulse">
-                ⏸ 일시정지 중 — 터치하여 재개
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* 축약 헤더 - 총 자산 + AI 대결 + 종료 (항상 표시) */}
       <div className="sticky top-0 z-20 px-4 py-2.5 bg-[#191919]/95 backdrop-blur-sm border-b border-gray-800/50">
         {/* 1행: 총 자산 + 종료 */}

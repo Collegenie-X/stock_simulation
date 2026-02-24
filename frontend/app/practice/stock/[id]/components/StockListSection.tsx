@@ -59,7 +59,7 @@ export const StockListSection = ({
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      <div className="flex-1 overflow-y-auto px-5 py-3 pb-24 space-y-4">
+      <div className="flex-1 overflow-y-auto px-5 py-3 pb-44 space-y-4">
 
         {/* ── 내 주식 ── */}
         {myStocks.length > 0 && (
@@ -184,19 +184,6 @@ export const StockListSection = ({
             </div>
           ))}
         </div>
-      </div>
-
-      {/* ── 다음 시간 버튼 (하단 고정) ── */}
-      <div className="fixed bottom-0 left-0 right-0 px-5 py-3 bg-[#191919]/95 backdrop-blur-lg border-t border-gray-700/50 pb-safe-bottom z-10">
-        <button
-          onClick={() => onDecision("skip")}
-          className="w-full py-4 bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 text-white rounded-2xl font-bold text-base transition-all active:scale-[0.98] shadow-lg"
-        >
-          <span className="flex items-center justify-center gap-2">
-            {LABELS.actions.skip}
-            <ChevronRight className="w-5 h-5" />
-          </span>
-        </button>
       </div>
     </div>
   )
