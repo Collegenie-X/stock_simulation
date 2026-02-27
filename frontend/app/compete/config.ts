@@ -1,4 +1,85 @@
 // ============================================================
+// 랭킹 규칙 정의
+// ============================================================
+
+/**
+ * 랭킹 반영 기준
+ *
+ * [반영 O] 실전 시뮬레이션
+ *   - 모든 참여자가 동일 시나리오를 플레이 → 공정한 상대 비교 가능
+ *   - 주간 랭킹: 해당 주 시나리오 1회 결과 기준
+ *   - 누적 랭킹: 최근 4주 도전자 점수 평균
+ *
+ * [반영 X] 한종목 연습 / 파도 연습
+ *   - 개인 학습 목적, 시나리오·난이도가 제각각 → 비교 불공정
+ *   - 점수/등급은 개인 성장 지표로만 활용
+ *
+ * 도전자 점수 산정 공식 (0~100점):
+ *   수익률 백분위  × 0.50  (해당 주 참여자 중 상위 몇 %)
+ *   파도 정확도    × 0.25  (매매 타이밍이 엘리엇 파동 기준에 맞는 비율)
+ *   승률           × 0.15  (수익 거래 / 전체 거래)
+ *   일관성 보너스  × 0.10  (연속 참여 주수: 3주+5점, 5주+10점)
+ */
+export const RANKING_RULES = {
+  // 랭킹에 반영되는 게임 유형
+  rankedGameType: 'simulation' as const,
+
+  // 도전자 점수 가중치
+  scoreWeights: {
+    profitPercentile: 0.50,
+    waveAccuracy: 0.25,
+    winRate: 0.15,
+    consistency: 0.10,
+  },
+
+  // 일관성 보너스 (연속 참여 주수 → 추가 점수)
+  consistencyBonus: [
+    { weeks: 3, bonus: 5 },
+    { weeks: 5, bonus: 10 },
+  ],
+
+  // 랭킹 탭 종류
+  rankTabs: [
+    { id: 'weekly', label: '주간 랭킹', desc: '이번 주 시나리오 결과' },
+    { id: 'cumulative', label: '누적 랭킹', desc: '최근 4주 평균 점수' },
+  ] as const,
+
+  // 랭킹 안내 문구
+  notice: {
+    ranked: '실전 시뮬레이션만 글로벌 랭킹에 반영됩니다.',
+    notRanked: '한종목·파도 연습은 개인 성장 지표 전용입니다.',
+    scoreFormula: '도전자 점수 = 수익률(50%) + 파도정확도(25%) + 승률(15%) + 일관성(10%)',
+    weeklyDesc: '매주 같은 시나리오를 플레이한 참여자끼리 공정하게 비교합니다.',
+  },
+} as const
+
+/**
+ * 도전자 점수 계산 함수
+ * @param profitPercentile  수익률 상위 백분위 (0~100)
+ * @param waveAccuracy      파도 정확도 (0~100)
+ * @param winRate           승률 (0~100)
+ * @param consistencyWeeks  연속 참여 주수
+ */
+export function calcChallengerScore(
+  profitPercentile: number,
+  waveAccuracy: number,
+  winRate: number,
+  consistencyWeeks: number,
+): number {
+  const { scoreWeights, consistencyBonus } = RANKING_RULES
+  const bonus = consistencyBonus
+    .filter((b) => consistencyWeeks >= b.weeks)
+    .reduce((max, b) => Math.max(max, b.bonus), 0)
+
+  const base =
+    profitPercentile * scoreWeights.profitPercentile +
+    waveAccuracy * scoreWeights.waveAccuracy +
+    winRate * scoreWeights.winRate
+
+  return Math.min(100, Math.round(base + bonus * scoreWeights.consistency * 10))
+}
+
+// ============================================================
 // 경쟁 페이지 설정 및 라벨
 // ============================================================
 
@@ -67,7 +148,11 @@ export const COMPETE_LABELS = {
   },
 
   leaderboard: {
-    title: "주간 리더보드",
+    title: "리더보드",
+    weeklyTab: "주간 랭킹",
+    cumulativeTab: "누적 랭킹",
+    weeklyDesc: "이번 주 시나리오 결과",
+    cumulativeDesc: "최근 4주 평균 점수",
     filterAll: "전체 단계",
     filterLabels: [
       "전체",
@@ -84,6 +169,8 @@ export const COMPETE_LABELS = {
     strategy: "전략",
     trades: "거래",
     waveType: "파동 유형",
+    scoreLabel: "도전자 점수",
+    rankBasis: "실전 시뮬레이션 기준",
   },
 
   challenge: {

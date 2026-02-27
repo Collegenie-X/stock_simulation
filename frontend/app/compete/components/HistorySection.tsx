@@ -28,6 +28,8 @@ interface SimulationRecord {
   highlight: string;
   winDays: number;
   loseDays: number;
+  rankScore?: number;
+  rankScoreBreakdown?: { profitPercentile: number; waveAccuracy: number; winRate: number; consistency: number };
 }
 
 interface PracticeRecord {
@@ -163,7 +165,7 @@ function SimulationCard({ item }: { item: SimulationRecord }) {
         </div>
 
         {/* 랭킹 + 파도 정확도 */}
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center justify-between gap-2 my-[5px]">
           <RankFlare rank={item.rank} total={item.totalUsers} />
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
@@ -178,10 +180,23 @@ function SimulationCard({ item }: { item: SimulationRecord }) {
           </div>
         </div>
 
-        {/* 하이라이트 */}
-        <p className={cn('text-xs mt-2 font-semibold', isProfit ? 'text-green-300/70' : 'text-orange-300/70')}>
-          {item.highlight}
-        </p>
+        {/* 도전자 점수 */}
+        {item.rankScore !== undefined && (
+          <div className="flex items-center justify-between mt-[5px]">
+            <p className={cn('text-xs font-semibold', isProfit ? 'text-green-300/70' : 'text-orange-300/70')}>
+              {item.highlight}
+            </p>
+            <div className="flex items-center gap-1 bg-yellow-500/10 border border-yellow-500/20 rounded-lg px-2 py-0.5 shrink-0">
+              <span className="text-[10px] text-yellow-400/70">점수</span>
+              <span className="text-xs font-black text-yellow-300">{item.rankScore}</span>
+            </div>
+          </div>
+        )}
+        {item.rankScore === undefined && (
+          <p className={cn('text-xs mt-[5px] font-semibold', isProfit ? 'text-green-300/70' : 'text-orange-300/70')}>
+            {item.highlight}
+          </p>
+        )}
 
         {/* 우상단 방향 화살표 */}
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100">
@@ -233,10 +248,12 @@ function PracticeCard({ item, type }: { item: PracticeRecord; type: 'stock' | 'w
         </div>
 
         {/* Score bar */}
-        <ScoreBar score={item.totalScore} max={item.maxScore} />
+        <div className="my-[5px]">
+          <ScoreBar score={item.totalScore} max={item.maxScore} />
+        </div>
 
         {/* Round mini badges */}
-        <div className="flex gap-1.5 mt-2.5">
+        <div className="flex gap-1.5 my-[5px]">
           {item.roundResults.map((r) => (
             <div key={r.round} className={cn(
               'flex-1 text-center py-1 rounded-lg border text-[10px] font-black',
@@ -250,7 +267,7 @@ function PracticeCard({ item, type }: { item: PracticeRecord; type: 'stock' | 'w
 
         {/* 파도 정확도 (wave only) */}
         {item.wave3Accuracy !== undefined && (
-          <div className="flex items-center gap-3 mt-2">
+          <div className="flex items-center gap-3 my-[5px]">
             <div className="flex items-center gap-1">
               <Waves className="w-3 h-3 text-cyan-400" />
               <span className="text-xs text-cyan-400 font-bold">3파 {item.wave3Accuracy}%</span>
@@ -262,7 +279,7 @@ function PracticeCard({ item, type }: { item: PracticeRecord; type: 'stock' | 'w
         )}
 
         <p className={cn(
-          'text-xs mt-2 font-semibold',
+          'text-xs mt-[5px] font-semibold',
           isHighScore ? 'text-yellow-300/70' : 'text-gray-400'
         )}>
           {item.highlight}
@@ -380,7 +397,7 @@ function AccordionSection({
         'overflow-hidden transition-all duration-400',
         open ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
       )}>
-        <div className="bg-[#141414] px-4 pt-3 pb-4 space-y-3">
+        <div className="bg-[#141414] px-4 pt-3 pb-4 space-y-[10px]">
           {children}
         </div>
       </div>

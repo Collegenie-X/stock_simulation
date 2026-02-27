@@ -1,224 +1,210 @@
-# 주식 시뮬레이션 - 100일 실시간 업데이트
+# 주식 시뮬레이션 — 기술 가이드
 
 ## 🎯 주요 기능
 
-이번 업데이트에서 추가된 기능:
+### 1. 듀얼 AI 경쟁자 시스템
+- ✅ **유사 AI**: 사용자 투자 성향 실시간 분석 → 5단계 중 매칭
+- ✅ **최고 AI**: 항상 초공격형(ultra_aggressive) 전략 운영
+- ✅ 같은 종목에서 동시 의사결정 → 3자 비교 (나 vs 유사 AI vs 최고 AI)
+- ✅ 투자 성향 자동 분류 (보수형 → 안정형 → 균형형 → 공격형 → 초공격형)
+- ✅ 파도 흐름 분석 (상승/하락/횡보 + 정확도 0~100점)
 
-### 1. 100일치 주식 데이터
-- ✅ 업체별 100일간의 실제 거래 데이터
-- ✅ 현실적인 주가 변동 패턴 (GBM 모델 사용)
-- ✅ 가격 변동에 따른 동적 거래량
-- ✅ 자동 생성되는 뉴스/이벤트
-- ✅ 주말 제외 거래일 기준
+### 2. AI 갭 분석 시스템
+- ✅ **실시간 갭 피드백** (AIGapFeedback) — 매 거래 직후 플로팅 배너
+- ✅ **일일 갭 분석** (DaySummaryOverlay) — 매일 종료 시 AI 비교
+- ✅ **3일 미니 리포트** (MiniGameReport) — 등급(S~D) + 업적 + 종목별 분석
+- ✅ **최종 리포트** (FinalGameReport) — 등급(S+~F) + 자산 흐름 차트 + 순위
+- ✅ **종목별 상세** (StockDetailPanel) — 가격 차트 + 거래 마커 + AI 비교
+- ✅ **경쟁 갭 분석** (GapAnalysisSection) — 주간 추이 + 인사이트
 
-### 2. 실시간 업데이트
-- ✅ timeout을 통한 자동 진행
-- ✅ 5단계 속도 조절 (1초 ~ 60초/일)
-- ✅ 일시정지/재생 기능
-- ✅ 진행률 표시
+### 3. 3대 게임 모드
+- ✅ **연습 (Learn)**: 시나리오 학습 (5턴/30초) + 패턴 연습 (15초)
+- ✅ **실전 (Practice)**: 스프린트(30턴) / 스탠다드(100턴) / 마라톤(200턴)
+- ✅ **도전 (Compete)**: 주간/누적 랭킹 + 투자 DNA + 주간 챌린지
 
-### 3. 데이터 생성 도구
-- ✅ 유틸리티 함수 제공
-- ✅ 프리셋 설정 (안정형/변동형/고변동형/하락형)
-- ✅ 커스터마이징 가능
-- ✅ 일괄 생성 지원
+### 4. 랭킹 & 경쟁
+- ✅ 도전자 점수 공식: 수익률(50%) + 파도정확도(25%) + 승률(15%) + 일관성(10%)
+- ✅ 실전 시뮬레이션만 랭킹 반영 (공정성)
+- ✅ 6단계 자본금 필터
+- ✅ 주간 챌린지 시스템
+
+### 5. 데이터 & 시나리오
+- ✅ 업체별 100일간 거래 데이터 (GBM 모델)
+- ✅ 다양한 섹터 시나리오 (AI반도체, 방산, 바이오, 금융 등)
+- ✅ 엘리엇 파동 기반 패턴 데이터
+- ✅ 자동 생성 뉴스/이벤트
 
 ## 🚀 빠른 시작
 
-### 1. 100일 시뮬레이션 실행
+### 1. 실행
 
 ```bash
-# 개발 서버 실행
 cd frontend
 pnpm install
 pnpm dev
 
-# 브라우저에서 접속
-http://localhost:3000/practice/stock/scenario-100days
+# http://localhost:3000
 ```
 
-### 2. 속도 조절
+### 2. 주요 경로
 
-화면에서 다음 옵션 선택:
-- **초고속** (1초/일): 빠른 테스트용
-- **고속** (3초/일): 일반적인 시뮬레이션
-- **빠름** (5초/일): 균형잡힌 속도
-- **보통** (10초/일): 여유있는 체험
-- **느림** (60초/일): 실시간에 가까운 경험
+| 경로 | 설명 |
+|:---|:---|
+| `/learn` | 시나리오 & 패턴 학습 |
+| `/learn/scenarios/[id]/play` | 시나리오 플레이 |
+| `/learn/patterns/[id]/practice` | 패턴 연습 |
+| `/practice/stock/[id]` | 실전 시뮬레이션 |
+| `/compete` | 랭킹 & 경쟁 |
+| `/onboarding` | AI 성격 분석 |
 
-### 3. 기능 사용
+## 📁 핵심 파일
 
-- ⏯️ 재생/일시정지: 언제든 중단 가능
-- 📊 진행률 확인: 현재 N/100일 표시
-- 📈 실시간 차트: 자동 업데이트
-- 💰 자산 변동: 실시간 수익률 계산
-
-## 📁 파일 구조
+### AI 경쟁자 시스템
 
 ```
-frontend/
-├── data/
-│   ├── game-scenarios.json              # 기존 10일 시나리오
-│   └── stock-100days-data.json          # 신규 100일 시나리오 ⭐
-│
-├── lib/
-│   └── stock-data-generator.ts          # 데이터 생성 유틸리티 ⭐
-│
-├── scripts/
-│   └── generate-stock-data-example.ts   # 생성 예시 스크립트 ⭐
-│
-├── docs/
-│   └── STOCK_DATA_GENERATION.md         # 상세 가이드 ⭐
-│
-└── app/
-    └── practice/stock/[id]/page.tsx     # 메인 페이지 (업데이트됨) ⭐
+frontend/app/practice/stock/[id]/components/hooks/useAICompetitor.ts
+├── InvestStyle: 5단계 투자 성향
+├── STRATEGY_PARAMS: 성향별 전략 파라미터
+├── classifyUserStyle(): 사용자 성향 자동 분류
+├── simulateDayTrades(): 유사 AI + 최고 AI 동시 시뮬레이션
+├── simulateSameStockDecisions(): 같은 종목 AI 결정
+├── analyzeWavePattern(): 파도 흐름 분석
+└── GapRecord: 갭 기록 데이터 구조
 ```
 
-## 💡 사용 예시
+### 리포트 시스템
 
-### 새로운 주식 데이터 생성
+```
+frontend/app/practice/stock/[id]/components/
+├── AIGapFeedback.tsx      — 실시간 갭 배너
+├── MiniGameReport.tsx     — 3일 미니 리포트
+├── FinalGameReport.tsx    — 최종 종합 리포트
+├── StockDetailPanel.tsx   — 종목별 드릴다운
+└── DaySummaryOverlay.tsx  — 일일 요약
+```
+
+### 설정 & 타입
+
+```
+frontend/app/practice/stock/[id]/
+├── config.ts   — 게임 상수 + 한국어 라벨
+└── types.ts    — 전체 타입 정의
+
+frontend/app/compete/
+└── config.ts   — 랭킹 규칙 + 도전자 점수 공식
+```
+
+### 공용 UI
+
+```
+frontend/components/
+└── game-play-ui.tsx  — GameActionBar + RatioModal (시나리오/패턴 공용)
+```
+
+## 📊 데이터 구조
+
+### AI 전략 파라미터
+
+| 성향 | investmentRatio | stopLoss | takeProfit | maxPositionRatio | minCashRatio |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| conservative | 0.3 | -3% | +8% | 0.15 | 0.50 |
+| stable | 0.5 | -5% | +10% | 0.20 | 0.35 |
+| balanced | 0.6 | -7% | +12% | 0.25 | 0.25 |
+| aggressive | 0.7 | -8% | +15% | 0.35 | 0.15 |
+| ultra_aggressive | 0.9 | -10% | +20% | 0.50 | 0.05 |
+
+### 갭 기록 (GapRecord)
 
 ```typescript
-import { generateStockData, STOCK_PRESETS } from '@/lib/stock-data-generator'
-
-// 카카오 주식 100일 데이터 생성
-const kakaoData = generateStockData({
-  name: '카카오',
-  initialPrice: 50000,
-  days: 100,
-  volatility: STOCK_PRESETS.moderate.volatility,  // 3% 변동성
-  trend: 0.005,                                     // 일일 0.5% 상승
-  startDate: new Date('2024-01-02'),
-  baseVolume: 1200000,
-  generateNews: true,
-})
+interface GapRecord {
+  day: number
+  userRate: number        // 사용자 수익률
+  bestAIRate: number      // 최고 AI 수익률
+  similarAIRate: number   // 유사 AI 수익률
+  gapToBest: number       // 최고 AI 대비 갭 (%p)
+  gapToSimilar: number    // 유사 AI 대비 갭 (%p)
+  waveAccuracy: number    // 파도 정확도 (0~100)
+}
 ```
 
-### 여러 주식 일괄 생성
+### 종목별 비교 (StockCompareResult)
 
 ```typescript
-import { generateMultipleStocks, STOCK_PRESETS } from '@/lib/stock-data-generator'
+interface StockCompareResult {
+  stockId: string
+  stockName: string
+  price: number
+  userAction: "buy" | "sell" | "skip"
+  userQty: number
+  similarAction: "buy" | "sell" | "hold"
+  similarQty: number
+  similarReason: string
+  bestAction: "buy" | "sell" | "hold"
+  bestQty: number
+  bestReason: string
+}
+```
 
-const stocks = generateMultipleStocks(
-  [
-    {
-      id: 'kakao',
-      name: '카카오',
-      category: 'IT/테크',
-      initialPrice: 50000,
-      ...STOCK_PRESETS.moderate,
-      baseVolume: 1200000,
-    },
-    {
-      id: 'samsung',
-      name: '삼성전자',
-      category: 'IT/테크',
-      initialPrice: 70000,
-      ...STOCK_PRESETS.stable,
-      baseVolume: 18000000,
-    },
-  ],
-  100,
-  new Date('2024-01-02')
-)
+### 도전자 점수 공식
+
+```typescript
+function calcChallengerScore(
+  profitPercentile: number,  // 수익률 상위 백분위 (0~100)
+  waveAccuracy: number,      // 파도 정확도 (0~100)
+  winRate: number,           // 승률 (0~100)
+  consistencyWeeks: number,  // 연속 참여 주수
+): number {
+  const base =
+    profitPercentile * 0.50 +
+    waveAccuracy * 0.25 +
+    winRate * 0.15
+  const bonus = consistencyWeeks >= 5 ? 10 : consistencyWeeks >= 3 ? 5 : 0
+  return Math.min(100, Math.round(base + bonus * 0.10 * 10))
+}
 ```
 
 ## 🎨 프리셋 설정
 
-4가지 주식 유형 프리셋 제공:
+4가지 주식 유형 프리셋:
 
 | 유형 | 변동성 | 추세 | 예시 |
-|------|--------|------|------|
-| **안정형** | 1.5% | +0.1% | 삼성전자, KB금융 |
-| **변동형** | 3% | +0.2% | 카카오, 네이버 |
-| **고변동형** | 5% | +0.5% | 하이브, 셀트리온 |
-| **하락형** | 3% | -0.2% | 구조조정 중인 기업 |
-
-## 📊 생성된 데이터
-
-### 현재 포함된 주식 (3종목)
-
-1. **카카오** (IT/테크)
-   - 시작가: 50,000원 → 종가: 88,500원
-   - 수익률: +77%
-   - 거래량: 1,200,000 ~ 4,580,000
-
-2. **삼성전자** (IT/테크)
-   - 시작가: 70,000원 → 종가: 109,200원
-   - 수익률: +56%
-   - 거래량: 18,000,000 ~ 49,000,000
-
-3. **네이버** (IT/테크)
-   - 시작가: 200,000원 → 종가: 277,500원
-   - 수익률: +38.75%
-   - 거래량: 800,000 ~ 2,410,000
-
-### 추가 가능한 카테고리
-
-- 자동차/화학 (현대차, LG에너지솔루션)
-- 엔터/콘텐츠 (하이브, JYP, SM)
-- 바이오/헬스 (셀트리온, 한미약품)
-- 금융 (KB금융, 신한지주)
-- 건설/중공업 (POSCO, 현대건설)
-- 소비재/유통 (아모레퍼시픽, 이마트)
+|:---:|:---:|:---:|:---|
+| 안정형 | 1.5% | +0.1% | 삼성전자, KB금융 |
+| 변동형 | 3% | +0.2% | 카카오, 네이버 |
+| 고변동형 | 5% | +0.5% | 하이브, 셀트리온 |
+| 하락형 | 3% | -0.2% | 구조조정 중인 기업 |
 
 ## 🔧 커스터마이징
 
-### 변동성 조정
+### 게임 상수 변경
 
 ```typescript
-// 낮은 변동성 (안정적)
-volatility: 0.01  // 1%
-
-// 일반적인 변동성
-volatility: 0.03  // 3%
-
-// 높은 변동성 (극적)
-volatility: 0.08  // 8%
+// frontend/app/practice/stock/[id]/config.ts
+export const DECISIONS_PER_DAY = 3        // 하루 의사결정 횟수
+export const DECISION_TIMER_SECONDS = 30  // 결정 제한 시간
+export const AI_REPORT_INTERVAL = 3       // 미니 리포트 간격 (일)
 ```
 
-### 추세 조정
+### 속도 모드 변경
 
 ```typescript
-// 강한 하락
-trend: -0.01
-
-// 횡보
-trend: 0
-
-// 강한 상승
-trend: 0.01
+// frontend/app/practice/stock/[id]/config.ts
+export const SPEED_MODE_TURNS: Record<string, number> = {
+  sprint: 30,      // 빠른 체험
+  standard: 100,   // 균형 잡힌 경험
+  marathon: 200,   // 심화 학습
+}
 ```
 
-### 재생 속도 기본값 변경
+### AI 전략 조정
 
 ```typescript
-// page.tsx에서
-const [playSpeed, setPlaySpeed] = useState<1 | 3 | 5 | 10 | 60>(5)
-//                                                            ^^
-//                                                        원하는 기본값
+// frontend/app/practice/stock/[id]/components/hooks/useAICompetitor.ts
+const STRATEGY_PARAMS: Record<InvestStyle, StrategyParams> = {
+  conservative: { investmentRatio: 0.3, stopLoss: -3, takeProfit: 8, ... },
+  // ... 값 조정 가능
+}
 ```
-
-## 🎯 주요 특징
-
-### 1. 현실적인 가격 변동
-- GBM (Geometric Brownian Motion) 모델 사용
-- 실제 주식 시장의 랜덤 워크 특성 반영
-- 음수 가격 방지 로직
-
-### 2. 동적 거래량
-- 가격 변동이 클수록 거래량 증가
-- 랜덤 요소 포함 (80~120%)
-- 현실적인 시장 분위기 재현
-
-### 3. 자동 뉴스 생성
-- 가격 변동에 따른 적절한 뉴스 선택
-- 50+ 뉴스 템플릿
-- 마일스톤 이벤트 (10일마다)
-
-### 4. 주말 제외
-- 실제 주식 시장처럼 평일만 거래
-- 토요일, 일요일 자동 스킵
 
 ## 📈 알고리즘 상세
 
@@ -235,66 +221,29 @@ const dailyReturn = trend / days + randomShock
 currentPrice = currentPrice * (1 + dailyReturn)
 ```
 
-여기서:
-- `μ` (mu): 추세 (drift)
-- `σ` (sigma): 변동성 (volatility)
-- `dW`: 위너 프로세스 (랜덤 워크)
+### 파도 정확도 계산
 
-## 🚀 성능
-
-- **데이터 크기**: ~200KB (100일 × 3종목)
-- **로딩 시간**: < 100ms
-- **메모리 사용**: 최소
-- **렌더링**: useMemo로 최적화
+```
+1. 시장 방향 분석 (상승/하락/횡보)
+2. 사용자 매매 방향과 비교
+   - 상승장 + 매수 > 매도 → 높은 점수
+   - 하락장 + 매도 > 매수 → 높은 점수
+3. 최고 AI 매매 패턴과 비교
+   - 매수 횟수 차이가 클수록 감점
+4. 최종 점수: 10~100 범위
+```
 
 ## 📝 향후 계획
 
+- [ ] 실시간 서버 랭킹
+- [ ] 친구 대결 모드
 - [ ] 더 많은 주식 추가 (50+ 종목)
 - [ ] 실제 역사적 데이터 통합
 - [ ] 섹터별 상관관계 반영
-- [ ] 이벤트 기반 급등/급락
 - [ ] 배당금, 액면분할 이벤트
-- [ ] 공매도 기능
-- [ ] 신용거래 기능
-
-## 🐛 문제 해결
-
-### Q: 데이터가 로드되지 않습니다.
-
-```bash
-# JSON 파일 확인
-ls -la frontend/data/stock-100days-data.json
-
-# import 경로 확인
-# page.tsx에서 scenarios100DaysData 확인
-```
-
-### Q: 속도 조절이 작동하지 않습니다.
-
-- 페이지 새로고침
-- 브라우저 캐시 삭제
-- `playSpeed` state 확인
-
-### Q: 주가가 너무 극단적입니다.
-
-- `volatility` 값 조정 (0.02~0.04 권장)
-- `trend` 값 조정 (-0.01 ~ 0.01 범위)
-
-## 📚 참고 문서
-
-- [상세 가이드](docs/STOCK_DATA_GENERATION.md)
-- [데이터 생성 예시](scripts/generate-stock-data-example.ts)
-- [유틸리티 API](lib/stock-data-generator.ts)
-
-## 👥 기여
-
-버그 리포트나 기능 제안은 이슈로 등록해주세요.
-
-## 📄 라이선스
-
-이 프로젝트의 일부입니다.
+- [ ] 모바일 앱 출시
 
 ---
 
-**Happy Trading! 📈💰**
-
+**Last Updated**: 2025.02.27
+**Version**: v3.0

@@ -150,12 +150,16 @@ export interface GameHeaderProps {
   // 자산 정보
   totalValue: number
   profitRate: number
-  // AI 대결 정보
+  // 유사 AI 대결 정보
   aiName: string
   aiEmoji: string
   aiProfitRate: number
   aiTopStocks: string[]
   nextReportDay: number
+  // 최고 AI 정보
+  bestAIName: string
+  bestAIEmoji: string
+  bestAIProfitRate: number
   // 타이머
   decisionTimer: number
   totalDecisions: number
@@ -166,6 +170,18 @@ export interface GameHeaderProps {
   onTogglePause: () => void
   onExitClick: () => void
   onProfitClick: () => void
+}
+
+// AI 갭 피드백 (매수/매도 직후 표시)
+export interface AIGapFeedbackProps {
+  isVisible: boolean
+  userProfitRate: number
+  bestAIProfitRate: number
+  similarAIProfitRate: number
+  bestAIName: string
+  similarAIName: string
+  waveAccuracy: number
+  onHide: () => void
 }
 
 export interface StockListSectionProps {
@@ -190,4 +206,142 @@ export interface ExitConfirmDialogProps {
   isOpen: boolean
   onCancel: () => void
   onConfirm: () => void
+}
+
+// ============================================================
+// 미니 게임 리포트 (3일 간격)
+// ============================================================
+
+export interface MiniReportHoldingItem {
+  stockId: string
+  stockName: string
+  quantity: number
+  avgPrice: number
+  currentPrice: number
+  profitAmount: number
+  profitRate: number
+}
+
+export interface MiniGameReportProps {
+  isVisible: boolean
+  reportDay: number
+  periodLabel: string
+  userProfitRate: number
+  userTotalValue: number
+  initialValue: number
+  cash: number
+  tradeCount: number
+  holdingsCount: number
+  // 거래 내역
+  tradeHistory: TradeRecord[]
+  // 보유 종목 상세
+  holdingItems: MiniReportHoldingItem[]
+  // 자산 흐름 차트
+  assetHistory: { turn: number; value: number }[]
+  // AI 비교
+  aiSimilarProfitRate: number
+  aiSimilarName: string
+  aiSimilarEmoji: string
+  aiBestProfitRate: number
+  aiBestName: string
+  aiBestEmoji: string
+  onContinue: () => void
+}
+
+// ============================================================
+// 최종 게임 리포트 (게임 종료)
+// ============================================================
+export interface FinalGameReportTradeRecord {
+  id?: string
+  stockId?: string
+  stockName: string
+  action: "buy" | "sell"
+  price: number
+  quantity: number
+  totalAmount: number
+  avgBuyPrice?: number
+  profit?: number
+  profitRate?: number
+  date?: string
+  turn?: number
+  day?: number
+}
+
+// 종목별 AI 거래 기록
+export interface StockAITrade {
+  action: "buy" | "sell" | "hold"
+  price: number
+  quantity: number
+  turn: number
+  day: number
+  reason: string
+}
+
+// 종목별 가격 히스토리 포인트
+export interface StockPricePoint {
+  turn: number
+  price: number
+  date: string
+}
+
+// 종목 상세 분석 데이터
+export interface StockDetailData {
+  stockId: string
+  stockName: string
+  category: string
+  // 내 거래 요약
+  myTotalProfit: number
+  myTotalProfitRate: number
+  myTrades: FinalGameReportTradeRecord[]
+  currentHolding: number
+  avgBuyPrice: number
+  currentPrice: number
+  unrealizedProfit: number
+  unrealizedProfitRate: number
+  // 가격 히스토리 (차트용)
+  priceHistory: StockPricePoint[]
+  // 유사 AI 데이터
+  aiSimilarTrades: StockAITrade[]
+  aiSimilarProfit: number
+  aiSimilarProfitRate: number
+  // 최고 AI 데이터
+  aiBestTrades: StockAITrade[]
+  aiBestProfit: number
+  aiBestProfitRate: number
+  // 파도 분석 코멘트
+  waveComment: string
+}
+
+// 자산 히스토리 (AI 비교 포함)
+export interface AssetHistoryPoint {
+  turn: number
+  value: number
+  aiSimilar?: number
+  aiBest?: number
+}
+
+export interface FinalGameReportProps {
+  isVisible: boolean
+  totalDays: number
+  userProfitRate: number
+  userTotalValue: number
+  initialValue: number
+  cash: number
+  holdings: Holdings
+  tradeHistory: FinalGameReportTradeRecord[]
+  weeklyHistory: { turn: number; value: number }[]
+  // 자산 히스토리 (AI 포함)
+  assetHistory?: AssetHistoryPoint[]
+  // 종목 상세 데이터
+  stockDetails?: StockDetailData[]
+  aiSimilarName: string
+  aiSimilarEmoji: string
+  aiSimilarProfitRate: number
+  aiSimilarTotalValue: number
+  aiBestName: string
+  aiBestEmoji: string
+  aiBestProfitRate: number
+  aiBestTotalValue: number
+  onGoHome: () => void
+  onPlayAgain: () => void
 }

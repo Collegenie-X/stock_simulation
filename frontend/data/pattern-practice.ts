@@ -54,7 +54,8 @@ export const TURNS_PER_ROUND = 8;
 export const CANDLES_PER_TURN = 2;
 export const INITIAL_REVEAL = 4;
 export const INITIAL_CASH = 1_000_000;   // 시작 자금 100만원 (현금 50% + 주식 50%)
-export const DECISION_TIMERS = [12, 10, 9];
+// 패턴 연습 턴 제한 시간: 15초 고정 (시나리오 플레이는 30초)
+export const DECISION_TIMERS = [15, 15, 15];
 const TARGET_LENGTH = INITIAL_REVEAL + TURNS_PER_ROUND * CANDLES_PER_TURN + 2; // 22
 
 const GRADE_MAP: { min: number; grade: Grade; emoji: string; message: string }[] = [
@@ -768,17 +769,20 @@ export function getTurnFeedback(params: {
 
   if (action === exitAction) {
     if (hasPosition) {
+      // exitAction = 상승패턴에서 '팔래', 하락패턴에서 '살래' (숏 커버링)
+      const exitLabel = isBuySignal ? '익절' : '숏 커버링';
       if (zone === 'exit')
-        return { isGood: true, emoji: '💰', title: '완벽한 청산!', reason: '최적의 이익 실현 타이밍이에요!', effect: 'sparkle' };
+        return { isGood: true, emoji: '💰', title: `완벽한 ${exitLabel}!`, reason: '최적의 이익 실현 타이밍이에요!', effect: 'sparkle' };
       if (zone === 'hold')
         return { isGood: true, emoji: '💵', title: '수익 확정!', reason: '이익을 확정했어요. 조금 더 기다리면 더 좋았을 수도!', effect: 'sparkle' };
       if (zone === 'late')
-        return { isGood: true, emoji: '🤏', title: '늦은 청산', reason: '최적보다 늦었지만 포지션을 정리한 건 잘했어요!', effect: 'neutral' };
-      return { isGood: false, emoji: '😱', title: '너무 빨리 청산!', reason: '아직 수익 구간이 남았어요. 좀 더 기다려보세요!', effect: 'shake' };
+        return { isGood: true, emoji: '🤏', title: `늦은 ${exitLabel}`, reason: '최적보다 늦었지만 포지션을 정리한 건 잘했어요!', effect: 'neutral' };
+      return { isGood: false, emoji: '😱', title: '너무 빨리!', reason: '아직 수익 구간이 남았어요. 좀 더 기다려보세요!', effect: 'shake' };
     }
+    // 포지션 없이 청산 버튼 → 방향 반대
     return { isGood: false, emoji: '⚠️', title: '방향이 반대!', reason: isBuySignal
-      ? '이 패턴은 상승 신호예요! 매도가 아닌 매수를 노리세요!'
-      : '이 패턴은 하락 신호예요! 매수가 아닌 매도를 노리세요!', effect: 'shake' };
+      ? '이 패턴은 상승 신호예요! 팔래가 아닌 살래를 노리세요!'
+      : '이 패턴은 하락 신호예요! 살래가 아닌 팔래를 노리세요!', effect: 'shake' };
   }
 
   // Skip

@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Share2, Copy, Check, Zap, TrendingUp, Shield, Target } from 'lucide-react';
-import { COMPETE_LABELS, INVESTMENT_STYLES, WAVE_PATTERN_TYPES } from '../config';
+import { Share2, Copy, Check, Zap, Info } from 'lucide-react';
+import { COMPETE_LABELS, INVESTMENT_STYLES, WAVE_PATTERN_TYPES, RANKING_RULES } from '../config';
 import { formatNumber } from '@/lib/format';
 
 interface MyProfile {
@@ -134,7 +134,29 @@ export function HeroSection({ profile }: HeroSectionProps) {
                 style={{ width: `${profile.challengerScore}%` }}
               />
             </div>
-            <p className="text-xs text-gray-500 mt-1">{L.challengerScoreDesc}</p>
+
+            {/* 점수 구성 분해 */}
+            <div className="grid grid-cols-4 gap-1 mt-2">
+              {[
+                { label: '수익률', pct: '50%', color: 'text-red-400' },
+                { label: '파도정확도', pct: '25%', color: 'text-cyan-400' },
+                { label: '승률', pct: '15%', color: 'text-green-400' },
+                { label: '일관성', pct: '10%', color: 'text-yellow-400' },
+              ].map((item) => (
+                <div key={item.label} className="bg-white/5 rounded-lg px-1.5 py-1 text-center">
+                  <p className={`text-[10px] font-black ${item.color}`}>{item.pct}</p>
+                  <p className="text-[9px] text-gray-500 leading-tight">{item.label}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* 랭킹 기준 안내 */}
+            <div className="flex items-start gap-1.5 mt-2">
+              <Info className="w-3 h-3 text-gray-500 mt-0.5 shrink-0" />
+              <p className="text-[10px] text-gray-500 leading-relaxed">
+                <span className="text-yellow-400/80 font-bold">실전 시뮬레이션</span>만 글로벌 랭킹에 반영 · 매주 동일 시나리오 공정 비교
+              </p>
+            </div>
           </div>
 
           {/* AI 멘토 비교 */}

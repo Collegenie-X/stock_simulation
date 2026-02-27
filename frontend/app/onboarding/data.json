@@ -1,0 +1,50 @@
+{
+  "slides": [
+    {
+      "id": "chart-training",
+      "accent": "green",
+      "badge": "CHART TRAINING",
+      "title": "차트로 읽는\n시장의 흐름",
+      "desc": "실전과 동일한 차트를 보며\n매수·매도 타이밍을 직접 판단하세요"
+    },
+    {
+      "id": "event-scenario",
+      "accent": "yellow",
+      "badge": "EVENT SCENARIO",
+      "title": "돌발 이벤트!\n당신의 판단은?",
+      "desc": "급등, 폭락, 실적 발표 —\n상황별 대응 능력을 훈련합니다"
+    },
+    {
+      "id": "real-data",
+      "accent": "cyan",
+      "badge": "REAL DATA",
+      "title": "AI·로봇주\n실전 데이터로 연습",
+      "desc": "가장 핫한 테마주의 실제 1년 데이터로\n주식 파동의 흐름을 타는 연습"
+    },
+    {
+      "id": "ai-battle",
+      "accent": "indigo",
+      "badge": "AI BATTLE",
+      "title": "나와 비슷한 AI와\n대결하며 배우기",
+      "desc": "투자 DNA를 분석하고\nAI 코멘트와 비교하며 실력 향상"
+    }
+  ],
+  "comparisonChart": {
+    "data": [
+      { "turn": 1, "user": 100, "topPerformer": 100, "similarAI": 100 },
+      { "turn": 2, "user": 102, "topPerformer": 103, "similarAI": 101 },
+      { "turn": 3, "user": 105, "topPerformer": 108, "similarAI": 104 },
+      { "turn": 4, "user": 103, "topPerformer": 110, "similarAI": 106 },
+      { "turn": 5, "user": 106, "topPerformer": 113, "similarAI": 108 },
+      { "turn": 6, "user": 108, "topPerformer": 116, "similarAI": 110 },
+      { "turn": 7, "user": 110, "topPerformer": 119, "similarAI": 112 },
+      { "turn": 8, "user": 108, "topPerformer": 122, "similarAI": 111 }
+    ],
+    "finalReturns": {
+      "user": "+8.2%",
+      "topPerformer": "+22.0%",
+      "similarAI": "+11.5%"
+    },
+    "insight": "3턴에서 매도 타이밍을 놓쳤어요. 저항선 근처에서 일부 매도가 더 좋았을 거예요"
+  }
+}

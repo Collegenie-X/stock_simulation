@@ -192,7 +192,7 @@ export function MyPatternSection({ investmentStyle, wavePatternType, wavePattern
         <h4 className="text-sm font-bold text-white mb-3">{L.favoriteStocks}</h4>
         <div className="space-y-2.5">
           {stockPreferences.map((stock, idx) => (
-            <div key={stock.ticker} className="flex items-center gap-3">
+            <div key={stock.ticker} className="flex items-center gap-3 py-[5px]">
               <span className="text-xs text-gray-500 w-4">{idx + 1}</span>
               <span className="text-xl w-6">{stock.emoji}</span>
               <div className="flex-1 min-w-0">

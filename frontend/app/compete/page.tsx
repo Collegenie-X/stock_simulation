@@ -6,11 +6,12 @@ import { COMPETE_LABELS } from './config';
 import { HeroSection } from './components/HeroSection';
 import { MyPatternSection } from './components/MyPatternSection';
 import { HistorySection } from './components/HistorySection';
+import { GapAnalysisSection } from './components/GapAnalysisSection';
 
 import historyData from '@/data/compete-history.json';
 
 export default function CompetePage() {
-  const { myProfile, stockPreferences, wavePatternStats, simulations, stockPractice, wavePractice, rankTrend } = historyData;
+  const { myProfile, stockPreferences, wavePatternStats, simulations, stockPractice, wavePractice, rankTrend, gapAnalysis } = historyData;
 
   return (
     <div className="min-h-screen-mobile bg-[#191919] pb-24">
@@ -28,7 +29,10 @@ export default function CompetePage() {
           stockPreferences={stockPreferences}
         />
 
-        {/* 3. 나의 역대 기록 + 순위 변화 추이 (히스토리) */}
+        {/* 3. 나의 투자 갭 분석 (최고 투자자 / 유사 AI 비교 + 방향성) */}
+        <GapAnalysisSection gapAnalysis={gapAnalysis as any} />
+
+        {/* 4. 나의 역대 기록 + 순위 변화 추이 (히스토리) */}
         <HistorySection
           simulations={simulations as any}
           stockPractice={stockPractice as any}

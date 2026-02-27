@@ -20,20 +20,20 @@ import {
   feedbackLevel,
   getMarketHint,
   getGrade,
-  analyzePersonality,
   calcTheoreticalMax,
   type TurnData,
   type ActionType,
   type TradeRecord,
-  type PersonalityResult,
 } from "./utils"
 import personalityData from "@/data/scenario-personality-result.json"
 import {
   ArrowLeft, TrendingUp, TrendingDown,
   RotateCcw, Bot, Sparkles, Lightbulb,
-  Package, Trophy, Flame, Timer,
-  User, Star,
+  Package, Trophy, Flame,
+  User, Star, Waves,
 } from "lucide-react"
+import { TradeHistoryCard, type TradeAccountingItem } from "./components/TradeHistoryCard"
+import { GameActionBar, RatioModal } from "@/components/game-play-ui"
 
 const { ui: UI, feedback: FB, grades: GRADES, game: GAME } = playContent
 
@@ -332,52 +332,18 @@ export default function ScenarioPlayPage() {
         </div>
       )}
 
-      {/* Ratio Selection Modal */}
-      {showRatio && (
-        <div className="fixed inset-0 z-40 flex items-end justify-center">
-          <div className="absolute inset-0 bg-black/50" onClick={() => setShowRatio(null)} />
-          <div className="relative w-full max-w-md bg-[#1e1e1e] rounded-t-3xl p-5 pb-8 animate-in slide-in-from-bottom duration-200">
-            <div className="w-10 h-1 bg-gray-700 rounded-full mx-auto mb-4" />
-            <h3 className={cn("text-base font-bold mb-1",
-              showRatio === "buy" ? "text-red-400" : "text-blue-400")}>
-              {stock.name} {showRatio === "buy" ? "얼마나 살까?" : "얼마나 팔까?"}
-            </h3>
-            <p className="text-[10px] text-gray-500 mb-4">
-              {showRatio === "buy"
-                ? `현금: ${formatNumber(cash)}원 · 살 수 있는 주식: ${maxBuy}주`
-                : `갖고 있는 주식: ${holdings}주`}
-            </p>
-            <div className="grid grid-cols-4 gap-2 mb-4">
-              {(UI.ratioValues as number[]).map((r, i) => {
-                const qty = showRatio === "buy"
-                  ? Math.max(1, Math.floor(maxBuy * r))
-                  : Math.max(1, Math.ceil(holdings * r))
-                const descs = UI.ratioDescriptions as string[]
-                return (
-                  <button key={i} onClick={() => doTrade(showRatio, r, (UI.ratioLabels as string[])[i])}
-                    disabled={qty === 0}
-                    className={cn("py-3 rounded-xl border text-center transition-all active:scale-95 disabled:opacity-20",
-                      showRatio === "buy"
-                        ? "bg-red-500/10 border-red-500/20 hover:bg-red-500/20"
-                        : "bg-blue-500/10 border-blue-500/20 hover:bg-blue-500/20")}>
-                    <span className={cn("text-sm font-bold",
-                      showRatio === "buy" ? "text-red-400" : "text-blue-400")}>
-                      {(UI.ratioLabels as string[])[i]}
-                    </span>
-                    <p className="text-[10px] text-gray-400 mt-0.5">{qty}주</p>
-                    <p className="text-[9px] text-gray-600">{descs[i]}</p>
-                  </button>
-                )
-              })}
-            </div>
-            {hint && (
-              <div className="bg-yellow-500/5 border border-yellow-500/15 rounded-lg p-2.5">
-                <p className="text-[10px] text-yellow-500/80 leading-relaxed">💡 {hint.ratioGuide}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {/* 비율 선택 모달 - 공통 컴포넌트 */}
+      <RatioModal
+        mode={showRatio}
+        price={price}
+        cash={cash}
+        holdings={holdings}
+        avgPrice={avgPrice}
+        stockName={stock.name}
+        hint={hint?.ratioGuide}
+        onSelect={(ratio, label) => doTrade(showRatio!, ratio, label)}
+        onClose={() => setShowRatio(null)}
+      />
 
       {/* Exit Confirm Modal */}
       {showExitConfirm && (
@@ -442,8 +408,8 @@ export default function ScenarioPlayPage() {
           <Package className="w-5 h-5 text-indigo-400 shrink-0" />
           <div className="flex-1">
             <div className="flex items-baseline gap-1">
-              <p className="text-2xl font-black text-white">{holdings}</p>
-              <span className="text-sm text-indigo-300">주</span>
+              <p className="text-5xl font-black text-white leading-none">{holdings}</p>
+              <span className="text-xl text-indigo-300 font-bold">주</span>
               {avgPrice > 0 && (
                 <span className="text-[9px] text-gray-600 ml-1">평균 {formatNumber(Math.round(avgPrice))}원</span>
               )}
@@ -525,38 +491,19 @@ export default function ScenarioPlayPage() {
         )}
       </div>
 
-      {/* BOTTOM: Timer + Action Buttons */}
-      <div className="px-4 pt-2 pb-5 border-t border-gray-800/40 bg-[#0d0d0d]">
-        {/* Timer Bar */}
-        <div className="flex items-center gap-2 mb-3">
-          <div className="flex-1 h-3 bg-gray-800 rounded-full overflow-hidden">
-            <div
-              className={cn("h-full rounded-full transition-all duration-1000 ease-linear", timerColor)}
-              style={{ width: `${timerPct}%` }}
-            />
-          </div>
-          <div className={cn("flex items-center gap-0.5 min-w-[44px]",
-            shakeTimer && "animate-pulse")}>
-            <Timer className={cn("w-4 h-4", timerTextColor)} />
-            <span className={cn("text-sm font-black tabular-nums", timerTextColor)}>{timer}초</span>
-          </div>
-        </div>
-        {/* Action Buttons */}
-        <div className="flex gap-2">
-          <button onClick={() => setShowRatio("buy")} disabled={maxBuy === 0 || !!feedback}
-            className="flex-1 h-13 bg-gradient-to-b from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 disabled:from-gray-800 disabled:to-gray-800 disabled:text-gray-600 rounded-2xl font-bold text-sm text-white transition-all active:scale-95 shadow-lg shadow-red-500/20">
-            {UI.actionLabels.buy}
-          </button>
-          <button onClick={() => setShowRatio("sell")} disabled={holdings === 0 || !!feedback}
-            className="flex-1 h-13 bg-gradient-to-b from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 disabled:from-gray-800 disabled:to-gray-800 disabled:text-gray-600 rounded-2xl font-bold text-sm text-white transition-all active:scale-95 shadow-lg shadow-blue-500/20">
-            {UI.actionLabels.sell}
-          </button>
-          <button onClick={() => doTrade("hold")} disabled={!!feedback}
-            className="flex-1 h-13 bg-gradient-to-b from-gray-600 to-gray-700 hover:from-gray-500 hover:to-gray-600 disabled:from-gray-800 disabled:to-gray-800 disabled:text-gray-600 rounded-2xl font-bold text-sm text-white transition-all active:scale-95">
-            {UI.actionLabels.hold}
-          </button>
-        </div>
-      </div>
+      {/* 타이머 + 액션 버튼 - 공통 컴포넌트 (시나리오: 30초) */}
+      <GameActionBar
+        timer={timer}
+        timerSec={GAME.turnTimerSec}
+        shakeTimer={shakeTimer}
+        hasFeedback={!!feedback}
+        canBuy={maxBuy > 0}
+        canSell={holdings > 0}
+        onBuy={() => setShowRatio("buy")}
+        onSell={() => setShowRatio("sell")}
+        onHold={() => doTrade("hold")}
+        labels={{ buy: UI.actionLabels.buy as string, sell: UI.actionLabels.sell as string, hold: UI.actionLabels.hold as string }}
+      />
     </div>
   )
 }
@@ -696,96 +643,6 @@ function LiveChart({ points, animProg, isUp, height = 200, turnSize = 20, trades
   )
 }
 
-function PersonalityCard({ result }: { result: PersonalityResult }) {
-  const pData = personalityData.types[result.type as keyof typeof personalityData.types]
-  if (!pData) return null
-
-  const activePatterns = Object.entries(result.patterns)
-    .filter(([, v]) => v > 0)
-    .sort((a, b) => b[1] - a[1])
-
-  return (
-    <div className="px-4 mb-4 space-y-3">
-      <h3 className="text-xs font-bold text-gray-400 flex items-center gap-1.5">
-        <User className="w-3.5 h-3.5 text-indigo-400" />나의 투자 성향 분석
-      </h3>
-
-      {/* Main personality card */}
-      <div className={cn("rounded-2xl border p-5 text-center", pData.border, pData.bg, pData.glow)}>
-        <div className="text-5xl mb-2">{pData.emoji}</div>
-        <p className={cn("text-lg font-black", pData.accent)}>{pData.label}</p>
-        <p className="text-xs text-white font-bold mt-0.5">{pData.title}</p>
-        <p className="text-[11px] text-gray-400 leading-relaxed mt-2">{pData.description}</p>
-
-        <div className="flex justify-center gap-4 mt-4">
-          <div className="text-center">
-            <p className="text-[9px] text-gray-500">강점</p>
-            <div className="flex flex-wrap justify-center gap-1 mt-1">
-              {pData.strengths.map((s, i) => (
-                <span key={i} className={cn("text-[9px] px-2 py-0.5 rounded-full border", pData.border, pData.bg, pData.accent)}>{s}</span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Trait bars */}
-      <div className="bg-[#151515] rounded-2xl p-4 border border-gray-800/30">
-        <p className="text-[10px] font-bold text-gray-400 mb-3 flex items-center gap-1.5">
-          <Star className="w-3 h-3 text-yellow-500" />투자 능력치
-        </p>
-        <div className="space-y-2.5">
-          {personalityData.traits.map((trait) => {
-            const val = result.traits[trait.key] ?? 0
-            return (
-              <div key={trait.key}>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-[10px] text-gray-400 flex items-center gap-1">
-                    <span>{trait.emoji}</span>{trait.label}
-                  </span>
-                  <span className="text-[10px] font-bold text-white">{val}</span>
-                </div>
-                <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
-                  <div
-                    className={cn("h-full rounded-full bg-gradient-to-r transition-all duration-1000 ease-out", trait.bar)}
-                    style={{ width: `${val}%` }}
-                  />
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Trading patterns */}
-      {activePatterns.length > 0 && (
-        <div className="bg-[#151515] rounded-2xl p-4 border border-gray-800/30">
-          <p className="text-[10px] font-bold text-gray-400 mb-3">🔍 나의 매매 패턴</p>
-          <div className="flex flex-wrap gap-1.5">
-            {activePatterns.map(([key, count]) => {
-              const pd = personalityData.patternDescriptions[key as keyof typeof personalityData.patternDescriptions]
-              if (!pd) return null
-              return (
-                <div key={key} className="bg-gray-800/50 rounded-lg px-2.5 py-1.5 border border-gray-700/30">
-                  <span className="text-sm mr-1">{pd.emoji}</span>
-                  <span className="text-[10px] text-gray-300 font-bold">{pd.label}</span>
-                  <span className="text-[10px] text-gray-500 ml-1">×{count}</span>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Tip */}
-      <div className={cn("rounded-xl p-3 border", pData.border, pData.bg)}>
-        <p className={cn("text-[10px] font-bold mb-0.5", pData.accent)}>💡 맞춤 조언</p>
-        <p className="text-[11px] text-gray-300 leading-relaxed">{pData.tip}</p>
-      </div>
-    </div>
-  )
-}
-
 function ResultView({ scenario, total, rate, cash, holdings, price, avgPrice, trades, aiResults, initTotal, chartPts, turns, score, bestCombo, onReplay, onBack }: {
   scenario: LegendaryScenario; total: number; rate: number; cash: number
   holdings: number; price: number; avgPrice: number; trades: TradeRecord[]
@@ -801,7 +658,6 @@ function ResultView({ scenario, total, rate, cash, holdings, price, avgPrice, tr
   const finalHoldingValue = holdings * price
   const holdingPnL = holdings > 0 && avgPrice > 0 ? (price - avgPrice) * holdings : 0
   const holdingPnLRate = avgPrice > 0 && holdings > 0 ? ((price - avgPrice) / avgPrice) * 100 : 0
-  const personality = useMemo(() => analyzePersonality(trades), [trades])
 
   const profitMsg = personalityData.profitMessages.find((m) => rate >= m.minRate) ?? personalityData.profitMessages[personalityData.profitMessages.length - 1]
 
@@ -846,299 +702,370 @@ function ResultView({ scenario, total, rate, cash, holdings, price, avgPrice, tr
 
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-white pb-28">
-      <div className={cn("px-5 pt-10 pb-6 bg-gradient-to-br relative overflow-hidden", scenario.gradientFrom, scenario.gradientTo)}>
-        <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
-        <div className="relative z-10">
-          <p className="text-xs opacity-80 mb-1">{stock.name} ({stock.code}) · {scenario.title}</p>
+      {/* 상단 결과 헤더 - 다크 테마 통일 */}
+      <div className="px-5 pt-10 pb-6 bg-[#1a1a1a] border-b border-white/5">
+        <p className="text-xs text-gray-500 mb-3">{stock.name} ({stock.code}) · {scenario.title}</p>
 
-          {/* Profit message */}
-          <div className="flex items-center gap-2 mb-3 bg-white/10 rounded-xl px-3 py-2">
-            <span className="text-2xl">{profitMsg.emoji}</span>
-            <div>
-              <p className="text-sm font-black">{profitMsg.title}</p>
-              <p className="text-[10px] opacity-80">{profitMsg.message}</p>
-            </div>
+        {/* Profit message */}
+        <div className="flex items-center gap-3 mb-4 bg-[#252525] rounded-xl px-4 py-3 border border-white/5">
+          <span className="text-2xl">{profitMsg.emoji}</span>
+          <div>
+            <p className="text-sm font-bold text-white">{profitMsg.title}</p>
+            <p className="text-[10px] text-gray-400">{profitMsg.message}</p>
           </div>
+        </div>
 
-          {/* 총 자산 - 크게 + 컬러 */}
-          <div className="flex items-end justify-between mb-3">
+        {/* 총 자산 */}
+        <div className="flex items-end justify-between mb-4">
+          <div>
+            <p className="text-[10px] text-gray-500 mb-1">시작 {formatNumber(initTotal)}원 →</p>
+            <p className="text-3xl font-black text-white">{formatNumber(Math.round(total))}원</p>
+            <p className={cn("text-lg font-bold mt-1", rate >= 0 ? "text-red-400" : "text-blue-400")}>
+              {rate >= 0 ? "+" : ""}{rate.toFixed(2)}%
+              <span className="text-xs text-gray-500 ml-1.5">({rate >= 0 ? "+" : ""}{formatNumber(Math.round(total - initTotal))}원)</span>
+            </p>
+          </div>
+          <div className="text-right">
+            <div className={cn(
+              "text-4xl font-black",
+              gi.label === 'S' ? "text-yellow-400" :
+              gi.label === 'A' ? "text-green-400" :
+              gi.label === 'B' ? "text-cyan-400" :
+              gi.label === 'C' ? "text-gray-400" : "text-gray-500"
+            )}>{gi.label}</div>
+            <p className="text-[10px] text-gray-500">{gi.title}</p>
+          </div>
+        </div>
+
+        {/* 점수 카드 */}
+        <div className="bg-[#252525] rounded-xl p-4 border border-white/5">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Trophy className="w-4 h-4 text-yellow-500" />
+              <p className="text-xs font-bold text-gray-400">최종 점수</p>
+            </div>
+            <p className="text-2xl font-black text-white">{totalScore}<span className="text-xs text-gray-500 ml-0.5">점</span></p>
+          </div>
+          <div className="grid grid-cols-4 gap-2 pt-3 border-t border-white/5">
             <div>
-              <p className="text-[10px] opacity-60">시작 {formatNumber(initTotal)}원 →</p>
-              <p className="text-4xl font-black">{formatNumber(Math.round(total))}원</p>
-              <p className={cn("text-xl font-black mt-1", rate >= 0 ? "text-green-200" : "text-red-200")}>
-                {rate >= 0 ? "+" : ""}{rate.toFixed(2)}%
-                <span className="text-sm opacity-70 ml-1.5">({rate >= 0 ? "+" : ""}{formatNumber(Math.round(total - initTotal))}원)</span>
+              <p className="text-[9px] text-gray-500">판단 점수</p>
+              <p className="text-sm font-bold text-white">{score}</p>
+            </div>
+            <div>
+              <p className="text-[9px] text-gray-500">수익 보너스</p>
+              <p className={cn("text-sm font-bold", profitBonus >= 0 ? "text-red-400" : "text-blue-400")}>
+                {profitBonus >= 0 ? "+" : ""}{profitBonus}
               </p>
             </div>
-            <div className="text-center">
-              <div className={cn("text-5xl font-black", gi.color)}>{gi.label}</div>
-              <p className="text-[10px] opacity-70">{gi.title}</p>
+            <div>
+              <p className="text-[9px] text-gray-500">최고 콤보</p>
+              <p className="text-sm font-bold text-white flex items-center gap-0.5">
+                <Flame className="w-3 h-3 text-orange-400" />{bestCombo}
+              </p>
             </div>
-          </div>
-
-          {/* 점수 카드 - 판단점수 + 수익보너스 = 총점수 */}
-          <div className="bg-white/15 rounded-xl p-3 mb-3">
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-yellow-300" />
-                <p className="text-[10px] font-bold opacity-70">최종 점수</p>
-              </div>
-              <p className="text-2xl font-black">{totalScore}<span className="text-xs opacity-70 ml-0.5">점</span></p>
+            <div>
+              <p className="text-[9px] text-gray-500">AI 격파</p>
+              <p className="text-sm font-bold text-white">{beaten}/{aiResults.length}</p>
             </div>
-            <div className="grid grid-cols-4 gap-1.5 pt-2 border-t border-white/15">
-              <div>
-                <p className="text-[8px] opacity-60">판단 점수</p>
-                <p className="text-sm font-bold">{score}</p>
-              </div>
-              <div>
-                <p className="text-[8px] opacity-60">수익 보너스</p>
-                <p className={cn("text-sm font-bold", profitBonus >= 0 ? "text-green-200" : "text-red-200")}>
-                  {profitBonus >= 0 ? "+" : ""}{profitBonus}
-                </p>
-              </div>
-              <div>
-                <p className="text-[8px] opacity-60">최고 콤보</p>
-                <p className="text-sm font-bold flex items-center gap-0.5">
-                  <Flame className="w-3 h-3 text-orange-300" />{bestCombo}
-                </p>
-              </div>
-              <div>
-                <p className="text-[8px] opacity-60">AI 격파</p>
-                <p className="text-sm font-bold">{beaten}/{aiResults.length}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* 최종 주식 현황 */}
-          {holdings > 0 ? (
-            <div className="bg-white/10 rounded-xl p-3 mb-2">
-              <p className="text-[9px] opacity-70 font-bold mb-2">📦 보유 주식 현황</p>
-              <div className="grid grid-cols-3 gap-2 mb-2">
-                <div>
-                  <p className="text-[8px] opacity-60">최종 주식 수</p>
-                  <p className="text-xl font-black">{holdings}<span className="text-xs opacity-70 ml-0.5">주</span></p>
-                </div>
-                <div>
-                  <p className="text-[8px] opacity-60">최종 주식가</p>
-                  <p className="text-sm font-bold">{formatNumber(Math.round(price))}원</p>
-                </div>
-                <div>
-                  <p className="text-[8px] opacity-60">주식 수익률</p>
-                  <p className={cn("text-sm font-bold", holdingPnLRate >= 0 ? "text-green-200" : "text-red-200")}>
-                    {holdingPnLRate >= 0 ? "+" : ""}{holdingPnLRate.toFixed(1)}%
-                  </p>
-                </div>
-              </div>
-              <div className="pt-2 border-t border-white/10">
-                <p className="text-[8px] opacity-60">
-                  주식 평가금액
-                  <span className={cn("ml-1 font-bold", holdingPnL >= 0 ? "text-green-200" : "text-red-200")}>
-                    ({holdingPnL >= 0 ? "+" : ""}{formatNumber(Math.round(holdingPnL))}원 손익)
-                  </span>
-                </p>
-                <p className={cn("text-lg font-black", holdingPnL >= 0 ? "text-green-100" : "text-red-100")}>
-                  {formatNumber(Math.round(finalHoldingValue))}원
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white/10 rounded-xl p-3 mb-2 text-center">
-              <p className="text-xs opacity-60">📦 보유 주식 없음 · 전부 매도 완료</p>
-            </div>
-          )}
-
-          {/* 남은 원화 - 크게 따로 표시 */}
-          <div className="bg-white/15 rounded-xl px-4 py-3">
-            <p className="text-[9px] opacity-70 font-bold mb-1">💰 남은 원화</p>
-            <p className="text-3xl font-black">{formatNumber(Math.round(cash))}원</p>
           </div>
         </div>
       </div>
 
-      {/* Personality Analysis */}
-      <div className="pt-4">
-        <PersonalityCard result={personality} />
+      {/* 보유 현황 */}
+      <div className="px-5 py-4 bg-[#151515]">
+        {holdings > 0 ? (
+          <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5 mb-3">
+            <p className="text-[10px] text-gray-500 font-bold mb-3">📦 보유 주식 현황</p>
+            <div className="grid grid-cols-3 gap-3 mb-3">
+              <div>
+                <p className="text-[9px] text-gray-500">최종 주식 수</p>
+                <p className="text-lg font-black text-white">{holdings}<span className="text-xs text-gray-500 ml-0.5">주</span></p>
+              </div>
+              <div>
+                <p className="text-[9px] text-gray-500">최종 주식가</p>
+                <p className="text-sm font-bold text-white">{formatNumber(Math.round(price))}원</p>
+              </div>
+              <div>
+                <p className="text-[9px] text-gray-500">주식 수익률</p>
+                <p className={cn("text-sm font-bold", holdingPnLRate >= 0 ? "text-red-400" : "text-blue-400")}>
+                  {holdingPnLRate >= 0 ? "+" : ""}{holdingPnLRate.toFixed(1)}%
+                </p>
+              </div>
+            </div>
+            <div className="pt-3 border-t border-white/5">
+              <p className="text-[9px] text-gray-500">
+                주식 평가금액
+                <span className={cn("ml-1 font-bold", holdingPnL >= 0 ? "text-red-400" : "text-blue-400")}>
+                  ({holdingPnL >= 0 ? "+" : ""}{formatNumber(Math.round(holdingPnL))}원 손익)
+                </span>
+              </p>
+              <p className="text-lg font-black text-white">
+                {formatNumber(Math.round(finalHoldingValue))}원
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5 mb-3 text-center">
+            <p className="text-xs text-gray-500">📦 보유 주식 없음 · 전부 매도 완료</p>
+          </div>
+        )}
+
+        {/* 남은 원화 */}
+        <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5">
+          <p className="text-[10px] text-gray-500 font-bold mb-2">💰 남은 원화</p>
+          <p className="text-2xl font-black text-white">{formatNumber(Math.round(cash))}원</p>
+        </div>
       </div>
 
-      <div className="px-4 py-2">
+      <div className="px-4 py-2 pt-4">
         <LiveChart points={chartPts} animProg={1} isUp={rate >= 0} height={200} trades={trades} />
       </div>
 
-      {/* 턴 히스토리 - 회계 정보 중심 */}
+      {/* 턴 히스토리 - 게임 형식 */}
       <div className="px-4 mb-4">
-        <h3 className="text-xs font-bold text-gray-400 mb-2 flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-yellow-500" />{trades.length}턴 거래 내역
-        </h3>
-        <div className="space-y-2">
-          {tradeAccounting.map((t, i) => (
-            <div key={i} className="bg-[#1a1a1a] rounded-xl p-3 border border-gray-800/30">
-              {/* 헤더: 턴 번호 + 액션 배지 + 이벤트명 (작게) */}
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-sm shrink-0">{(UI.turnEmoji as string[])[i] ?? "🔢"}</span>
-                <div className={cn("text-[10px] font-bold px-2 py-0.5 rounded-lg shrink-0",
-                  t.action === "buy" ? "bg-red-500/15 text-red-400" :
-                  t.action === "sell" ? "bg-blue-500/15 text-blue-400" : "bg-gray-700/30 text-gray-400")}>
-                  {t.action === "buy" ? "🛒 매수" : t.action === "sell" ? "💸 매도" : "⏸️ 관망"}
-                </div>
-                <p className="text-[9px] text-gray-600 truncate flex-1">{t.eventTitle}</p>
-              </div>
-
-              {/* 회계 정보 - 크고 굵게 */}
-              {t.action !== "hold" && t.quantity > 0 ? (
-                <div className="bg-[#252525] rounded-lg px-3 py-2.5">
-                  <div className="grid grid-cols-3 gap-2">
-                    <div>
-                      <p className="text-[9px] text-gray-500">{t.action === "buy" ? "매수가" : "매도가"}</p>
-                      <p className="text-sm font-black text-white">{formatNumber(Math.round(t.price))}원</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] text-gray-500">수량</p>
-                      <p className="text-sm font-black text-white">{t.quantity}주</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] text-gray-500">총 금액</p>
-                      <p className="text-sm font-black text-white">{formatNumber(Math.round(t.amount))}원</p>
-                    </div>
-                  </div>
-                  {/* 매도 시 실현 손익 */}
-                  {t.action === "sell" && (
-                    <div className={cn("mt-2 pt-2 border-t border-white/5 flex items-center justify-between",
-                      t.pnl >= 0 ? "text-red-400" : "text-blue-400")}>
-                      <span className="text-[10px]">실현 손익</span>
-                      <div className="text-right">
-                        <span className="text-base font-black">
-                          {t.pnl >= 0 ? "+" : ""}{formatNumber(Math.round(t.pnl))}원
-                        </span>
-                        <span className="text-[10px] ml-1.5 opacity-80">
-                          ({t.pnlRate >= 0 ? "+" : ""}{t.pnlRate.toFixed(1)}%)
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <p className="text-[10px] text-gray-600 pl-1">거래 없음</p>
-              )}
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-bold text-white flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center">
+              <Waves className="w-4 h-4 text-white" />
             </div>
-          ))}
+            {trades.length}턴 파도 분석
+          </h3>
+          <div className="flex items-center gap-1.5 bg-white/5 rounded-full px-2.5 py-1">
+            <span className="text-[9px] text-gray-500">탭하여 AI 갭 비교</span>
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          {tradeAccounting.map((t, i) => {
+            const nextTurnChange = turns[i + 1]?.change
+            return (
+              <TradeHistoryCard
+                key={i}
+                mode="scenario"
+                trade={t as TradeAccountingItem}
+                index={i}
+                turnEmoji={(UI.turnEmoji as string[])[i] ?? "🔢"}
+                nextTurnChange={nextTurnChange}
+                aiResults={aiResults}
+                turns={turns}
+                initTotal={initTotal}
+                userRate={rate}
+                currentPrice={turns[i]?.endPrice}
+              />
+            )
+          })}
         </div>
       </div>
 
-      {/* AI 투자자 비교 */}
+      {/* AI 투자자 비교 - 게임 형식 */}
       <div className="px-4 mb-4">
-        <h3 className="text-xs font-bold text-gray-400 mb-1.5 flex items-center gap-1.5">
-          <Bot className="w-3.5 h-3.5 text-purple-400" />AI 투자자 비교
-          <span className="text-[9px] text-gray-600 ml-1">AI 최고 수익: {bestAIReturn >= 0 ? "+" : ""}{bestAIReturn.toFixed(1)}%</span>
-        </h3>
-        {aiResults.map((ai, i) => {
-          const win = rate > ai.returnNum
-          return (
-            <div key={i} className={cn("rounded-xl p-3 border flex items-center gap-3 mb-1.5",
-              win ? "bg-green-500/5 border-green-500/15" : "bg-[#1a1a1a] border-gray-800/30")}>
-              <span className="text-xl">{ai.emoji}</span>
-              <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold">{ai.name}</p>
-                <p className="text-[10px] text-gray-500 truncate">{ai.result}</p>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-bold text-white flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+              <Bot className="w-4 h-4 text-white" />
+            </div>
+            AI 대결 결과
+          </h3>
+          <div className={cn(
+            "flex items-center gap-1.5 px-3 py-1.5 rounded-full font-bold text-xs",
+            beaten >= aiResults.length ? "bg-green-500/20 text-green-400" :
+            beaten > 0 ? "bg-yellow-500/20 text-yellow-400" : "bg-red-500/20 text-red-400"
+          )}>
+            <Trophy className="w-3.5 h-3.5" />
+            {beaten}/{aiResults.length} 격파
+          </div>
+        </div>
+
+        {/* 나의 수익률 카드 */}
+        <div className="bg-gradient-to-r from-blue-600/20 to-cyan-600/20 rounded-2xl p-4 border border-cyan-500/30 mb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
+                <User className="w-6 h-6 text-white" />
               </div>
-              <div className="text-right">
-                <p className={cn("text-sm font-bold", ai.returnNum >= 0 ? "text-red-400" : "text-blue-400")}>{ai.returnRate}</p>
-                <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded",
-                  win ? "bg-green-500/20 text-green-400" : "bg-gray-700 text-gray-500")}>{win ? "🎉 승리" : "패배"}</span>
+              <div>
+                <p className="text-[10px] text-cyan-300 font-semibold">나의 최종 수익률</p>
+                <p className={cn(
+                  "text-2xl font-black",
+                  rate >= 0 ? "text-red-400" : "text-blue-400"
+                )}>
+                  {rate >= 0 ? "+" : ""}{rate.toFixed(2)}%
+                </p>
               </div>
             </div>
-          )
-        })}
+            <div className="text-right">
+              <p className="text-[9px] text-gray-400">최고 AI 대비</p>
+              <p className={cn(
+                "text-lg font-black",
+                rate >= bestAIReturn ? "text-green-400" : "text-orange-400"
+              )}>
+                {rate >= bestAIReturn ? "+" : ""}{(rate - bestAIReturn).toFixed(1)}%p
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* AI 리스트 */}
+        <div className="space-y-2">
+          {aiResults.map((ai, i) => {
+            const win = rate > ai.returnNum
+            const gap = rate - ai.returnNum
+            return (
+              <div key={i} className={cn(
+                "rounded-xl p-3 border flex items-center gap-3 transition-all",
+                win 
+                  ? "bg-green-500/8 border-green-500/20" 
+                  : "bg-[#1a1a1a] border-gray-800/30"
+              )}>
+                <div className="relative">
+                  <span className="text-2xl">{ai.emoji}</span>
+                  {win && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                      <span className="text-[8px]">✓</span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs font-bold text-white">{ai.name}</p>
+                    <span className={cn(
+                      "text-[9px] font-bold px-1.5 py-0.5 rounded",
+                      win ? "bg-green-500/20 text-green-400" : "bg-gray-700 text-gray-500"
+                    )}>
+                      {win ? "🎉 승리" : "패배"}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-gray-500">{ai.type}</p>
+                </div>
+                <div className="text-right">
+                  <p className={cn(
+                    "text-sm font-bold",
+                    ai.returnNum >= 0 ? "text-red-400" : "text-blue-400"
+                  )}>
+                    {ai.returnRate}
+                  </p>
+                  <p className={cn(
+                    "text-[10px] font-bold",
+                    gap >= 0 ? "text-green-400" : "text-orange-400"
+                  )}>
+                    갭 {gap >= 0 ? "+" : ""}{gap.toFixed(1)}%p
+                  </p>
+                </div>
+              </div>
+            )
+          })}
+        </div>
       </div>
 
-      {/* 이론적 최대 수익 vs 실제 비교 */}
+      {/* 파도 읽기 달성도 */}
       <div className="px-4 mb-4">
-        <h3 className="text-xs font-bold text-gray-400 mb-2 flex items-center gap-1.5">
-          <TrendingUp className="w-3.5 h-3.5 text-green-400" />내 결과 vs 최대 달성 가능 수익
-        </h3>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-sm font-bold text-white flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center">
+              <Star className="w-4 h-4 text-white" />
+            </div>
+            파도 읽기 달성도
+          </h3>
+          {theoreticalMax.maxRate > 0 && (
+            <div className={cn(
+              "px-3 py-1.5 rounded-full font-bold text-sm",
+              rate / theoreticalMax.maxRate >= 0.7 ? "bg-green-500/20 text-green-400" :
+              rate / theoreticalMax.maxRate >= 0.4 ? "bg-yellow-500/20 text-yellow-400" : 
+              "bg-red-500/20 text-red-400"
+            )}>
+              {Math.max(0, (rate / theoreticalMax.maxRate * 100)).toFixed(0)}%
+            </div>
+          )}
+        </div>
+
         <div className="bg-[#1a1a1a] rounded-2xl p-4 border border-gray-800/30">
-          {/* 상단: 내 결과 vs 완벽 전략 */}
-          <div className="grid grid-cols-2 gap-3 mb-3">
-            <div className="bg-[#252525] rounded-xl p-3">
-              <p className="text-[9px] text-gray-500 mb-1">👤 내 결과</p>
-              <p className={cn("text-xl font-black", rate >= 0 ? "text-red-400" : "text-blue-400")}>
-                {rate >= 0 ? "+" : ""}{rate.toFixed(2)}%
+          {/* 달성도 게이지 */}
+          {theoreticalMax.maxRate > 0 && (
+            <div className="mb-4">
+              <div className="relative h-4 bg-gray-800 rounded-full overflow-hidden">
+                <div
+                  className={cn(
+                    "h-full rounded-full transition-all duration-1000 relative",
+                    rate / theoreticalMax.maxRate >= 0.7 ? "bg-gradient-to-r from-green-600 to-green-400" :
+                    rate / theoreticalMax.maxRate >= 0.4 ? "bg-gradient-to-r from-yellow-600 to-yellow-400" : 
+                    "bg-gradient-to-r from-red-600 to-red-400"
+                  )}
+                  style={{ width: `${Math.min(100, Math.max(0, (rate / theoreticalMax.maxRate) * 100))}%` }}
+                />
+                {/* 마일스톤 마커 */}
+                <div className="absolute top-0 left-[40%] w-0.5 h-full bg-white/20" />
+                <div className="absolute top-0 left-[70%] w-0.5 h-full bg-white/20" />
+              </div>
+              <div className="flex justify-between mt-1 text-[8px] text-gray-600">
+                <span>0%</span>
+                <span>40%</span>
+                <span>70%</span>
+                <span>100%</span>
+              </div>
+            </div>
+          )}
+
+          {/* 비교 카드 */}
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="bg-gradient-to-br from-blue-500/10 to-cyan-500/10 rounded-xl p-3 border border-cyan-500/20">
+              <div className="flex items-center gap-2 mb-2">
+                <User className="w-4 h-4 text-cyan-400" />
+                <p className="text-[10px] text-cyan-300 font-bold">내 결과</p>
+              </div>
+              <p className={cn("text-2xl font-black", rate >= 0 ? "text-red-400" : "text-blue-400")}>
+                {rate >= 0 ? "+" : ""}{rate.toFixed(1)}%
               </p>
-              <p className="text-xs text-gray-400">
+              <p className="text-[10px] text-gray-500">
                 {rate >= 0 ? "+" : ""}{formatNumber(Math.round(total - initTotal))}원
               </p>
             </div>
-            <div className="bg-[#252525] rounded-xl p-3">
-              <p className="text-[9px] text-gray-500 mb-1">🔥 완벽한 최대 전략</p>
-              <p className="text-xl font-black text-yellow-400">
-                +{theoreticalMax.maxRate.toFixed(2)}%
+            <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 rounded-xl p-3 border border-yellow-500/20">
+              <div className="flex items-center gap-2 mb-2">
+                <Trophy className="w-4 h-4 text-yellow-400" />
+                <p className="text-[10px] text-yellow-300 font-bold">완벽 전략</p>
+              </div>
+              <p className="text-2xl font-black text-yellow-400">
+                +{theoreticalMax.maxRate.toFixed(1)}%
               </p>
-              <p className="text-xs text-gray-400">
+              <p className="text-[10px] text-gray-500">
                 +{formatNumber(theoreticalMax.maxValue - initTotal)}원
               </p>
             </div>
           </div>
 
-          {/* 달성도 바 */}
-          {theoreticalMax.maxRate > 0 && (
-            <div className="mb-3">
-              <div className="flex justify-between text-[9px] text-gray-500 mb-1">
-                <span>달성도</span>
-                <span className={cn("font-bold", rate / theoreticalMax.maxRate >= 0.7 ? "text-green-400" : rate / theoreticalMax.maxRate >= 0.4 ? "text-yellow-400" : "text-red-400")}>
-                  {Math.max(0, (rate / theoreticalMax.maxRate * 100)).toFixed(0)}%
-                </span>
-              </div>
-              <div className="h-2.5 bg-gray-800 rounded-full overflow-hidden">
-                <div
-                  className={cn("h-full rounded-full transition-all duration-1000",
-                    rate / theoreticalMax.maxRate >= 0.7 ? "bg-green-500" :
-                    rate / theoreticalMax.maxRate >= 0.4 ? "bg-yellow-500" : "bg-red-500")}
-                  style={{ width: `${Math.min(100, Math.max(0, (rate / theoreticalMax.maxRate) * 100))}%` }}
-                />
-              </div>
-            </div>
-          )}
-
           {/* 갭 분석 */}
-          <div className="grid grid-cols-3 gap-2 mb-3">
-            <div className="text-center">
-              <p className="text-[8px] text-gray-600 mb-0.5">단순 저점→고점</p>
-              <p className="text-[11px] font-bold text-gray-300">+{theoreticalMax.singleTradeRate.toFixed(1)}%</p>
-              <p className="text-[9px] text-gray-500">+{formatNumber(theoreticalMax.singleTradeValue - initTotal)}원</p>
-            </div>
-            <div className="text-center border-x border-gray-700/50">
-              <p className="text-[8px] text-gray-600 mb-0.5">내 결과와 갭</p>
-              <p className="text-[11px] font-bold text-orange-400">
-                -{(theoreticalMax.maxRate - rate).toFixed(1)}%p
-              </p>
-              <p className="text-[9px] text-gray-500">-{formatNumber(theoreticalMax.maxValue - Math.round(total))}원</p>
-            </div>
-            <div className="text-center">
-              <p className="text-[8px] text-gray-600 mb-0.5">최저가 → 최고가</p>
-              <p className="text-[11px] font-bold text-gray-300">
-                T{theoreticalMax.lowestTurn} → T{theoreticalMax.highestTurn}
-              </p>
-              <p className="text-[9px] text-gray-500">
-                {formatNumber(theoreticalMax.lowestPrice)} → {formatNumber(theoreticalMax.highestPrice)}
-              </p>
+          <div className="bg-[#252525] rounded-xl p-3 mb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[9px] text-gray-500 mb-1">최대 수익과의 갭</p>
+                <p className="text-lg font-black text-orange-400">
+                  -{(theoreticalMax.maxRate - rate).toFixed(1)}%p
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-[9px] text-gray-500 mb-1">놓친 수익</p>
+                <p className="text-lg font-black text-gray-400">
+                  -{formatNumber(theoreticalMax.maxValue - Math.round(total))}원
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* 완벽 전략 상세 */}
-          <div className="bg-[#0d0d0d] rounded-xl p-3">
-            <p className="text-[9px] text-gray-500 mb-2 font-bold">🏆 완벽 전략 상세</p>
-            <div className="space-y-1">
-              {theoreticalMax.strategy.map((s, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0",
-                    s.action === "buy" ? "bg-red-500/20 text-red-400" : "bg-blue-500/20 text-blue-400")}>
-                    T{s.turn} {s.action === "buy" ? "매수" : "매도"}
-                  </span>
-                  <span className="text-[9px] text-gray-400">
-                    {s.qty}주 × {formatNumber(s.price)}원
-                    <span className="text-gray-600 ml-1">= {formatNumber(s.qty * s.price)}원</span>
-                  </span>
-                </div>
-              ))}
+          {/* 파도 전환점 */}
+          <div className="bg-cyan-500/8 border border-cyan-500/20 rounded-xl p-3">
+            <p className="text-[10px] font-bold text-cyan-300 mb-2 flex items-center gap-1">
+              <Waves className="w-3 h-3" /> 파도 전환점 분석
+            </p>
+            <div className="flex items-center justify-between text-[10px]">
+              <div>
+                <p className="text-gray-500">최저점</p>
+                <p className="text-white font-bold">T{theoreticalMax.lowestTurn} · {formatNumber(theoreticalMax.lowestPrice)}원</p>
+              </div>
+              <TrendingUp className="w-4 h-4 text-green-400" />
+              <div className="text-right">
+                <p className="text-gray-500">최고점</p>
+                <p className="text-white font-bold">T{theoreticalMax.highestTurn} · {formatNumber(theoreticalMax.highestPrice)}원</p>
+              </div>
             </div>
           </div>
         </div>

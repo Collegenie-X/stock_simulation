@@ -283,7 +283,7 @@ export default function PatternDetailPage() {
         <div className="max-w-md mx-auto flex gap-3">
           <Button
             variant="outline"
-            onClick={() => router.back()}
+            onClick={() => router.push('/learn?tab=patterns')}
             className="flex-1 h-12 rounded-xl bg-[#252525] border-white/10 text-white hover:bg-[#333]"
           >
             목록으로

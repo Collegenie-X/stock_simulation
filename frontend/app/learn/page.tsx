@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { MobileHeader } from '@/components/mobile-header';
 import { MobileNav } from '@/components/mobile-nav';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,12 +15,9 @@ import { LearningProcessSteps } from './components/LearningProcessSteps';
 import { ScenarioTab } from './components/ScenarioTab';
 import { PatternTab } from './components/PatternTab';
 
-/**
- * 학습 페이지
- * - 다크 테마 모바일 최적화
- * - 강의, 패턴, AI 멘토 탭
- */
-export default function LearnPage() {
+function LearnContent() {
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get('tab') === 'patterns' ? 'patterns' : 'scenarios';
   const [progress, setProgress] = useState<any>(null);
   const [userPersonality, setUserPersonality] =
     useState<InvestorPersonality>('balanced');
@@ -42,7 +40,7 @@ export default function LearnPage() {
 
   return (
     <div className="min-h-screen-mobile bg-[#191919] pb-24">
-      <MobileHeader title="학습" showSettings />
+      <MobileHeader title="연습" showSettings />
 
       <main className="pt-16 px-5 max-w-md mx-auto">
         <InvestorDNAHero userPersonality={userPersonality} progress={progress} />
@@ -50,7 +48,7 @@ export default function LearnPage() {
         <LearningProcessSteps />
 
         {/* 탭 네비게이션 */}
-        <Tabs defaultValue="scenarios" className="mt-6">
+        <Tabs defaultValue={initialTab} className="mt-6">
           <TabsList className="w-full bg-[#252525] border border-white/10 rounded-2xl p-1 grid grid-cols-2 mb-6">
             <TabsTrigger
               value="scenarios"
@@ -78,5 +76,17 @@ export default function LearnPage() {
 
       <MobileNav />
     </div>
+  );
+}
+
+export default function LearnPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen-mobile bg-[#191919] flex items-center justify-center">
+        <div className="animate-pulse text-4xl">📚</div>
+      </div>
+    }>
+      <LearnContent />
+    </Suspense>
   );
 }

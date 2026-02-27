@@ -7,6 +7,8 @@
     "progressPercent": 65,
     "reward": "500XP + 황금 파도 뱃지"
   },
+  "_rankingRule": "실전 시뮬레이션 기준 | 도전자 점수 = 수익률백분위(50%) + 파도정확도(25%) + 승률(15%) + 일관성(10%)",
+  "_rankTabs": ["weekly", "cumulative"],
   "rankings": [
     {
       "rank": 1,
@@ -19,7 +21,12 @@
       "style": "공격형",
       "portfolio": 7,
       "trades": 31,
-      "waveType": "3파 집중형"
+      "waveType": "3파 집중형",
+      "weeklyScore": 97,
+      "cumulativeScore": 94,
+      "waveAccuracy": 94,
+      "winRate": 84,
+      "consistencyWeeks": 6
     },
     {
       "rank": 2,
@@ -32,7 +39,12 @@
       "style": "균형형",
       "portfolio": 5,
       "trades": 23,
-      "waveType": "선점형"
+      "waveType": "선점형",
+      "weeklyScore": 92,
+      "cumulativeScore": 89,
+      "waveAccuracy": 88,
+      "winRate": 78,
+      "consistencyWeeks": 5
     },
     {
       "rank": 3,
@@ -45,7 +57,12 @@
       "style": "공격형",
       "portfolio": 6,
       "trades": 28,
-      "waveType": "꼭대기형"
+      "waveType": "꼭대기형",
+      "weeklyScore": 88,
+      "cumulativeScore": 85,
+      "waveAccuracy": 82,
+      "winRate": 75,
+      "consistencyWeeks": 4
     },
     {
       "rank": 4,
@@ -58,7 +75,12 @@
       "style": "공격형",
       "portfolio": 4,
       "trades": 19,
-      "waveType": "3파 집중형"
+      "waveType": "3파 집중형",
+      "weeklyScore": 84,
+      "cumulativeScore": 80,
+      "waveAccuracy": 90,
+      "winRate": 68,
+      "consistencyWeeks": 3
     },
     {
       "rank": 5,
@@ -71,7 +93,12 @@
       "style": "안정형",
       "portfolio": 8,
       "trades": 14,
-      "waveType": "조정파 활용형"
+      "waveType": "조정파 활용형",
+      "weeklyScore": 80,
+      "cumulativeScore": 82,
+      "waveAccuracy": 76,
+      "winRate": 86,
+      "consistencyWeeks": 5
     },
     {
       "rank": 6,
@@ -84,7 +111,12 @@
       "style": "공격형",
       "portfolio": 3,
       "trades": 22,
-      "waveType": "선점형"
+      "waveType": "선점형",
+      "weeklyScore": 76,
+      "cumulativeScore": 74,
+      "waveAccuracy": 71,
+      "winRate": 72,
+      "consistencyWeeks": 2
     },
     {
       "rank": 7,
@@ -97,7 +129,12 @@
       "style": "균형형",
       "portfolio": 5,
       "trades": 17,
-      "waveType": "3파 집중형"
+      "waveType": "3파 집중형",
+      "weeklyScore": 72,
+      "cumulativeScore": 70,
+      "waveAccuracy": 80,
+      "winRate": 65,
+      "consistencyWeeks": 2
     },
     {
       "rank": 8,
@@ -110,7 +147,12 @@
       "style": "공격형",
       "portfolio": 4,
       "trades": 35,
-      "waveType": "꼭대기형"
+      "waveType": "꼭대기형",
+      "weeklyScore": 68,
+      "cumulativeScore": 65,
+      "waveAccuracy": 65,
+      "winRate": 60,
+      "consistencyWeeks": 1
     }
   ],
   "levelDistribution": [

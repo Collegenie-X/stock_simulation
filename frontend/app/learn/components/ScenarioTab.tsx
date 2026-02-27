@@ -11,7 +11,7 @@ import {
 } from '@/data/legendary-scenarios';
 import type { InvestorPersonality } from '@/data/legendary-scenarios';
 import { getScenarioStockType } from '@/data/scenario-stock-types';
-import { ChevronDown, Swords, Trophy, Users, Info, Sparkles } from 'lucide-react';
+import { ChevronDown, Swords, Trophy, Users, Info, Sparkles, Waves, TrendingUp, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // ─── Hero Section ────────────────────────────────────────────────
@@ -21,11 +21,11 @@ function ScenarioHero({ myDNA }: { myDNA: { emoji: string; label: string } }) {
   return (
     <div className="bg-gradient-to-r from-yellow-600/80 to-orange-700/80 rounded-2xl border border-yellow-500/30 text-white overflow-hidden">
       <button className="w-full flex items-center gap-4 p-4 text-left" onClick={() => setOpen(!open)}>
-        <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-2xl shrink-0">🎯</div>
+        <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-2xl shrink-0">🌊</div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-yellow-200 font-semibold">전설의 10턴</p>
-          <h3 className="text-base font-bold">사고 대처 시뮬레이션</h3>
-          <p className="text-[11px] text-yellow-100/70 mt-0.5">종목 특성을 파악해 대처 능력을 키우세요</p>
+          <p className="text-xs text-yellow-200 font-semibold">파도 흐름 연습</p>
+          <h3 className="text-base font-bold">시나리오 시뮬레이션</h3>
+          <p className="text-[11px] text-yellow-100/70 mt-0.5">파도의 흐름을 읽고 AI와 갭을 비교하세요</p>
         </div>
         <div className="flex items-center gap-1 shrink-0">
           <div className="w-7 h-7 bg-white/20 rounded-full flex items-center justify-center text-sm">👤</div>
@@ -38,12 +38,12 @@ function ScenarioHero({ myDNA }: { myDNA: { emoji: string; label: string } }) {
       {open && (
         <div className="px-4 pb-4 border-t border-white/10 space-y-3">
           <div className="mt-3 bg-white/10 rounded-xl p-3 space-y-1.5">
-            <p className="text-xs font-bold text-yellow-200 mb-2">📚 이렇게 배워요</p>
+            <p className="text-xs font-bold text-yellow-200 mb-2">🌊 파도 읽기가 중요한 이유</p>
             {[
-              '각 종목이 가진 고유 특성(사이클/규제/테마)을 파악',
-              '같은 특성의 유사 종목들도 함께 확인',
-              '위기 상황에서 나만의 대처 전략을 연습',
-              '동일 성향 AI와 수익률을 비교하며 성장',
+              '주가는 파도처럼 상승과 하락을 반복해요',
+              '파도의 전환점을 읽으면 매매 타이밍이 보여요',
+              '유사 AI와 갭을 비교하며 판단력을 키워요',
+              '최대 갭을 줄이면 손실을 최소화할 수 있어요',
             ].map((text, i) => (
               <div key={i} className="flex items-start gap-2">
                 <span className="text-yellow-300 text-xs shrink-0 mt-0.5">0{i + 1}</span>
@@ -167,46 +167,84 @@ function ScenarioCard({ scenario, userPersonality }: ScenarioCardProps) {
             </div>
           )}
 
-          {/* AI 수익률 비교 */}
+          {/* 파도 흐름 & AI 갭 분석 */}
           <div>
             <p className="text-[10px] font-bold text-gray-500 mb-2 flex items-center gap-1">
-              <Users className="w-3 h-3" /> 성향별 AI 수익률 비교
+              <Waves className="w-3 h-3 text-cyan-400" /> 파도 흐름 & AI 갭 분석
             </p>
-            <div className="grid grid-cols-3 gap-1.5">
-              {scenario.aiStrategies.map((ai) => {
-                const isMyType = getAIPersonality(ai.type) === userPersonality;
-                return (
-                  <div
-                    key={ai.name}
-                    className={cn(
-                      'rounded-xl px-2 py-2 text-center relative',
-                      isMyType ? 'bg-cyan-500/15 border-2 border-cyan-400/40'
-                        : ai.color === 'green' ? 'bg-green-500/10 border border-green-500/20'
-                        : ai.color === 'red' ? 'bg-red-500/10 border border-red-500/20'
-                        : 'bg-blue-500/10 border border-blue-500/20'
-                    )}
-                  >
-                    {isMyType && (
-                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-cyan-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded-full whitespace-nowrap">나</div>
-                    )}
-                    <div className="text-sm">{ai.emoji}</div>
-                    <div className="text-[9px] text-gray-400 mt-0.5">{ai.type}</div>
-                    <div className={cn('text-[11px] font-bold mt-0.5', ai.returnRate.startsWith('+') ? 'text-green-400' : ai.returnRate.startsWith('-') ? 'text-red-400' : 'text-gray-400')}>
-                      {ai.returnRate}
+            
+            {/* 핵심 지표 */}
+            <div className="grid grid-cols-3 gap-1.5 mb-2">
+              <div className="bg-cyan-500/10 rounded-xl p-2 text-center border border-cyan-500/20">
+                <Waves className="w-3 h-3 mx-auto mb-0.5 text-cyan-400" />
+                <p className="text-[8px] text-gray-500">파도 정확도</p>
+                <p className="text-sm font-black text-cyan-300">{scenario.stats.avgClearRate}%</p>
+              </div>
+              <div className="bg-yellow-500/10 rounded-xl p-2 text-center border border-yellow-500/20">
+                <TrendingUp className="w-3 h-3 mx-auto mb-0.5 text-yellow-400" />
+                <p className="text-[8px] text-gray-500">최대 갭</p>
+                <p className="text-sm font-black text-yellow-300">-{(100 - scenario.stats.avgClearRate) / 2}%</p>
+              </div>
+              <div className="bg-purple-500/10 rounded-xl p-2 text-center border border-purple-500/20">
+                <Target className="w-3 h-3 mx-auto mb-0.5 text-purple-400" />
+                <p className="text-[8px] text-gray-500">유사 AI 갭</p>
+                <p className="text-sm font-black text-purple-300">-{(100 - scenario.stats.avgClearRate) / 4}%p</p>
+              </div>
+            </div>
+
+            {/* AI 비교 */}
+            <div className="bg-[#1a1a1a] rounded-xl p-2.5 border border-white/5">
+              <p className="text-[9px] text-gray-500 mb-1.5 flex items-center gap-1">
+                <Users className="w-2.5 h-2.5" /> 성향별 AI 수익률
+              </p>
+              <div className="grid grid-cols-3 gap-1.5">
+                {scenario.aiStrategies.map((ai) => {
+                  const isMyType = getAIPersonality(ai.type) === userPersonality;
+                  return (
+                    <div
+                      key={ai.name}
+                      className={cn(
+                        'rounded-lg px-2 py-1.5 text-center relative',
+                        isMyType ? 'bg-cyan-500/15 border border-cyan-400/40'
+                          : 'bg-white/5 border border-white/5'
+                      )}
+                    >
+                      {isMyType && (
+                        <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 bg-cyan-500 text-white text-[7px] font-bold px-1 py-0.5 rounded-full whitespace-nowrap">나</div>
+                      )}
+                      <div className="text-xs">{ai.emoji}</div>
+                      <div className="text-[8px] text-gray-500">{ai.type}</div>
+                      <div className={cn('text-[10px] font-bold', ai.returnRate.startsWith('+') ? 'text-green-400' : ai.returnRate.startsWith('-') ? 'text-red-400' : 'text-gray-400')}>
+                        {ai.returnRate}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          {/* 도전 버튼 */}
+          {/* 파도 읽기 코멘트 */}
+          <div className="bg-cyan-500/8 border border-cyan-500/20 rounded-xl p-2.5">
+            <div className="flex items-start gap-2">
+              <span className="text-sm">💡</span>
+              <div>
+                <p className="text-[10px] font-bold text-cyan-300 mb-0.5">파도 읽기 포인트</p>
+                <p className="text-[10px] text-gray-400 leading-relaxed">
+                  이 시나리오에서는 {stockType?.stockType || '종목'} 특성상 {scenario.difficulty >= 4 ? '급격한 변동성' : '완만한 흐름'}이 나타나요. 
+                  전환점을 놓치지 않도록 거래량 변화에 주목하세요.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 연습 버튼 */}
           <button
             onClick={() => router.push(`/learn/scenarios/${scenario.id}`)}
-            className="w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-500 hover:to-orange-500 text-white text-xs font-bold rounded-xl py-2.5 transition-all active:scale-[0.98]"
+            className="w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white text-xs font-bold rounded-xl py-2.5 transition-all active:scale-[0.98]"
           >
-            <Swords className="w-3.5 h-3.5" />
-            <span>도전하기</span>
+            <Waves className="w-3.5 h-3.5" />
+            <span>파도 읽기 연습</span>
           </button>
         </div>
       )}
@@ -261,8 +299,8 @@ export function ScenarioTab({ userPersonality }: Props) {
       <div className="space-y-2">
         <div className="flex items-center justify-between mb-1">
           <h4 className="text-xs font-bold text-gray-500">
-            <Trophy className="w-3 h-3 inline mr-1 text-yellow-500" />
-            학습 시나리오 {filtered.length}개
+            <Waves className="w-3 h-3 inline mr-1 text-cyan-400" />
+            연습 시나리오 {filtered.length}개
           </h4>
           <span className="text-[10px] text-gray-600">탭하여 펼치기</span>
         </div>

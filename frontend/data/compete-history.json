@@ -66,6 +66,9 @@
       "highlight": "3파 집중 공략으로 최고 수익 달성",
       "winDays": 5,
       "loseDays": 2,
+      "rankScore": 86,
+      "rankScoreBreakdown": { "profitPercentile": 49, "waveAccuracy": 21, "winRate": 11, "consistency": 5 },
+      "consistencyWeeks": 3,
       "trades": [
         { "date": "2월 11일", "action": "buy", "stock": "TSLA", "price": 210000, "shares": 3, "amount": 630000, "wavePoint": "1파 상승 초기" },
         { "date": "2월 13일", "action": "buy", "stock": "NVDA", "price": 88000, "shares": 5, "amount": 440000, "wavePoint": "3파 진입 전" },
@@ -95,6 +98,9 @@
       "highlight": "조정 구간에서도 플러스 유지",
       "winDays": 4,
       "loseDays": 3,
+      "rankScore": 76,
+      "rankScoreBreakdown": { "profitPercentile": 49, "waveAccuracy": 18, "winRate": 9, "consistency": 0 },
+      "consistencyWeeks": 2,
       "trades": [
         { "date": "2월 4일", "action": "buy", "stock": "삼성전자", "price": 78000, "shares": 8, "amount": 624000, "wavePoint": "2파 조정 저점" },
         { "date": "2월 6일", "action": "buy", "stock": "NVDA", "price": 92000, "shares": 4, "amount": 368000, "wavePoint": "3파 시작" },
@@ -123,6 +129,9 @@
       "highlight": "역대 최고 순위! 상위 1% 진입 🔥",
       "winDays": 6,
       "loseDays": 1,
+      "rankScore": 91,
+      "rankScoreBreakdown": { "profitPercentile": 50, "waveAccuracy": 23, "winRate": 13, "consistency": 5 },
+      "consistencyWeeks": 3,
       "trades": [
         { "date": "1월 28일", "action": "buy", "stock": "NVDA", "price": 75000, "shares": 6, "amount": 450000, "wavePoint": "1파 초기" },
         { "date": "1월 29일", "action": "buy", "stock": "TSLA", "price": 195000, "shares": 2, "amount": 390000, "wavePoint": "1파 초기" },
@@ -284,5 +293,99 @@
     { "week": "2주전", "rank": 52, "profitRate": 12.1 },
     { "week": "1주전", "rank": 15, "profitRate": 24.3 },
     { "week": "이번주", "rank": 42, "profitRate": 15.2 }
-  ]
+  ],
+  "gapAnalysis": {
+    "me": {
+      "profitRate": 15.2,
+      "waveAccuracy": 85,
+      "winRate": 71.4,
+      "avgHoldDays": 3.2,
+      "weakPoint": "조정파 대응",
+      "style": "aggressive"
+    },
+    "bestPlayer": {
+      "nickname": "파도마스터",
+      "profitRate": 45.8,
+      "waveAccuracy": 94,
+      "winRate": 84,
+      "avgHoldDays": 4.8,
+      "keyDiff": "3파 진입 타이밍이 평균 1.2일 빠름",
+      "style": "aggressive"
+    },
+    "similarAI": {
+      "name": "박영희",
+      "emoji": "⚡",
+      "label": "공격왕 AI",
+      "profitRate": 18.5,
+      "waveAccuracy": 91,
+      "winRate": 62,
+      "avgHoldDays": 2.9,
+      "style": "aggressive",
+      "strategy": "3파 상승 집중 공략"
+    },
+    "weeklyGap": [
+      {
+        "week": "5주전",
+        "me": 11.4,
+        "bestPlayer": 38.2,
+        "similarAI": 14.1
+      },
+      {
+        "week": "4주전",
+        "me": 8.7,
+        "bestPlayer": 31.5,
+        "similarAI": 11.2
+      },
+      {
+        "week": "3주전",
+        "me": -5.2,
+        "bestPlayer": 18.9,
+        "similarAI": 6.3
+      },
+      {
+        "week": "2주전",
+        "me": 12.1,
+        "bestPlayer": 35.6,
+        "similarAI": 15.8
+      },
+      {
+        "week": "1주전",
+        "me": 24.3,
+        "bestPlayer": 45.8,
+        "similarAI": 22.1
+      },
+      {
+        "week": "이번주",
+        "me": 15.2,
+        "bestPlayer": 45.8,
+        "similarAI": 18.5
+      }
+    ],
+    "insights": [
+      {
+        "type": "gap_best",
+        "icon": "🏆",
+        "title": "최고 투자자와 갭",
+        "value": "+30.6%p",
+        "desc": "파도마스터는 조정 구간 재진입 타이밍이 핵심",
+        "action": "조정파(2·4파) 저점 매수 연습 필요"
+      },
+      {
+        "type": "gap_ai",
+        "icon": "⚡",
+        "title": "나와 비슷한 AI와 갭",
+        "value": "-3.3%p",
+        "desc": "박영희 AI는 파도 정확도가 6%p 높음",
+        "action": "3파 진입 후 손절 기준을 명확히 설정"
+      },
+      {
+        "type": "strength",
+        "icon": "💪",
+        "title": "나의 강점",
+        "value": "3파 집중도 95%",
+        "desc": "상승 3파 포착 능력은 상위 5% 수준",
+        "action": "이 강점을 유지하면서 조정파 대응만 보완"
+      }
+    ]
+  }
 }

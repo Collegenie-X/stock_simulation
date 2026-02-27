@@ -11,6 +11,88 @@ import scenariosData from "@/data/game-scenarios.json"
 import scenarios100DaysData from "@/data/stock-100days-data.json"
 import { generateAIStocks, generateRobotAutoStocks } from "../utils/stockDataUtils"
 
+// ─── 거래 완료 게임 이펙트 팝업 ──────────────────────────────
+interface TradeSuccessPopupProps {
+  isBuy: boolean
+  stockName: string
+  quantity: number
+  profit?: number
+  profitRate?: number
+  onDone: () => void
+}
+
+function TradeSuccessPopup({ isBuy, stockName, quantity, profit, profitRate, onDone }: TradeSuccessPopupProps) {
+  const hasProfit = profit !== undefined && profit !== null
+  const isProfit = hasProfit && profit >= 0
+
+  // 자동 닫기 (1.6초)
+  useEffect(() => {
+    const t = setTimeout(onDone, 1600)
+    return () => clearTimeout(t)
+  }, [onDone])
+
+  return (
+    <div
+      className="fixed inset-0 z-[80] flex items-center justify-center pointer-events-none"
+      onClick={onDone}
+      style={{ pointerEvents: "auto" }}
+    >
+      {/* 반투명 배경 */}
+      <div className="absolute inset-0 bg-black/50" />
+
+      {/* 팝업 카드 */}
+      <div className="relative flex flex-col items-center animate-in zoom-in-75 duration-200">
+        {/* 이모지 */}
+        <div className="text-7xl mb-2 animate-bounce" style={{ animationDuration: "0.6s", animationIterationCount: 2 }}>
+          {isBuy ? "📈" : "💰"}
+        </div>
+
+        {/* 액션 뱃지 */}
+        <div className={cn(
+          "text-xs font-black px-3 py-1 rounded-full mb-3 tracking-widest uppercase",
+          isBuy ? "bg-red-500 text-white" : "bg-blue-500 text-white"
+        )}>
+          {isBuy ? "매수" : "매도"}
+        </div>
+
+        {/* 주식명 + 수량 (핵심) */}
+        <div className="text-center mb-2">
+          <p className="text-gray-300 text-sm font-bold mb-1">{stockName}</p>
+          <p className={cn(
+            "text-6xl font-black leading-none",
+            isBuy ? "text-red-400" : "text-blue-400"
+          )}>
+            {isBuy ? "+" : "-"}{quantity}주
+          </p>
+        </div>
+
+        {/* 판매 시 손익 */}
+        {!isBuy && hasProfit && (
+          <div className={cn(
+            "mt-3 px-5 py-2 rounded-2xl text-center",
+            isProfit ? "bg-red-500/20" : "bg-blue-500/20"
+          )}>
+            <p className={cn(
+              "text-2xl font-black",
+              isProfit ? "text-red-400" : "text-blue-400"
+            )}>
+              {isProfit ? "+" : ""}{formatNumber(Math.round(profit!))}원
+            </p>
+            {profitRate !== undefined && (
+              <p className={cn(
+                "text-xs font-bold mt-0.5",
+                isProfit ? "text-red-400/70" : "text-blue-400/70"
+              )}>
+                {isProfit ? "+" : ""}{profitRate.toFixed(1)}%
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function TradePage() {
   const params = useParams()
   const router = useRouter()
@@ -28,6 +110,11 @@ export default function TradePage() {
   const [takeProfit, setTakeProfit] = useState<number | null>(null)
   const [stopLoss, setStopLoss] = useState<number | null>(null)
   const [userLevel, setUserLevel] = useState(1)
+  const [tradeResult, setTradeResult] = useState<{
+    quantity: number
+    profit?: number
+    profitRate?: number
+  } | null>(null)
 
   useEffect(() => {
     console.log("=== Trade 페이지: 세션 로드 시작 ===")
@@ -439,15 +526,22 @@ export default function TradePage() {
       return
     }
     
-    console.log("✅ 저장 성공, 메인 페이지로 이동")
-    console.log("최종 확인 - 저장된 holdings:", savedData?.holdings)
-    console.log("최종 확인 - 저장된 cash:", savedData?.cash)
-    
-    // 확실하게 저장 완료 후 이동
-    setTimeout(() => {
-      // 메인 페이지로 이동 (새로고침 파라미터 추가)
+    console.log("✅ 저장 성공 - 거래 완료 다이얼로그 표시")
+
+    // 거래 완료 팝업 표시
+    if (orderType === "market") {
+      if (isBuy) {
+        setTradeResult({ quantity })
+      } else {
+        const avgBuyPrice = (session.averagePrices || {})[selectedStockId] || currentPrice
+        const profit = (currentPrice - avgBuyPrice) * quantity
+        const profitRate = avgBuyPrice > 0 ? ((currentPrice - avgBuyPrice) / avgBuyPrice) * 100 : 0
+        setTradeResult({ quantity, profit, profitRate })
+      }
+    } else {
+      // 조건 주문은 다이얼로그 없이 바로 이동
       router.push(`/practice/stock/${scenarioId}?refresh=${Date.now()}`)
-    }, 50)
+    }
   }
 
   const Keypad = ({ onInput, onDelete }: { onInput: (val: string) => void; onDelete: () => void }) => (
@@ -497,6 +591,21 @@ export default function TradePage() {
 
   return (
     <div className="min-h-screen bg-[#191919] text-white flex flex-col animate-in slide-in-from-bottom duration-300">
+      {/* 거래 완료 게임 이펙트 */}
+      {tradeResult && (
+        <TradeSuccessPopup
+          isBuy={isBuy}
+          stockName={stock.name}
+          quantity={tradeResult.quantity}
+          profit={tradeResult.profit}
+          profitRate={tradeResult.profitRate}
+          onDone={() => {
+            setTradeResult(null)
+            router.push(`/practice/stock/${scenarioId}?refresh=${Date.now()}`)
+          }}
+        />
+      )}
+
       {/* Header */}
       <div className="px-4 py-3 flex items-center justify-between bg-[#191919]">
         <button onClick={() => router.back()} className="p-1">

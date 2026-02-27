@@ -20,8 +20,8 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { icon: Map, label: '홈', href: '/home' },
-  { icon: LineChart, label: '학습', href: '/learn' },
-  { icon: Trophy, label: '랭킹', href: '/compete' },
+  { icon: LineChart, label: '연습', href: '/learn' },
+  { icon: Trophy, label: '도전', href: '/compete' },
   { icon: User, label: 'MY', href: '/profile' },
 ];
 

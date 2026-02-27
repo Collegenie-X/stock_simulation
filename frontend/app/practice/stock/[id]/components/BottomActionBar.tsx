@@ -1,8 +1,8 @@
 "use client"
 
-import { Pause, Play, ChevronRight } from "lucide-react"
+import { Pause, Play, ChevronRight, FileText, Trophy } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { LABELS, DAY_PHASES, DECISIONS_PER_DAY } from "../config"
+import { LABELS, DAY_PHASES } from "../config"
 
 interface BottomActionBarProps {
   decisionTimer: number
@@ -15,6 +15,9 @@ interface BottomActionBarProps {
   isWaitingForDecision: boolean
   onTogglePause: () => void
   onSkip: () => void
+  // 미리보기 버튼 (개발/테스트용)
+  onPreviewMiniReport?: () => void
+  onPreviewFinalReport?: () => void
 }
 
 export const BottomActionBar = ({
@@ -28,6 +31,8 @@ export const BottomActionBar = ({
   isWaitingForDecision,
   onTogglePause,
   onSkip,
+  onPreviewMiniReport,
+  onPreviewFinalReport,
 }: BottomActionBarProps) => {
   const timerProgress = decisionTimer / 30
   const isUrgent = decisionTimer <= 10
@@ -53,7 +58,7 @@ export const BottomActionBar = ({
         />
       </div>
 
-      {/* ── 타이머 info 행 (압축) ── */}
+      {/* ── 타이머 info 행 ── */}
       <div className="flex items-center justify-between px-4 py-1.5">
         {/* 왼쪽: 페이즈 + 일시정지 버튼 */}
         <div className="flex items-center gap-2">
@@ -121,7 +126,7 @@ export const BottomActionBar = ({
         </div>
       </div>
 
-      {/* ── 일시정지 알림 (조건부 표시, 높이 최소화) ── */}
+      {/* ── 일시정지 알림 ── */}
       {isTimerPaused && (
         <div className="mx-4 mb-1 py-1 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
           <p className="text-[9px] font-bold text-yellow-400/90 text-center">
@@ -130,20 +135,44 @@ export const BottomActionBar = ({
         </div>
       )}
 
-      {/* ── 다음 시간으로 버튼 ── */}
-      <div className="px-4 pb-1 pt-1">
+      {/* ── 버튼 영역 ── */}
+      <div className="px-4 pb-1 pt-1 space-y-2">
+        {/* 미리보기 버튼 행 (개발용) */}
+        {(onPreviewMiniReport || onPreviewFinalReport) && (
+          <div className="flex gap-2">
+            {onPreviewMiniReport && (
+              <button
+                onClick={onPreviewMiniReport}
+                className="flex-1 py-2 rounded-xl font-bold text-[11px] transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/25"
+              >
+                <FileText className="w-3.5 h-3.5" />
+                3일차 리포트
+              </button>
+            )}
+            {onPreviewFinalReport && (
+              <button
+                onClick={onPreviewFinalReport}
+                className="flex-1 py-2 rounded-xl font-bold text-[11px] transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 bg-yellow-500/15 border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/25"
+              >
+                <Trophy className="w-3.5 h-3.5" />
+                최종 보고서
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* 다음 시간으로 버튼 (작게) */}
         <button
           onClick={onSkip}
           className={cn(
-            "w-full py-3 rounded-2xl font-bold text-[14px] transition-all active:scale-[0.98]",
-            "flex items-center justify-center gap-2",
-            "bg-gray-800 border border-gray-700/80 text-gray-200",
-            "hover:bg-gray-700 hover:border-gray-600 hover:text-white",
-            "shadow-sm"
+            "w-full py-2.5 rounded-xl font-bold text-[12px] transition-all active:scale-[0.98]",
+            "flex items-center justify-center gap-1.5",
+            "bg-gray-800/80 border border-gray-700/60 text-gray-400",
+            "hover:bg-gray-700/80 hover:text-gray-300",
           )}
         >
           {LABELS.actions.skip}
-          <ChevronRight className="w-4 h-4 text-gray-400" />
+          <ChevronRight className="w-3.5 h-3.5 text-gray-500" />
         </button>
       </div>
     </div>

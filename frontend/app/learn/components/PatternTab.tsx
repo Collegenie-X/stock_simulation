@@ -9,7 +9,7 @@ import {
   type PatternCategory,
   type ChartPattern,
 } from '@/data/chart-patterns';
-import { ChevronDown, ChevronRight, Zap, BookOpen } from 'lucide-react';
+import { ChevronDown, ChevronRight, Zap, BookOpen, Waves, TrendingUp, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MiniPatternChart } from './MiniPatternChart';
 
@@ -26,11 +26,13 @@ function PatternHero({ totalCount }: { totalCount: number }) {
   return (
     <div className="bg-gradient-to-r from-indigo-600/80 to-purple-700/80 rounded-2xl border border-indigo-500/30 text-white overflow-hidden">
       <button className="w-full flex items-center gap-4 p-4 text-left" onClick={() => setOpen(!open)}>
-        <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center text-2xl shrink-0">📊</div>
+        <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shrink-0">
+          <Waves className="w-6 h-6" />
+        </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-purple-200 font-semibold">차트 패턴 도감</p>
-          <h3 className="text-base font-bold">패턴을 읽는 눈 키우기</h3>
-          <p className="text-[11px] text-purple-100/70 mt-0.5">리스트에서 패턴 차트를 미리 확인하세요</p>
+          <p className="text-xs text-purple-200 font-semibold">파도 패턴 연습</p>
+          <h3 className="text-base font-bold">파도 흐름 읽는 눈 키우기</h3>
+          <p className="text-[11px] text-purple-100/70 mt-0.5">패턴으로 파도의 전환점을 포착하세요</p>
         </div>
         <ChevronDown className={cn('w-4 h-4 opacity-60 shrink-0 transition-transform duration-200', open && 'rotate-180')} />
       </button>
@@ -38,12 +40,12 @@ function PatternHero({ totalCount }: { totalCount: number }) {
       {open && (
         <div className="px-4 pb-4 border-t border-white/10 space-y-3">
           <div className="mt-3 bg-white/10 rounded-xl p-3 space-y-1.5">
-            <p className="text-xs font-bold text-purple-200 mb-2">📈 차트 패턴이란?</p>
+            <p className="text-xs font-bold text-purple-200 mb-2">🌊 파도 패턴이란?</p>
             {[
-              '주가가 특정 모양(패턴)을 만들면 이후 방향을 예측할 수 있어요',
-              '매수 타이밍(↑)과 매도 타이밍(↓)을 잡는 핵심 도구',
-              '패턴을 알면 공포에 팔고 욕심에 사는 실수를 줄일 수 있어요',
-              '카드를 탭해서 패턴 차트와 핵심 포인트를 확인하세요',
+              '주가의 파도는 특정 모양(패턴)을 만들며 흘러가요',
+              '패턴을 읽으면 파도의 전환점을 미리 알 수 있어요',
+              '상승 파도(↑)와 하락 파도(↓)의 신호를 구분하세요',
+              '패턴 연습으로 AI와의 갭을 줄여나가세요',
             ].map((text, i) => (
               <div key={i} className="flex items-start gap-2">
                 <span className="text-purple-300 text-xs shrink-0 mt-0.5">0{i + 1}</span>
@@ -54,7 +56,7 @@ function PatternHero({ totalCount }: { totalCount: number }) {
           <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
             <div className="h-full bg-white rounded-full" style={{ width: '0%' }} />
           </div>
-          <p className="text-[10px] text-purple-100/60 text-center">0 / {totalCount} 패턴 학습 완료</p>
+          <p className="text-[10px] text-purple-100/60 text-center">0 / {totalCount} 패턴 연습 완료</p>
         </div>
       )}
     </div>
@@ -115,14 +117,47 @@ function PatternCard({ pattern, catConfig }: { pattern: ChartPattern; catConfig:
       {/* 펼쳐진 상태 */}
       {open && (
         <div className="px-4 pb-4 border-t border-white/5 mt-0 space-y-3">
+          {/* 파도 흐름 분석 */}
+          <div className="mt-3 grid grid-cols-3 gap-1.5">
+            <div className="bg-cyan-500/10 rounded-xl p-2 text-center border border-cyan-500/20">
+              <Waves className="w-3 h-3 mx-auto mb-0.5 text-cyan-400" />
+              <p className="text-[8px] text-gray-500">파도 유형</p>
+              <p className="text-[10px] font-bold text-cyan-300">
+                {pattern.signal === '매수' ? '상승 파도' : pattern.signal === '매도' ? '하락 파도' : '전환 파도'}
+              </p>
+            </div>
+            <div className="bg-purple-500/10 rounded-xl p-2 text-center border border-purple-500/20">
+              <TrendingUp className="w-3 h-3 mx-auto mb-0.5 text-purple-400" />
+              <p className="text-[8px] text-gray-500">난이도</p>
+              <p className="text-[10px] font-bold text-purple-300">{'⭐'.repeat(pattern.difficulty)}</p>
+            </div>
+            <div className="bg-yellow-500/10 rounded-xl p-2 text-center border border-yellow-500/20">
+              <Target className="w-3 h-3 mx-auto mb-0.5 text-yellow-400" />
+              <p className="text-[8px] text-gray-500">정확도 목표</p>
+              <p className="text-[10px] font-bold text-yellow-300">{70 + pattern.difficulty * 5}%</p>
+            </div>
+          </div>
+
           {/* 핵심 포인트 */}
-          <div className="mt-3 space-y-1.5">
+          <div className="space-y-1.5">
             {pattern.keyPoints.map((point, idx) => (
               <div key={idx} className="flex items-start gap-2">
                 <span className="text-indigo-400 text-xs mt-0.5 shrink-0">✦</span>
                 <span className="text-[11px] text-gray-300 leading-snug">{point}</span>
               </div>
             ))}
+          </div>
+
+          {/* 파도 읽기 코멘트 */}
+          <div className="bg-cyan-500/8 border border-cyan-500/20 rounded-xl p-2.5 flex items-start gap-2">
+            <Waves className="w-3.5 h-3.5 text-cyan-400 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-[10px] font-bold text-cyan-300 mb-0.5">파도 읽기 포인트</p>
+              <p className="text-[10px] text-gray-400 leading-relaxed">
+                이 패턴이 나타나면 파도의 {pattern.signal === '매수' ? '상승 전환' : pattern.signal === '매도' ? '하락 전환' : '방향 전환'}을 
+                예상할 수 있어요. 거래량 증가와 함께 나타나면 신뢰도가 높아요.
+              </p>
+            </div>
           </div>
 
           {/* 매매 팁 */}
@@ -144,12 +179,13 @@ function PatternCard({ pattern, catConfig }: { pattern: ChartPattern; catConfig:
             </p>
           </div>
 
-          {/* 자세히 보기 버튼 */}
+          {/* 연습 버튼 */}
           <button
             onClick={() => router.push(`/learn/patterns/${pattern.id}`)}
-            className="w-full flex items-center justify-center gap-1.5 bg-indigo-600/80 hover:bg-indigo-600 text-white text-xs font-bold rounded-xl py-2.5 transition-colors active:scale-[0.98]"
+            className="w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white text-xs font-bold rounded-xl py-2.5 transition-colors active:scale-[0.98]"
           >
-            <span>상세 학습 + 실전 연습</span>
+            <Waves className="w-3.5 h-3.5" />
+            <span>파도 패턴 연습하기</span>
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
         </div>

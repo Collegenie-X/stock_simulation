@@ -12,6 +12,7 @@ import { HintModal } from "@/components/hint-modal"
 import { EnhancedReportModal } from "@/components/enhanced-report-modal"
 import { ItemsShopModal, OwnedItemsBadge } from "@/components/items-shop-modal"
 import aiCompetitorsData from "@/data/ai-competitors.json"
+import reportPreviewDummy from "@/data/report-preview-dummy.json"
 
 // ── 분리된 컴포넌트 import ─────────────────────────────────────
 import {
@@ -27,9 +28,13 @@ import {
   DetailView,
   FloatingExitButton,
   BottomActionBar,
+  AIGapFeedback,
+  MiniGameReport,
+  FinalGameReport,
 } from "./components"
 import { useLivePrices } from "./components/hooks/useLivePrices"
 import { useAICompetitor } from "./components/hooks/useAICompetitor"
+import type { WaveAnalysis, UserDayDecision, StockCompareResult } from "./components/hooks/useAICompetitor"
 import { generateHistory, generateAIStocks, generateRobotAutoStocks, CHARACTER_REACTIONS } from "./utils/stockDataUtils"
 import { EXCHANGE_RATE, DECISIONS_PER_DAY, DECISION_TIMER_SECONDS, DAYS_PER_WEEK, TURNS_PER_DECISION, DAY_PHASES, DAY_NAMES, LABELS, SPEED_MODE_TURNS, AI_REPORT_INTERVAL } from "./config"
 
@@ -110,6 +115,11 @@ export default function GamePlayPage() {
     priceChange?: string
   } | null>(null)
   const [showDaySummary, setShowDaySummary] = useState(false)
+  const [showMiniReport, setShowMiniReport] = useState(false)
+  const [showFinalReport, setShowFinalReport] = useState(false)
+  // 더미 데이터 미리보기 상태
+  const [showPreviewMiniReport, setShowPreviewMiniReport] = useState(false)
+  const [showPreviewFinalReport, setShowPreviewFinalReport] = useState(false)
   const [pendingNextDay, setPendingNextDay] = useState<number | null>(null)
   const [totalDecisions, setTotalDecisions] = useState(0)
   const [showQuickTrade, setShowQuickTrade] = useState<"buy" | "sell" | null>(null)
@@ -597,13 +607,13 @@ export default function GamePlayPage() {
       // 게임 종료 체크
       if (currentTurn + TURNS_PER_DECISION >= maxTurns - 1) {
         setIsPlaying(false)
-        setTimeout(() => setShowResult(true), 500)
+        setTimeout(() => setShowFinalReport(true), 500)
         return
       }
 
-      // 3일 간격으로 AI 대결 분석 리포트 표시 (수동 닫기)
+      // 3일 간격으로 미니 게임 리포트 표시 (수동 닫기)
       if (currentDay % AI_REPORT_INTERVAL === 0) {
-        setShowDaySummary(true)
+        setShowMiniReport(true)
         setPendingNextDay(nextDay)
       } else {
         // 리포트 없는 날: 바로 다음 날로 진행
@@ -628,7 +638,7 @@ export default function GamePlayPage() {
 
   // 30초 결정 타이머
   useEffect(() => {
-    if (!isWaitingForDecision || showCardFeedback || showDaySummary || showResult || showQuickTrade || isTimerPaused) return
+    if (!isWaitingForDecision || showCardFeedback || showDaySummary || showMiniReport || showResult || showFinalReport || showQuickTrade || isTimerPaused) return
 
     const timer = setInterval(() => {
       setDecisionTimer(prev => {
@@ -652,7 +662,7 @@ export default function GamePlayPage() {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [isWaitingForDecision, showCardFeedback, showDaySummary, showResult, showQuickTrade, isTimerPaused, advanceToNext])
+  }, [isWaitingForDecision, showCardFeedback, showDaySummary, showMiniReport, showResult, showFinalReport, showQuickTrade, isTimerPaused, advanceToNext])
 
   useEffect(() => {
     if (!scenario) return
@@ -917,16 +927,32 @@ export default function GamePlayPage() {
   // 라이브 가격 (StockListSection + GameHeader 공유)
   const { livePrices, tickUps } = useLivePrices(allStocksData as any)
 
-  // AI 대결 시스템
-  const { aiCompetitor, simulateDayTrades, calcTotalValue: calcAITotalValue, matchedStyle } = useAICompetitor(initialValue)
+  // AI 갭 피드백 상태
+  const [showAIGapFeedback, setShowAIGapFeedback] = useState(false)
+  const [lastWaveAnalysis, setLastWaveAnalysis] = useState<WaveAnalysis | undefined>(undefined)
 
-  // 하루 요약 표시 시 AI 시뮬레이션 자동 실행
+  // 하루 사용자 결정 기록 (종목별 매수/매도/관망)
+  const [dailyUserDecisions, setDailyUserDecisions] = useState<UserDayDecision[]>([])
+  // 종목별 3자 비교 결과 (하루 요약에서 표시)
+  const [stockCompareResults, setStockCompareResults] = useState<StockCompareResult[]>([])
+
+  // AI 대결 시스템
+  const { aiCompetitor, bestAICompetitor, simulateDayTrades, calcTotalValue: calcAITotalValue, calcBestAITotalValue, matchedStyle, gapHistory } = useAICompetitor(initialValue)
+
+  // 하루 요약 또는 미니 리포트 표시 시 AI 시뮬레이션 자동 실행
   useEffect(() => {
-    if (showDaySummary && scenario) {
-      simulateDayTrades(scenario.stocks as any, currentTurn, holdings, cash)
+    if ((showDaySummary || showMiniReport) && scenario) {
+      const result = simulateDayTrades(scenario.stocks as any, currentTurn, holdings, cash, currentDay, liveProfitRate, dailyUserDecisions)
+      if (result?.waveAnalysis) {
+        setLastWaveAnalysis(result.waveAnalysis)
+        setShowAIGapFeedback(true)
+      }
+      if (result?.stockCompareResults && result.stockCompareResults.length > 0) {
+        setStockCompareResults(result.stockCompareResults)
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showDaySummary])
+  }, [showDaySummary, showMiniReport])
 
   // 라이브 가격 기반 총자산 (GameHeader 표시용)
   const liveTotalStockValue = allStocksData.reduce((acc, stock) => {
@@ -950,6 +976,32 @@ export default function GamePlayPage() {
   // 하루 요약 수동 닫기 → 다음 날 시작
   const handleDaySummaryContinue = useCallback(() => {
     setShowDaySummary(false)
+    setDailyUserDecisions([])
+    setStockCompareResults([])
+    const nextDay = pendingNextDay ?? currentDay + 1
+    setPendingNextDay(null)
+    setCurrentDay(nextDay)
+    if (scenario && scenario.stocks.length > 0) {
+      const stockIds = scenario.stocks.map(s => s.id)
+      const shuffled = [...stockIds].sort(() => Math.random() - 0.5)
+      const daily = shuffled.slice(0, Math.min(DECISIONS_PER_DAY, shuffled.length))
+      while (daily.length < DECISIONS_PER_DAY) {
+        daily.push(stockIds[Math.floor(Math.random() * stockIds.length)])
+      }
+      setDailyStockIds(daily)
+      setCurrentPhaseInDay(0)
+      setDecisionTimer(DECISION_TIMER_SECONDS)
+      setIsTimerPaused(false)
+      setIsWaitingForDecision(true)
+      setSelectedStockId(daily[0])
+    }
+  }, [pendingNextDay, currentDay, scenario])
+
+  // 미니 게임 리포트 닫기 → 다음 날 시작
+  const handleMiniReportContinue = useCallback(() => {
+    setShowMiniReport(false)
+    setDailyUserDecisions([])
+    setStockCompareResults([])
     const nextDay = pendingNextDay ?? currentDay + 1
     setPendingNextDay(null)
     setCurrentDay(nextDay)
@@ -976,6 +1028,42 @@ export default function GamePlayPage() {
     if (!stock) return
     
     const price = stock.turns[currentTurn]?.price || stock.initialPrice
+
+    // 하루 결정 기록 (종목별 AI 비교용)
+    if (action !== "skip") {
+      setDailyUserDecisions(prev => {
+        // 같은 종목 같은 액션이 이미 있으면 수량 누적, 아니면 추가
+        const existing = prev.findIndex(d => d.stockId === stockId && d.action === action)
+        if (existing >= 0) {
+          const updated = [...prev]
+          updated[existing] = { ...updated[existing], quantity: updated[existing].quantity + qty }
+          return updated
+        }
+        return [...prev, {
+          stockId,
+          stockName: stock.name,
+          action,
+          quantity: qty,
+          price,
+          turn: currentTurn,
+          day: 0, // currentDay는 closure 문제로 별도 처리
+        }]
+      })
+    } else {
+      // skip(관망)도 기록 (아직 해당 종목 결정이 없을 때만)
+      setDailyUserDecisions(prev => {
+        if (prev.some(d => d.stockId === stockId)) return prev
+        return [...prev, {
+          stockId,
+          stockName: stock.name,
+          action: "skip",
+          quantity: 0,
+          price,
+          turn: currentTurn,
+          day: 0,
+        }]
+      })
+    }
 
     if (action === "buy") {
       const cost = qty * price
@@ -1102,8 +1190,48 @@ export default function GamePlayPage() {
     return <LoadingScreen reason={loadingReason} />
   }
 
-  if (showResult) {
-    return <ResultScreen profitRate={profitRate} onGoHome={() => (window.location.href = "/home")} />
+  if (showResult || showFinalReport) {
+    const aiSimilarRate = scenario ? Number(((calcAITotalValue(scenario.stocks as any, currentTurn) - initialValue) / initialValue * 100).toFixed(1)) : 0
+    const aiBestRate = scenario ? Number(((calcBestAITotalValue(scenario.stocks as any, currentTurn) - initialValue) / initialValue * 100).toFixed(1)) : 0
+    const tradeHist = storage.getTradeHistory(scenarioId) || []
+    const mappedTrades = tradeHist.map((t: any) => ({
+      stockName: t.stockName || t.stockId || "",
+      action: t.action as "buy" | "sell",
+      price: t.price || 0,
+      quantity: t.quantity || 0,
+      totalAmount: t.totalAmount || 0,
+      profit: t.profit,
+      profitRate: t.profitRate,
+      date: t.date,
+      day: t.day,
+    }))
+
+    return (
+      <FinalGameReport
+        isVisible
+        totalDays={currentDay}
+        userProfitRate={profitRate}
+        userTotalValue={totalValue}
+        initialValue={initialValue}
+        cash={cash}
+        holdings={holdings}
+        tradeHistory={mappedTrades}
+        weeklyHistory={weeklyHistory}
+        aiSimilarName={aiCompetitor.name}
+        aiSimilarEmoji={aiCompetitor.emoji}
+        aiSimilarProfitRate={aiSimilarRate}
+        aiSimilarTotalValue={scenario ? calcAITotalValue(scenario.stocks as any, currentTurn) : initialValue}
+        aiBestName={bestAICompetitor.name}
+        aiBestEmoji={bestAICompetitor.emoji}
+        aiBestProfitRate={aiBestRate}
+        aiBestTotalValue={scenario ? calcBestAITotalValue(scenario.stocks as any, currentTurn) : initialValue}
+        onGoHome={() => (window.location.href = "/home")}
+        onPlayAgain={() => {
+          storage.clearGameSession(scenarioId)
+          window.location.reload()
+        }}
+      />
+    )
   }
 
   // --- 자유 거래 VIEW (메인 게임 화면) ---
@@ -1150,8 +1278,112 @@ export default function GamePlayPage() {
           aiTodayActions={aiCompetitor.todayActions}
           aiHoldingsCount={Object.keys(aiCompetitor.holdings).filter(k => aiCompetitor.holdings[k] > 0).length}
           aiTotalTrades={aiCompetitor.totalTrades}
+          bestAIName={bestAICompetitor.name}
+          bestAIEmoji={bestAICompetitor.emoji}
+          bestAITotalValue={scenario ? calcBestAITotalValue(scenario.stocks as any, currentTurn) : initialValue}
+          bestAIProfitRate={scenario ? Number(((calcBestAITotalValue(scenario.stocks as any, currentTurn) - initialValue) / initialValue * 100).toFixed(1)) : 0}
+          gapHistory={gapHistory}
+          waveAnalysis={lastWaveAnalysis}
+          stockCompareResults={stockCompareResults}
           onContinue={handleDaySummaryContinue}
         />
+
+        {/* 미니 게임 리포트 (3일 간격) */}
+        <MiniGameReport
+          isVisible={showMiniReport}
+          reportDay={currentDay}
+          periodLabel={`${currentDay}일차`}
+          userProfitRate={profitRate}
+          userTotalValue={totalValue}
+          initialValue={initialValue}
+          cash={cash}
+          tradeCount={totalDecisions}
+          holdingsCount={Object.keys(holdings).filter(k => holdings[k] > 0).length}
+          tradeHistory={storage.getTradeHistory(scenarioId)}
+          holdingItems={
+            scenario
+              ? Object.keys(holdings)
+                  .filter(k => holdings[k] > 0)
+                  .map(stockId => {
+                    const stock = scenario.stocks.find(s => s.id === stockId)
+                    const qty = holdings[stockId]
+                    const avg = averagePrices[stockId] || 0
+                    const cur = livePrices[stockId] ?? (stock?.turns?.[currentTurn]?.price || avg)
+                    const profitAmt = Math.round((cur - avg) * qty)
+                    const profitRt = avg > 0 ? ((cur - avg) / avg) * 100 : 0
+                    return {
+                      stockId,
+                      stockName: stock?.name || stockId,
+                      quantity: qty,
+                      avgPrice: avg,
+                      currentPrice: cur,
+                      profitAmount: profitAmt,
+                      profitRate: Math.round(profitRt * 10) / 10,
+                    }
+                  })
+              : []
+          }
+          assetHistory={weeklyHistory}
+          aiSimilarProfitRate={scenario ? Number(((calcAITotalValue(scenario.stocks as any, currentTurn) - initialValue) / initialValue * 100).toFixed(1)) : 0}
+          aiSimilarName={aiCompetitor.name}
+          aiSimilarEmoji={aiCompetitor.emoji}
+          aiBestProfitRate={scenario ? Number(((calcBestAITotalValue(scenario.stocks as any, currentTurn) - initialValue) / initialValue * 100).toFixed(1)) : 0}
+          aiBestName={bestAICompetitor.name}
+          aiBestEmoji={bestAICompetitor.emoji}
+          onContinue={handleMiniReportContinue}
+        />
+
+        {/* ── 더미 데이터 미리보기: 3일차 리포트 ── */}
+        {showPreviewMiniReport && (
+          <MiniGameReport
+            isVisible
+            reportDay={reportPreviewDummy.miniReport.reportDay}
+            periodLabel={reportPreviewDummy.miniReport.periodLabel}
+            userProfitRate={reportPreviewDummy.miniReport.userProfitRate}
+            userTotalValue={reportPreviewDummy.miniReport.userTotalValue}
+            initialValue={reportPreviewDummy.miniReport.initialValue}
+            cash={reportPreviewDummy.miniReport.cash}
+            tradeCount={reportPreviewDummy.miniReport.tradeCount}
+            holdingsCount={reportPreviewDummy.miniReport.holdingsCount}
+            tradeHistory={reportPreviewDummy.miniReport.tradeHistory as any}
+            holdingItems={reportPreviewDummy.miniReport.holdingItems}
+            assetHistory={reportPreviewDummy.miniReport.assetHistory}
+            aiSimilarProfitRate={reportPreviewDummy.miniReport.aiSimilarProfitRate}
+            aiSimilarName={reportPreviewDummy.miniReport.aiSimilarName}
+            aiSimilarEmoji={reportPreviewDummy.miniReport.aiSimilarEmoji}
+            aiBestProfitRate={reportPreviewDummy.miniReport.aiBestProfitRate}
+            aiBestName={reportPreviewDummy.miniReport.aiBestName}
+            aiBestEmoji={reportPreviewDummy.miniReport.aiBestEmoji}
+            onContinue={() => setShowPreviewMiniReport(false)}
+          />
+        )}
+
+        {/* ── 더미 데이터 미리보기: 최종 보고서 ── */}
+        {showPreviewFinalReport && (
+          <FinalGameReport
+            isVisible
+            totalDays={reportPreviewDummy.finalReport.totalDays}
+            userProfitRate={reportPreviewDummy.finalReport.userProfitRate}
+            userTotalValue={reportPreviewDummy.finalReport.userTotalValue}
+            initialValue={reportPreviewDummy.finalReport.initialValue}
+            cash={reportPreviewDummy.finalReport.cash}
+            holdings={reportPreviewDummy.finalReport.holdings}
+            tradeHistory={reportPreviewDummy.finalReport.tradeHistory as any}
+            weeklyHistory={reportPreviewDummy.finalReport.weeklyHistory}
+            assetHistory={reportPreviewDummy.finalReport.assetHistory as any}
+            stockDetails={reportPreviewDummy.finalReport.stockDetails as any}
+            aiSimilarName={reportPreviewDummy.finalReport.aiSimilarName}
+            aiSimilarEmoji={reportPreviewDummy.finalReport.aiSimilarEmoji}
+            aiSimilarProfitRate={reportPreviewDummy.finalReport.aiSimilarProfitRate}
+            aiSimilarTotalValue={reportPreviewDummy.finalReport.aiSimilarTotalValue}
+            aiBestName={reportPreviewDummy.finalReport.aiBestName}
+            aiBestEmoji={reportPreviewDummy.finalReport.aiBestEmoji}
+            aiBestProfitRate={reportPreviewDummy.finalReport.aiBestProfitRate}
+            aiBestTotalValue={reportPreviewDummy.finalReport.aiBestTotalValue}
+            onGoHome={() => setShowPreviewFinalReport(false)}
+            onPlayAgain={() => setShowPreviewFinalReport(false)}
+          />
+        )}
 
         {/* 주간 리포트 모달 */}
         <WeeklyReportModal
@@ -1183,6 +1415,9 @@ export default function GamePlayPage() {
               : []
           }
           nextReportDay={Math.ceil(currentDay / AI_REPORT_INTERVAL) * AI_REPORT_INTERVAL}
+          bestAIName={bestAICompetitor.name}
+          bestAIEmoji={bestAICompetitor.emoji}
+          bestAIProfitRate={scenario ? Number(((calcBestAITotalValue(scenario.stocks as any, currentTurn) - initialValue) / initialValue * 100).toFixed(1)) : 0}
           decisionTimer={decisionTimer}
           totalDecisions={totalDecisions}
           remainingDecisions={remainingDecisions}
@@ -1249,8 +1484,20 @@ export default function GamePlayPage() {
           />
         )}
 
+        {/* AI 갭 피드백 배너 (숨김 토글 가능) */}
+        <AIGapFeedback
+          isVisible={showAIGapFeedback && !showDaySummary && !showWeeklyReport}
+          userProfitRate={liveProfitRate}
+          bestAIProfitRate={scenario ? Number(((calcBestAITotalValue(scenario.stocks as any, currentTurn) - initialValue) / initialValue * 100).toFixed(1)) : 0}
+          similarAIProfitRate={scenario ? Number(((calcAITotalValue(scenario.stocks as any, currentTurn) - initialValue) / initialValue * 100).toFixed(1)) : 0}
+          bestAIName={bestAICompetitor.name}
+          similarAIName={aiCompetitor.name}
+          waveAccuracy={lastWaveAnalysis?.accuracy ?? 0}
+          onHide={() => setShowAIGapFeedback(false)}
+        />
+
         {/* 대기 중 */}
-        {!isWaitingForDecision && !showCardFeedback && !showDaySummary && (
+        {!isWaitingForDecision && !showCardFeedback && !showDaySummary && !showMiniReport && (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center animate-pulse">
               <div className="text-4xl mb-3">🎯</div>
@@ -1271,6 +1518,8 @@ export default function GamePlayPage() {
           isWaitingForDecision={isWaitingForDecision && !showQuickTrade}
           onTogglePause={() => setIsTimerPaused(prev => !prev)}
           onSkip={() => handleDecision("skip")}
+          onPreviewMiniReport={() => setShowPreviewMiniReport(true)}
+          onPreviewFinalReport={() => setShowPreviewFinalReport(true)}
         />
       </div>
     )

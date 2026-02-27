@@ -524,7 +524,7 @@ export default function ScenarioDetailPage() {
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#191919] via-[#191919] to-transparent">
         <div className="max-w-md mx-auto flex gap-3">
           <button
-            onClick={() => router.back()}
+            onClick={() => router.push('/learn')}
             className="flex-1 h-12 rounded-xl bg-[#252525] border border-white/10 text-white text-sm font-bold hover:bg-[#333] transition-colors"
           >
             목록으로

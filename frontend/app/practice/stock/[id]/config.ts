@@ -63,6 +63,9 @@ export const LABELS = {
     profitRate: "수익률",
     dayLabel: "일차",
     weekLabel: "주차",
+    bestAILabel: "최고 AI",
+    similarAILabel: "유사 AI",
+    gapLabel: "갭",
   },
 
   // 주식 상세 정보
@@ -95,6 +98,24 @@ export const LABELS = {
     profitAmount: "수익금",
     movingToNext: "다음 날로 이동 중...",
     analysisTitle: "📝 오늘의 분석",
+    gapAnalysisTitle: "📊 AI 갭 분석",
+    waveAnalysisTitle: "🌊 파도 흐름 분석",
+    bestAILabel: "최고 AI",
+    similarAILabel: "성향 유사 AI",
+    gapToBestLabel: "최고 AI 대비",
+    gapToSimilarLabel: "유사 AI 대비",
+    gapTrendLabel: "갭 추이 (최근 7일)",
+  },
+
+  // AI 갭 피드백 (매수/매도 즉시)
+  aiGapFeedback: {
+    title: "AI 갭 현황",
+    hideLabel: "숨기기",
+    showLabel: "AI 갭 보기",
+    bestAIGap: "최고 AI 대비",
+    similarAIGap: "유사 AI 대비",
+    waveAccuracy: "파도 읽기",
+    followTip: "AI 따라하기 연습",
   },
 
   // 로딩
@@ -141,6 +162,81 @@ export const LABELS = {
   // 차트 기간
   chartPeriods: ["1일", "1주", "3달", "1년"] as const,
   stockDetailTabs: ["차트", "호가", "내 주식", "종목정보", "커뮤니티"] as const,
+
+  // 미니 게임 리포트 (3일 간격)
+  miniReport: {
+    periodTitle: "{day}일차 중간 리포트",
+    myResult: "내 투자 성적",
+    bestAI: "최고 AI",
+    gapSimilar: "유사 AI 대비",
+    gapBest: "최고 AI 대비",
+    achievementsTitle: "🏅 획득 업적",
+    continueButton: "확인 완료 — 다음 날 시작",
+    // 탭
+    tabSummary: "종합",
+    tabTrades: "거래 내역",
+    tabHoldings: "보유 종목",
+    // 종합 탭
+    totalTrades: "총 거래",
+    buyLabel: "매수",
+    sellLabel: "매도",
+    winRateLabel: "승률",
+    realizedProfit: "실현 수익",
+    unrealizedProfit: "평가 손익",
+    profitTradesLabel: "수익",
+    lossTradesLabel: "손실",
+    holdingStocksUnit: "종목 보유 중",
+    // 거래 내역 탭
+    totalBuyAmount: "총 매수 금액",
+    totalSellAmount: "총 매도 금액",
+    tradeListTitle: "거래 내역서",
+    noTrades: "아직 거래 내역이 없습니다",
+    // 보유 종목 탭
+    cashLabel: "보유 현금",
+    stockValueLabel: "주식 평가액",
+    holdingListTitle: "보유 종목 상세",
+    noHoldings: "보유 중인 종목이 없습니다",
+    totalUnrealizedLabel: "총 평가 손익",
+    holdingStocks: "보유 종목",
+    totalAsset: "총 자산",
+  },
+
+  // 최종 게임 리포트 (게임 종료)
+  finalReport: {
+    gameComplete: "🎮 게임 완료!",
+    gradeLabel: "등급",
+    finalReturn: "최종 수익률",
+    tabOverview: "종합",
+    tabStocks: "주식 상세",
+    tabTrades: "거래",
+    tabAI: "AI 대결",
+    totalDays: "플레이 일수",
+    totalTrades: "총 거래",
+    winRate: "매도 승률",
+    holdingStocks: "보유 종목",
+    achievementsTitle: "🏆 획득 업적",
+    bestTrade: "최고의 거래",
+    worstTrade: "아쉬운 거래",
+    buyCount: "매수",
+    sellCount: "매도",
+    realizedProfit: "실현 수익",
+    recentTrades: "최근 거래 내역",
+    noTrades: "거래 내역이 없습니다",
+    bestAI: "최고 AI",
+    gapSimilar: "유사 AI 대비",
+    gapBest: "최고 AI 대비",
+    rankingTitle: "🏅 최종 순위",
+    playAgain: "다시 도전하기",
+    goHome: "홈으로 돌아가기",
+    // 주식 상세 탭
+    stockDetailTitle: "종목별 분석",
+    stockDetailEmpty: "종목 상세 데이터가 없습니다",
+    waveAnalysisLabel: "파도 분석",
+    improvementLabel: "개선 포인트",
+    myTradesLabel: "내 거래 내역",
+    aiCompareLabel: "AI 거래 비교",
+    priceChartLabel: "가격 흐름 + 거래 마커",
+  },
 } as const
 
 // ============================================================

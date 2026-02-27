@@ -63,38 +63,42 @@ export const StockListSection = ({
 
         {/* ── 내 주식 ── */}
         {myStocks.length > 0 && (
-          <div>
-            {/* 헤더 행 1: 레이블 + 총수익 */}
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold text-gray-400">{LABELS.sections.myStocks}</h3>
-              <span className={cn(
-                "text-[11px] font-bold",
-                isTotalProfit ? "text-red-400" : "text-blue-400"
-              )}>
-                {isTotalProfit ? "+" : ""}{formatNumber(totalLiveProfit)}원
-                {" "}({isTotalProfit ? "+" : ""}{totalProfitRate}%)
-              </span>
-            </div>
-            {/* 헤더 행 2: 현재가/평가금 탭 (오른쪽 정렬, 작게) */}
-            <div className="flex justify-end mt-1 mb-2">
-              <div className="flex bg-gray-800/50 rounded-lg p-0.5 gap-0.5">
-                {(["현재가", "평가금"] as const).map(tab => (
-                  <button
-                    key={tab}
-                    onClick={() => onChangeViewTab(tab)}
-                    className={cn(
-                      "px-2 py-0.5 rounded-md text-[10px] font-bold transition-all",
-                      stockViewTab === tab
-                        ? "bg-gray-600 text-white"
-                        : "text-gray-500 hover:text-gray-300"
-                    )}
-                  >
-                    {tab}
-                  </button>
-                ))}
+          <div className="bg-[#1e1e1e] rounded-2xl border border-gray-800/40 overflow-hidden">
+            {/* 헤더: 레이블 + 총수익 + 탭 */}
+            <div className="px-4 pt-3 pb-2">
+              <div className="flex items-center justify-between mb-1">
+                <h3 className="text-sm font-bold text-white">{LABELS.sections.myStocks}</h3>
+                <span className={cn(
+                  "text-sm font-bold",
+                  isTotalProfit ? "text-red-400" : "text-blue-400"
+                )}>
+                  {isTotalProfit ? "+" : ""}{formatNumber(totalLiveProfit)}원
+                  <span className="text-[11px] ml-0.5 opacity-70">
+                    ({isTotalProfit ? "+" : ""}{totalProfitRate}%)
+                  </span>
+                </span>
+              </div>
+              <div className="flex justify-end">
+                <div className="flex bg-gray-800/50 rounded-lg p-0.5 gap-0.5">
+                  {(["현재가", "평가금"] as const).map(tab => (
+                    <button
+                      key={tab}
+                      onClick={() => onChangeViewTab(tab)}
+                      className={cn(
+                        "px-2.5 py-1 rounded-md text-[10px] font-bold transition-all",
+                        stockViewTab === tab
+                          ? "bg-gray-600 text-white"
+                          : "text-gray-500 hover:text-gray-300"
+                      )}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-            <div className="space-y-0">
+            {/* 종목 리스트 */}
+            <div className="divide-y divide-gray-800/30">
               {myStocks.map((stock) => (
                 <StockRow
                   key={stock.id}

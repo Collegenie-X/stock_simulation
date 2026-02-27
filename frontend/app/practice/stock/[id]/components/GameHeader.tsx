@@ -1,9 +1,9 @@
 "use client"
 
-import { Pause, Play, ChevronRight, Bot, Swords } from "lucide-react"
+import { ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatNumber } from "@/lib/format"
-import { LABELS, DAY_PHASES, DECISIONS_PER_DAY } from "../config"
+import { LABELS } from "../config"
 import type { GameHeaderProps } from "../types"
 
 export const GameHeader = ({
@@ -19,6 +19,9 @@ export const GameHeader = ({
   aiProfitRate,
   aiTopStocks,
   nextReportDay,
+  bestAIName,
+  bestAIEmoji,
+  bestAIProfitRate,
   decisionTimer,
   totalDecisions,
   remainingDecisions,
@@ -28,137 +31,110 @@ export const GameHeader = ({
   onExitClick,
   onProfitClick,
 }: GameHeaderProps) => {
-  const userWinning = profitRate >= aiProfitRate
+  const gapToBest = Number((profitRate - bestAIProfitRate).toFixed(1))
+  const gapToSimilar = Number((profitRate - aiProfitRate).toFixed(1))
   const daysUntilReport = nextReportDay - currentDay
 
   return (
-    <>
-      {/* 축약 헤더 - 총 자산 + AI 대결 + 종료 (항상 표시) */}
-      <div className="sticky top-0 z-20 px-4 py-2.5 bg-[#191919]/95 backdrop-blur-sm border-b border-gray-800/50">
-        {/* 1행: 총 자산 + 종료 */}
-        <div className="flex items-center justify-between">
+    <div className="sticky top-0 z-20 bg-[#191919]/95 backdrop-blur-sm border-b border-gray-800/50">
+      {/* 진행도 바 (최상단, 얇게) */}
+      <div className="w-full bg-gray-800 h-[3px]">
+        <div
+          className="bg-blue-500 h-full rounded-r-full transition-all duration-500"
+          style={{
+            width: `${totalDays > 0 ? Math.min((currentDay / totalDays) * 100, 100) : 0}%`,
+          }}
+        />
+      </div>
+
+      <div className="px-4 pt-2.5 pb-3">
+        {/* 1행: 총 자산 (크게 강조) + 종료 */}
+        <div className="flex items-start justify-between mb-3">
           <button
             onClick={onProfitClick}
-            className="flex items-center gap-2 active:opacity-70 transition-opacity"
+            className="flex items-baseline gap-2 active:opacity-70 transition-opacity"
           >
             <div>
-              <div className="text-[10px] text-gray-500 mb-0.5">{LABELS.header.totalAsset}</div>
-              <div className="text-base font-black text-white leading-none">
-                {formatNumber(totalValue)}원
+              <div className="text-[10px] text-gray-500 mb-1">{LABELS.header.totalAsset}</div>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-2xl font-black text-white tracking-tight">
+                  {formatNumber(totalValue)}<span className="text-sm text-gray-400 font-bold">원</span>
+                </span>
+                <span className={cn(
+                  "text-sm font-bold",
+                  profitRate >= 0 ? "text-red-400" : "text-blue-400"
+                )}>
+                  {profitRate >= 0 ? "+" : ""}{profitRate}%
+                </span>
               </div>
             </div>
-            <div
-              className={cn(
-                "text-xs font-bold px-1.5 py-0.5 rounded leading-none",
-                profitRate >= 0 ? "text-red-500 bg-red-500/10" : "text-blue-500 bg-blue-500/10"
-              )}
-            >
-              {profitRate >= 0 ? "+" : ""}
-              {profitRate}%
-            </div>
-            <ChevronRight className="w-4 h-4 text-gray-500" />
+            <ChevronRight className="w-4 h-4 text-gray-600 mt-5" />
           </button>
 
           <button
             onClick={onExitClick}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-gray-800/80 hover:bg-gray-700 text-gray-400 hover:text-white transition-colors text-xs font-bold"
+            className="px-2.5 py-1.5 rounded-lg bg-gray-800/80 hover:bg-gray-700 text-gray-500 hover:text-white transition-colors text-[11px] font-bold"
           >
-            <span>{LABELS.actions.exit}</span>
-            <span className="text-[10px]">✕</span>
+            {LABELS.actions.exit} ✕
           </button>
         </div>
 
-        {/* 2행: AI vs 나 대결 배너 — 원금 대비 수익률만 비교 */}
-        <div className="mt-2 bg-gray-800/60 rounded-xl border border-gray-700/40 overflow-hidden">
-          {/* 수익률 비교 바 */}
-          <div className="flex items-center px-3 py-2">
-            {/* 나 */}
-            <div className="flex items-center gap-1.5 flex-1 min-w-0">
-              <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center shrink-0 border border-blue-500/30">
-                <span className="text-xs">👤</span>
-              </div>
-              <div className="min-w-0">
-                <div className="text-[9px] text-gray-500 font-bold leading-none mb-0.5">나</div>
-                <div className={cn(
-                  "text-sm font-extrabold tabular-nums leading-none",
-                  profitRate >= 0 ? "text-red-400" : "text-blue-400"
-                )}>
-                  {profitRate >= 0 ? "+" : ""}{profitRate}%
-                </div>
-              </div>
+        {/* 2행: AI 비교 - 간결한 2칸 카드 */}
+        <div className="grid grid-cols-2 gap-2">
+          {/* 유사 AI */}
+          <div className="bg-gray-800/50 rounded-xl px-3 py-2 border border-gray-700/30">
+            <div className="flex items-center gap-1 mb-1">
+              <span className="text-[10px]">{aiEmoji}</span>
+              <span className="text-[10px] text-gray-500 font-bold truncate">{LABELS.header.similarAILabel}</span>
             </div>
-
-            {/* VS 아이콘 + 승패 */}
-            <div className="shrink-0 flex flex-col items-center mx-2">
-              <Swords className="w-3.5 h-3.5 text-yellow-500/70" />
+            <div className="flex items-baseline justify-between">
               <span className={cn(
-                "text-[8px] font-black mt-0.5",
-                userWinning ? "text-blue-400" : "text-purple-400"
+                "text-sm font-extrabold tabular-nums",
+                aiProfitRate >= 0 ? "text-red-400" : "text-blue-400"
               )}>
-                {userWinning ? "승" : "패"}
+                {aiProfitRate >= 0 ? "+" : ""}{aiProfitRate.toFixed(1)}%
+              </span>
+              <span className={cn(
+                "text-[10px] font-bold tabular-nums",
+                gapToSimilar >= 0 ? "text-green-400" : "text-purple-400"
+              )}>
+                {gapToSimilar >= 0 ? "+" : ""}{gapToSimilar}%p
               </span>
             </div>
-
-            {/* AI */}
-            <div className="flex items-center gap-1.5 flex-1 min-w-0 justify-end">
-              <div className="min-w-0 text-right">
-                <div className="text-[9px] text-gray-500 font-bold leading-none mb-0.5">
-                  🤖 {aiName}
-                </div>
-                <div className={cn(
-                  "text-sm font-extrabold tabular-nums leading-none",
-                  aiProfitRate >= 0 ? "text-red-400" : "text-blue-400"
-                )}>
-                  {aiProfitRate >= 0 ? "+" : ""}{aiProfitRate.toFixed(1)}%
-                </div>
-              </div>
-              <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center shrink-0 border border-purple-500/30">
-                <Bot className="w-3.5 h-3.5 text-purple-400" />
-              </div>
-            </div>
           </div>
 
-          {/* AI 보유 종목 미리보기 */}
-          {aiTopStocks.length > 0 && (
-            <div className="px-3 py-1.5 bg-gray-900/50 border-t border-gray-700/30 flex items-center gap-1.5">
-              <Bot className="w-3 h-3 text-purple-400/60 shrink-0" />
-              <span className="text-[9px] text-gray-500 shrink-0">AI 보유:</span>
-              <div className="flex items-center gap-1 flex-1 min-w-0 overflow-hidden">
-                {aiTopStocks.slice(0, 3).map((name, idx) => (
-                  <span
-                    key={idx}
-                    className="text-[9px] font-bold text-purple-300/80 bg-purple-500/10 px-1.5 py-0.5 rounded truncate shrink-0"
-                  >
-                    {name}
-                  </span>
-                ))}
-                {aiTopStocks.length > 3 && (
-                  <span className="text-[9px] text-gray-500 shrink-0">
-                    +{aiTopStocks.length - 3}
-                  </span>
-                )}
-              </div>
-              {daysUntilReport > 0 && (
-                <span className="text-[8px] text-gray-600 font-bold shrink-0 tabular-nums">
-                  분석 {daysUntilReport}일 후
-                </span>
-              )}
+          {/* 최고 AI */}
+          <div className="bg-gray-800/50 rounded-xl px-3 py-2 border border-gray-700/30">
+            <div className="flex items-center gap-1 mb-1">
+              <span className="text-[10px]">{bestAIEmoji}</span>
+              <span className="text-[10px] text-gray-500 font-bold truncate">{LABELS.header.bestAILabel}</span>
             </div>
-          )}
-        </div>
-
-        {/* 3행: 전체 진행도 바 */}
-        <div className="mt-2">
-          <div className="w-full bg-gray-700 rounded-full h-1">
-            <div
-              className="bg-blue-500 h-1 rounded-full transition-all duration-500"
-              style={{
-                width: `${totalDays > 0 ? Math.min((currentDay / totalDays) * 100, 100) : 0}%`,
-              }}
-            />
+            <div className="flex items-baseline justify-between">
+              <span className={cn(
+                "text-sm font-extrabold tabular-nums",
+                bestAIProfitRate >= 0 ? "text-red-400" : "text-blue-400"
+              )}>
+                {bestAIProfitRate >= 0 ? "+" : ""}{bestAIProfitRate.toFixed(1)}%
+              </span>
+              <span className={cn(
+                "text-[10px] font-bold tabular-nums",
+                gapToBest >= 0 ? "text-green-400" : "text-orange-400"
+              )}>
+                {gapToBest >= 0 ? "+" : ""}{gapToBest}%p
+              </span>
+            </div>
           </div>
         </div>
+
+        {/* 다음 분석 일정 (있을 때만, 작게) */}
+        {daysUntilReport > 0 && (
+          <div className="mt-2 text-center">
+            <span className="text-[9px] text-gray-600 font-bold tabular-nums">
+              📊 분석 리포트 {daysUntilReport}일 후
+            </span>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   )
 }
