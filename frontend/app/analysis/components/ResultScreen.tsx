@@ -208,17 +208,17 @@ export default function ResultScreen({ personalityScores, abilities, totalQuesti
 
       {/* quick mode → upgrade prompt */}
       {mode === "quick" && (
-        <div className="rounded-2xl bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 p-4 animate-slideUp" style={{ animationDelay: "800ms" }}>
+        <div className="rounded-2xl bg-white/[0.03] border border-white/8 p-4 animate-slideUp" style={{ animationDelay: "800ms" }}>
           <div className="flex items-start gap-3">
             <span className="text-2xl flex-shrink-0">🔬</span>
-            <div>
+            <div className="flex-1">
               <p className="text-sm font-bold text-white mb-1">더 정확한 결과를 원한다면?</p>
               <p className="text-xs text-white/50 leading-relaxed mb-3">
                 세부 측정(21문항)은 시나리오 기반 분석과 더 많은 차트 반응을 포함해서 정밀한 성향을 파악해요.
               </p>
               <button
                 onClick={() => router.push("/analysis?mode=detailed")}
-                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-bold hover:scale-[1.01] active:scale-[0.98] transition-all"
+                className="w-full py-2.5 rounded-xl bg-white/10 border border-white/15 text-white/70 text-sm font-semibold hover:bg-white/15 hover:text-white/85 active:scale-[0.98] transition-all"
               >
                 세부 측정 해보기 →
               </button>
@@ -253,10 +253,10 @@ export default function ResultScreen({ personalityScores, abilities, totalQuesti
       <div className="flex flex-col gap-2 mt-2 animate-slideUp" style={{ animationDelay: mode === "quick" ? "1000ms" : "800ms" }}>
         {returnTo !== "compete" && (
           <button
-            onClick={() => router.push("/")}
-            className="w-full py-3.5 rounded-2xl bg-white/10 border border-white/15 text-white/85 text-sm font-bold hover:bg-white/15 hover:scale-[1.01] active:scale-[0.98] transition-all"
+            onClick={() => router.push("/home")}
+            className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 border border-blue-500/30 text-white text-sm font-bold hover:scale-[1.01] active:scale-[0.98] transition-all shadow-lg shadow-blue-500/25"
           >
-            {LABELS.homeBtn}
+            {LABELS.startGameBtn}
           </button>
         )}
         <button

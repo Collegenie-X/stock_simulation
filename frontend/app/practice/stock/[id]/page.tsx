@@ -32,11 +32,12 @@ import {
   MiniGameReport,
   FinalGameReport,
 } from "./components"
+import type { LastTradeToast } from "./components/BottomActionBar"
 import { useLivePrices } from "./components/hooks/useLivePrices"
 import { useAICompetitor } from "./components/hooks/useAICompetitor"
 import type { WaveAnalysis, UserDayDecision, StockCompareResult } from "./components/hooks/useAICompetitor"
 import { generateHistory, generateAIStocks, generateRobotAutoStocks, CHARACTER_REACTIONS } from "./utils/stockDataUtils"
-import { EXCHANGE_RATE, DECISIONS_PER_DAY, DECISION_TIMER_SECONDS, DAYS_PER_WEEK, TURNS_PER_DECISION, DAY_PHASES, DAY_NAMES, LABELS, SPEED_MODE_TURNS, AI_REPORT_INTERVAL } from "./config"
+import { EXCHANGE_RATE, DECISIONS_PER_DAY, DECISION_TIMER_SECONDS, DAYS_PER_WEEK, TURNS_PER_DECISION, DAY_PHASES, DAY_NAMES, LABELS, SPEED_MODE_TURNS, AI_REPORT_INTERVAL, DEBUG_BUTTONS } from "./config"
 
 export default function GamePlayPage() {
   const params = useParams()
@@ -128,6 +129,7 @@ export default function GamePlayPage() {
   const [isTimerPaused, setIsTimerPaused] = useState(false)
   const [showExitConfirm, setShowExitConfirm] = useState(false)
   const [stockViewTab, setStockViewTab] = useState<"현재가" | "평가금">("현재가")
+  const [lastTrade, setLastTrade] = useState<LastTradeToast | null>(null)
 
   // 시나리오 데이터 선택 및 확장
   const allScenarios = [...scenariosData.scenarios, scenarios100DaysData]
@@ -344,6 +346,23 @@ export default function GamePlayPage() {
 
   useEffect(() => {
     loadSessionData()
+
+    // 거래 페이지에서 돌아온 경우 거래 결과 토스트 표시
+    if (refreshParam) {
+      const raw = sessionStorage.getItem("lastTradeToast")
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw) as LastTradeToast
+          setLastTrade(parsed)
+          // 읽은 후 즉시 삭제 (중복 표시 방지)
+          sessionStorage.removeItem("lastTradeToast")
+          // 3.5초 후 자동 초기화
+          setTimeout(() => setLastTrade(null), 3500)
+        } catch {
+          sessionStorage.removeItem("lastTradeToast")
+        }
+      }
+    }
   }, [loadSessionData, refreshParam]) // refreshParam이 변경될 때마다 다시 로드
 
   // 페이지에 돌아올 때마다 localStorage 데이터 다시 로드
@@ -1506,7 +1525,7 @@ export default function GamePlayPage() {
           </div>
         )}
 
-        {/* 하단 고정 바 (타이머 + 다음 시간으로) */}
+        {/* 하단 고정 바 (타이머 + 거래 확인 토스트 + 다음 시간으로) */}
         <BottomActionBar
           decisionTimer={decisionTimer}
           totalDecisions={totalDecisions}
@@ -1516,6 +1535,8 @@ export default function GamePlayPage() {
           currentDayPhase={currentDayPhase}
           currentDay={currentDay}
           isWaitingForDecision={isWaitingForDecision && !showQuickTrade}
+          lastTrade={lastTrade}
+          showDebugButtons={DEBUG_BUTTONS}
           onTogglePause={() => setIsTimerPaused(prev => !prev)}
           onSkip={() => handleDecision("skip")}
           onPreviewMiniReport={() => setShowPreviewMiniReport(true)}

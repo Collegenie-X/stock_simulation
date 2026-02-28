@@ -1,9 +1,7 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-
-type SelectedMode = "quick" | "detailed" | null
 
 interface SceneLaunchProps {
   visible: boolean
@@ -20,63 +18,27 @@ const TYPES = [
 export default function SceneLaunch({ visible }: SceneLaunchProps) {
   const router = useRouter()
   const [step, setStep] = useState(0)
-  const [countdown, setCountdown] = useState<number | null>(null)
-  const [selectedMode, setSelectedMode] = useState<SelectedMode>(null)
-  const countdownRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     if (!visible) return
     setStep(0)
-    setCountdown(null)
-    setSelectedMode(null)
 
     const timers = [
       setTimeout(() => setStep(1), 200),
       setTimeout(() => setStep(2), 600),
       setTimeout(() => setStep(3), 1800),
     ]
-    return () => {
-      timers.forEach(clearTimeout)
-      if (countdownRef.current) clearTimeout(countdownRef.current)
-    }
+    return () => timers.forEach(clearTimeout)
   }, [visible])
 
   const handleLaunch = (mode: "quick" | "detailed") => {
-    setSelectedMode(mode)
-    setCountdown(3)
-    let count = 3
-    const tick = () => {
-      count--
-      if (count <= 0) {
-        router.push(`/analysis?mode=${mode}`)
-        return
-      }
-      setCountdown(count)
-      countdownRef.current = setTimeout(tick, 600)
-    }
-    countdownRef.current = setTimeout(tick, 600)
+    router.push(`/analysis?mode=${mode}`)
   }
 
   if (!visible) return null
 
   return (
     <div className="relative z-10 flex flex-col items-center justify-center min-h-screen px-6">
-      {/* Countdown overlay */}
-      {countdown !== null && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="text-center">
-            <div
-              key={countdown}
-              className="text-8xl font-black text-transparent bg-clip-text bg-gradient-to-b from-blue-400 to-purple-500 animate-bounceIn"
-            >
-              {countdown > 0 ? countdown : "GO!"}
-            </div>
-            <p className="text-gray-400 mt-4 text-sm tracking-widest uppercase">
-              {countdown > 0 ? "준비하세요..." : "시작합니다!"}
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Header */}
       <div
@@ -149,7 +111,6 @@ export default function SceneLaunch({ visible }: SceneLaunchProps) {
         {/* Quick mode */}
         <button
           onClick={() => handleLaunch("quick")}
-          disabled={countdown !== null}
           className="w-full relative group"
         >
           <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 via-cyan-600 to-emerald-600 rounded-2xl opacity-60 group-hover:opacity-100 blur-sm transition-opacity" />
@@ -171,7 +132,6 @@ export default function SceneLaunch({ visible }: SceneLaunchProps) {
         {/* Detailed mode */}
         <button
           onClick={() => handleLaunch("detailed")}
-          disabled={countdown !== null}
           className="w-full relative group"
         >
           <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl opacity-50 group-hover:opacity-90 blur-sm transition-opacity" />

@@ -135,7 +135,7 @@ export const LABELS = {
   resultTitle: "너의 투자 성향은...",
   abilityTitle: "⚔️ 능력치",
   tipsTitle: "💡 맞춤 조언",
-  homeBtn: "홈으로 돌아가기",
+  startGameBtn: "실전 시뮬레이션 시작하기 🚀",
   retryBtn: "다시 해볼래!",
   theoryBadge: "🎭 감정 탐색",
   chartBadge: "📈 차트 반응",

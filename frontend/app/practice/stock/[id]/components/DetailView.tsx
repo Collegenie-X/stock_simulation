@@ -163,26 +163,21 @@ export const DetailView = ({
 
       <DatePopup isVisible={showDatePopup} date={turnDate} />
 
-      {/* 거래 완료 피드백 토스트 */}
+      {/* 피드백 토스트 (작은 인라인 스타일) */}
       {feedback && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[150] animate-in slide-in-from-top duration-300">
-          <div
-            className={cn(
-              "px-6 py-4 rounded-2xl shadow-2xl border-2 backdrop-blur-md flex items-center gap-3 min-w-[280px]",
-              feedback.type === "success"
-                ? "bg-green-500/20 border-green-500 text-green-100"
-                : feedback.type === "error"
-                  ? "bg-red-500/20 border-red-500 text-red-100"
-                  : "bg-blue-500/20 border-blue-500 text-blue-100",
-            )}
-          >
-            <div className="text-3xl">
-              {feedback.type === "success" ? "✅" : feedback.type === "error" ? "❌" : "ℹ️"}
-            </div>
-            <div className="flex-1">
-              <div className="font-bold text-lg">{feedback.text}</div>
-              <div className="text-sm opacity-80">거래가 완료되었습니다</div>
-            </div>
+        <div className="fixed top-4 left-4 right-4 z-[150] animate-in slide-in-from-top-2 duration-200 pointer-events-none">
+          <div className={cn(
+            "flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl shadow-md border",
+            feedback.type === "success"
+              ? "bg-green-500/12 border-green-500/25 text-green-100"
+              : feedback.type === "error"
+                ? "bg-red-500/12 border-red-500/25 text-red-100"
+                : "bg-gray-700/80 border-gray-600/40 text-gray-100",
+          )}>
+            <span className="text-sm shrink-0">
+              {feedback.type === "success" ? "✓" : feedback.type === "error" ? "✕" : "ℹ"}
+            </span>
+            <span className="text-xs font-bold truncate">{feedback.text}</span>
           </div>
         </div>
       )}

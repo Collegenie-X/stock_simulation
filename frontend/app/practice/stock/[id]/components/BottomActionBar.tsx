@@ -1,8 +1,19 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Pause, Play, ChevronRight, FileText, Trophy } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { formatNumber } from "@/lib/format"
 import { LABELS, DAY_PHASES } from "../config"
+
+export interface LastTradeToast {
+  isBuy: boolean
+  stockName: string
+  quantity: number
+  profit?: number
+  profitRate?: number
+  totalAmount: number
+}
 
 interface BottomActionBarProps {
   decisionTimer: number
@@ -13,9 +24,10 @@ interface BottomActionBarProps {
   currentDayPhase: string
   currentDay: number
   isWaitingForDecision: boolean
+  lastTrade?: LastTradeToast | null
+  showDebugButtons?: boolean
   onTogglePause: () => void
   onSkip: () => void
-  // 미리보기 버튼 (개발/테스트용)
   onPreviewMiniReport?: () => void
   onPreviewFinalReport?: () => void
 }
@@ -29,6 +41,8 @@ export const BottomActionBar = ({
   currentDayPhase,
   currentDay,
   isWaitingForDecision,
+  lastTrade,
+  showDebugButtons = false,
   onTogglePause,
   onSkip,
   onPreviewMiniReport,
@@ -38,21 +52,32 @@ export const BottomActionBar = ({
   const isUrgent = decisionTimer <= 10
   const isCaution = decisionTimer <= 20
 
+  // 거래 토스트 표시 상태 (3초 후 자동 사라짐)
+  const [visibleTrade, setVisibleTrade] = useState<LastTradeToast | null>(null)
+
+  useEffect(() => {
+    if (!lastTrade) return
+    setVisibleTrade(lastTrade)
+    const t = setTimeout(() => setVisibleTrade(null), 3000)
+    return () => clearTimeout(t)
+  }, [lastTrade])
+
   if (!isWaitingForDecision) return null
 
-  return (
-    <div className="fixed bottom-0 left-0 right-0 z-30 bg-[#191919] border-t border-gray-800/80" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+  const hasProfit = visibleTrade && visibleTrade.profit !== undefined
+  const isProfit = hasProfit && (visibleTrade.profit ?? 0) >= 0
 
+  return (
+    <div
+      className="fixed bottom-0 left-0 right-0 z-30 bg-[#191919] border-t border-gray-800/80"
+      style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+    >
       {/* ── 타이머 프로그레스 바 ── */}
       <div className="relative h-1.5 bg-gray-800 overflow-hidden">
         <div
           className={cn(
             "absolute inset-y-0 left-0 transition-all duration-1000 rounded-r-full",
-            isUrgent
-              ? "bg-red-500"
-              : isCaution
-              ? "bg-yellow-500"
-              : "bg-green-500"
+            isUrgent ? "bg-red-500" : isCaution ? "bg-yellow-500" : "bg-green-500"
           )}
           style={{ width: `${timerProgress * 100}%` }}
         />
@@ -60,7 +85,7 @@ export const BottomActionBar = ({
 
       {/* ── 타이머 info 행 ── */}
       <div className="flex items-center justify-between px-4 py-1.5">
-        {/* 왼쪽: 페이즈 + 일시정지 버튼 */}
+        {/* 왼쪽: 일시정지 + 페이즈 도트 + 일차 */}
         <div className="flex items-center gap-2">
           <button
             onClick={onTogglePause}
@@ -78,7 +103,6 @@ export const BottomActionBar = ({
             )}
           </button>
 
-          {/* 페이즈 도트 */}
           <div className="flex items-center gap-1">
             {DAY_PHASES.map((phase, idx) => (
               <div
@@ -100,23 +124,17 @@ export const BottomActionBar = ({
           </span>
         </div>
 
-        {/* 오른쪽: 카운트다운 */}
+        {/* 오른쪽: 남은 횟수 + 카운트다운 */}
         <div className="flex items-center gap-2">
           <span className="text-[9px] text-gray-600 font-medium tabular-nums">
             {totalDecisions}번째 · 남은 {remainingDecisions}회
           </span>
-          <div className={cn(
-            "flex items-center gap-1",
-            isTimerPaused ? "opacity-50" : ""
-          )}>
+          <div className={cn("flex items-center gap-0.5", isTimerPaused ? "opacity-50" : "")}>
             <span className={cn(
               "text-lg font-black tabular-nums leading-none",
-              isTimerPaused
-                ? "text-gray-500"
-                : isUrgent
-                ? "text-red-400 animate-pulse"
-                : isCaution
-                ? "text-yellow-400"
+              isTimerPaused ? "text-gray-500"
+                : isUrgent ? "text-red-400 animate-pulse"
+                : isCaution ? "text-yellow-400"
                 : "text-green-400"
             )}>
               {decisionTimer}
@@ -129,16 +147,65 @@ export const BottomActionBar = ({
       {/* ── 일시정지 알림 ── */}
       {isTimerPaused && (
         <div className="mx-4 mb-1 py-1 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-          <p className="text-[9px] font-bold text-yellow-400/90 text-center">
-            ⏸ 일시정지 중
-          </p>
+          <p className="text-[9px] font-bold text-yellow-400/90 text-center">⏸ 일시정지 중</p>
+        </div>
+      )}
+
+      {/* ── 거래 확인 토스트 (주식 리스트에서 표시) ── */}
+      {visibleTrade && (
+        <div className="mx-4 mb-1.5 animate-in slide-in-from-bottom-2 duration-200">
+          <div className={cn(
+            "flex items-center gap-2.5 px-3 py-2 rounded-xl border",
+            visibleTrade.isBuy
+              ? "bg-red-500/10 border-red-500/25"
+              : "bg-blue-500/10 border-blue-500/25"
+          )}>
+            {/* 아이콘 */}
+            <span className="text-base shrink-0">{visibleTrade.isBuy ? "📈" : "💰"}</span>
+
+            {/* 내용 */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className={cn(
+                  "text-[9px] font-black px-1.5 py-px rounded-full",
+                  visibleTrade.isBuy ? "bg-red-500 text-white" : "bg-blue-500 text-white"
+                )}>
+                  {visibleTrade.isBuy ? "매수" : "매도"}
+                </span>
+                <span className="text-xs font-bold text-white truncate">{visibleTrade.stockName}</span>
+                <span className={cn(
+                  "text-xs font-bold shrink-0",
+                  visibleTrade.isBuy ? "text-red-400" : "text-blue-400"
+                )}>
+                  {visibleTrade.isBuy ? "+" : "-"}{visibleTrade.quantity}주
+                </span>
+              </div>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-[10px] text-gray-500">
+                  {formatNumber(visibleTrade.totalAmount)}원
+                </span>
+                {!visibleTrade.isBuy && hasProfit && (
+                  <span className={cn(
+                    "text-[10px] font-bold",
+                    isProfit ? "text-red-400" : "text-blue-400"
+                  )}>
+                    {isProfit ? "+" : ""}{formatNumber(Math.round(visibleTrade.profit!))}원
+                    {visibleTrade.profitRate !== undefined &&
+                      ` (${isProfit ? "+" : ""}${visibleTrade.profitRate.toFixed(1)}%)`}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <span className="text-green-400 text-xs shrink-0">✓</span>
+          </div>
         </div>
       )}
 
       {/* ── 버튼 영역 ── */}
-      <div className="px-4 pb-1 pt-1 space-y-2">
-        {/* 미리보기 버튼 행 (개발용) */}
-        {(onPreviewMiniReport || onPreviewFinalReport) && (
+      <div className="px-4 pb-1 pt-0.5 space-y-1.5">
+        {/* 디버그 버튼 (DEBUG_BUTTONS = true 일 때만) */}
+        {showDebugButtons && (
           <div className="flex gap-2">
             {onPreviewMiniReport && (
               <button
@@ -146,7 +213,7 @@ export const BottomActionBar = ({
                 className="flex-1 py-2 rounded-xl font-bold text-[11px] transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/25"
               >
                 <FileText className="w-3.5 h-3.5" />
-                3일차 리포트
+                {currentDay}일차 리포트
               </button>
             )}
             {onPreviewFinalReport && (
@@ -161,7 +228,7 @@ export const BottomActionBar = ({
           </div>
         )}
 
-        {/* 다음 시간으로 버튼 (작게) */}
+        {/* 다음 시간으로 */}
         <button
           onClick={onSkip}
           className={cn(
