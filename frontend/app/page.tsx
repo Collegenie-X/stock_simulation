@@ -24,9 +24,11 @@ function AnimatedChart() {
     canvas.style.height = `${H}px`
 
     const points = [
-      10, 45, 40, 55, 38, 60, 50, 42, 35, 55, 65,
-      58, 50, 62, 70, 68, 55, 75, 80, 72, 85, 78,
-      90, 82, 75, 88, 95, 90, 80, 92,
+      65, 58, 62, 55, 48, 52, 45, 38, 42, 35, 28,  // 하락 지그재그
+      32, 25, 30, 22, 18, 15, 12, 8, 10, 15,       // 바닥 탐색
+      12, 18, 22, 28, 25, 32, 38, 35, 42, 48,      // 반등 지그재그
+      45, 52, 58, 55, 62, 68, 65, 72, 78, 75,      // 상승 지그재그
+      82, 88, 85, 90, 95, 92, 96, 98,              // 급등 마무리
     ]
     const totalPts = points.length
     const xStep = W / (totalPts - 1)
@@ -44,9 +46,10 @@ function AnimatedChart() {
       const count = Math.min(Math.floor(drawn), totalPts)
       if (count < 2) { raf = requestAnimationFrame(draw); return }
 
-      // 영역 채우기
+      // 영역 채우기 (더 진한 그라데이션)
       const grad = ctx!.createLinearGradient(0, 0, 0, H)
-      grad.addColorStop(0, "rgba(34,197,94,0.25)")
+      grad.addColorStop(0, "rgba(34,197,94,0.4)")
+      grad.addColorStop(0.5, "rgba(34,197,94,0.2)")
       grad.addColorStop(1, "rgba(34,197,94,0)")
       ctx!.beginPath()
       ctx!.moveTo(0, norm(points[0]))
@@ -57,26 +60,68 @@ function AnimatedChart() {
       ctx!.fillStyle = grad
       ctx!.fill()
 
-      // 라인
+      // 그림자 레이어 (깊이감)
+      ctx!.shadowColor = "rgba(34,197,94,0.6)"
+      ctx!.shadowBlur = 20
+      ctx!.shadowOffsetX = 0
+      ctx!.shadowOffsetY = 0
+
+      // 외곽 글로우 라인 (더 굵고 밝게)
       ctx!.beginPath()
       ctx!.moveTo(0, norm(points[0]))
       for (let i = 1; i < count; i++) ctx!.lineTo(i * xStep, norm(points[i]))
-      ctx!.strokeStyle = "#22c55e"
-      ctx!.lineWidth = 2.5
+      ctx!.strokeStyle = "rgba(34,197,94,0.5)"
+      ctx!.lineWidth = 8
       ctx!.lineJoin = "round"
       ctx!.lineCap = "round"
       ctx!.stroke()
 
-      // 끝점 원
+      // 메인 라인 (그라데이션 + 더 굵게)
+      const lineGrad = ctx!.createLinearGradient(0, 0, W, 0)
+      lineGrad.addColorStop(0, "#10b981")
+      lineGrad.addColorStop(0.5, "#22c55e")
+      lineGrad.addColorStop(1, "#34d399")
+      
+      ctx!.beginPath()
+      ctx!.moveTo(0, norm(points[0]))
+      for (let i = 1; i < count; i++) ctx!.lineTo(i * xStep, norm(points[i]))
+      ctx!.strokeStyle = lineGrad
+      ctx!.lineWidth = 4
+      ctx!.lineJoin = "round"
+      ctx!.lineCap = "round"
+      ctx!.stroke()
+
+      // 그림자 제거 (끝점만 깨끗하게)
+      ctx!.shadowColor = "transparent"
+      ctx!.shadowBlur = 0
+
+      // 끝점 펄스 애니메이션 (더 크게)
       const lastX = (count - 1) * xStep
       const lastY = norm(points[count - 1])
+      const pulse = Math.sin(Date.now() / 200) * 0.5 + 0.5
+      
+      // 외곽 펄스 (큰 원)
       ctx!.beginPath()
-      ctx!.arc(lastX, lastY, 4, 0, Math.PI * 2)
+      ctx!.arc(lastX, lastY, 12 + pulse * 8, 0, Math.PI * 2)
+      ctx!.fillStyle = `rgba(34,197,94,${0.15 + pulse * 0.15})`
+      ctx!.fill()
+
+      // 중간 펄스
+      ctx!.beginPath()
+      ctx!.arc(lastX, lastY, 8 + pulse * 4, 0, Math.PI * 2)
+      ctx!.fillStyle = `rgba(34,197,94,${0.3 + pulse * 0.2})`
+      ctx!.fill()
+
+      // 내부 원 (밝은 코어)
+      ctx!.beginPath()
+      ctx!.arc(lastX, lastY, 5, 0, Math.PI * 2)
       ctx!.fillStyle = "#22c55e"
       ctx!.fill()
+
+      // 하이라이트 (반짝임)
       ctx!.beginPath()
-      ctx!.arc(lastX, lastY, 8, 0, Math.PI * 2)
-      ctx!.fillStyle = "rgba(34,197,94,0.2)"
+      ctx!.arc(lastX - 1, lastY - 1, 2, 0, Math.PI * 2)
+      ctx!.fillStyle = "rgba(255,255,255,0.8)"
       ctx!.fill()
 
       raf = requestAnimationFrame(draw)
@@ -112,7 +157,7 @@ export default function FlashPage() {
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center relative overflow-hidden">
       {/* 배경 애니메이션 차트 */}
-      <div className="absolute inset-0 opacity-20">
+      <div className="absolute inset-0 opacity-30">
         <AnimatedChart />
       </div>
 
