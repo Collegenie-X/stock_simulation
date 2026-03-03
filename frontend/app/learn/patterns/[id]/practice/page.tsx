@@ -6,21 +6,27 @@ import { Button } from '@/components/ui/button';
 import { CHART_PATTERNS, type ChartPattern } from '@/data/chart-patterns';
 import {
   getScenarioForRound,
+  getBasicScenarioForRound,
   calculateRoundScore,
+  calculateBasicRoundScore,
   getFinalResult,
   getTurnFeedback,
   TOTAL_ROUNDS,
   TURNS_PER_ROUND,
+  BASIC_TURNS_PER_ROUND,
   CANDLES_PER_TURN,
   INITIAL_REVEAL,
   INITIAL_CASH,
   DECISION_TIMERS,
+  BASIC_DECISION_TIMERS,
+  BASIC_STRATEGIES,
   type PatternScenario,
   type Candle,
   type RoundScore,
   type TradeLog,
   type TurnFeedback,
   type TurnEval,
+  type BasicStrategy,
 } from '@/data/pattern-practice';
 import { cn } from '@/lib/utils';
 import {
@@ -396,6 +402,7 @@ export default function PatternPracticePage() {
   const router = useRouter();
 
   const [pattern, setPattern] = useState<ChartPattern | null>(null);
+  const [basicStrategy, setBasicStrategy] = useState<BasicStrategy | null>(null);
   const [gamePhase, setGamePhase] = useState<GamePhase>('intro');
   const [currentRound, setCurrentRound] = useState(0);
   const [currentTurn, setCurrentTurn] = useState(0);
@@ -408,25 +415,26 @@ export default function PatternPracticePage() {
   const [scenario, setScenario] = useState<PatternScenario | null>(null);
   const [visibleCount, setVisibleCount] = useState(0);
   const [trades, setTrades] = useState<TradeLog[]>([]);
-  // 포트폴리오 상태 (현금 + 주식 비율 방식)
   const [cashRemaining, setCashRemaining] = useState(INITIAL_CASH);
   const [sharesHeld, setSharesHeld] = useState(0);
   const [avgCostBasis, setAvgCostBasis] = useState(0);
-  const [startingShares, setStartingShares] = useState(0); // 라운드 시작 시 보유 주수
+  const [startingShares, setStartingShares] = useState(0);
   const [timer, setTimer] = useState(12);
   const [countdownVal, setCountdownVal] = useState(3);
   const [feedback, setFeedback] = useState<TurnFeedback | null>(null);
   const [turnHistory, setTurnHistory] = useState<TurnHistoryEntry[]>([]);
-  // 2단계 선택: null=첫화면, 'buy'=매수%, 'sell'=매도%
   const [pendingAction, setPendingAction] = useState<'buy' | 'sell' | null>(null);
-
   const [timerExpired, setTimerExpired] = useState(false);
 
   const revealRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  // Tracks which turn triggered the current feedback (prevents double-fire)
   const feedbackTurnRef = useRef(-1);
   const decidedThisTurnRef = useRef(false);
+
+  // 기본 전략 여부 및 턴 수 결정
+  const isBasicStrategy = basicStrategy !== null;
+  const turnsPerRound = isBasicStrategy ? BASIC_TURNS_PER_ROUND : TURNS_PER_ROUND;
+  const decisionTimers = isBasicStrategy ? BASIC_DECISION_TIMERS : DECISION_TIMERS;
 
   const confirmExit = useCallback(() => {
     if (revealRef.current) clearTimeout(revealRef.current);
@@ -434,7 +442,16 @@ export default function PatternPracticePage() {
     router.push('/learn?tab=patterns');
   }, [router]);
 
-  useEffect(() => { setPattern(CHART_PATTERNS.find(p => p.id === params.id) ?? null); }, [params.id]);
+  useEffect(() => {
+    const id = params.id as string;
+    const foundBasic = BASIC_STRATEGIES.find(s => s.id === id);
+    if (foundBasic) {
+      setBasicStrategy(foundBasic);
+    } else {
+      setPattern(CHART_PATTERNS.find(p => p.id === id) ?? null);
+    }
+  }, [params.id]);
+
   useEffect(() => () => {
     if (revealRef.current) clearTimeout(revealRef.current);
     if (timerRef.current) clearInterval(timerRef.current);
@@ -443,6 +460,7 @@ export default function PatternPracticePage() {
   const totalCandles = scenario?.candles.length ?? 0;
   const currentPrice = scenario && visibleCount > 0 ? scenario.candles[visibleCount - 1].close : 0;
   const targetVisible = INITIAL_REVEAL + (currentTurn + 1) * CANDLES_PER_TURN;
+  const totalRounds = isBasicStrategy ? basicStrategy!.scenarios.length : TOTAL_ROUNDS;
 
   // 총 포트폴리오 가치 및 손익
   const totalValue = cashRemaining + sharesHeld * currentPrice;
@@ -460,7 +478,7 @@ export default function PatternPracticePage() {
     if (gamePhase !== 'revealing' || !scenario) return;
     const target = Math.min(targetVisible, totalCandles);
     if (visibleCount >= target) {
-      const secs = DECISION_TIMERS[currentRound] ?? 10;
+      const secs = decisionTimers[currentRound] ?? 15;
       setTimer(secs);
       setGamePhase('deciding');
       return;
@@ -473,7 +491,7 @@ export default function PatternPracticePage() {
   useEffect(() => {
     if (gamePhase !== 'deciding') return;
     if (timer <= 0) {
-      if (currentTurn >= TURNS_PER_ROUND - 1) {
+      if (currentTurn >= turnsPerRound - 1) {
         setTimerExpired(true);
         return;
       }
@@ -490,8 +508,8 @@ export default function PatternPracticePage() {
     if (gamePhase !== 'feedback') return;
     const capturedTurn = feedbackTurnRef.current;
     const t = setTimeout(() => {
-      setPendingAction(null); // 다음 턴 시작 시 선택 초기화
-      if (capturedTurn >= TURNS_PER_ROUND - 1) {
+      setPendingAction(null);
+      if (capturedTurn >= turnsPerRound - 1) {
         setGamePhase('closing');
       } else {
         decidedThisTurnRef.current = false;
@@ -514,10 +532,11 @@ export default function PatternPracticePage() {
 
   // ── Start round ─────────────────────────────────────────
   const startRound = useCallback((round: number) => {
-    const s = getScenarioForRound(pattern?.id ?? '', round);
+    const s = isBasicStrategy
+      ? getBasicScenarioForRound(basicStrategy!.id, round)
+      : getScenarioForRound(pattern?.id ?? '', round);
     if (!s) return;
 
-    // 초기 포트폴리오: 50% 현금 + 50% 주식 (총 100만원)
     const initialPrice = s.candles[INITIAL_REVEAL - 1]?.close ?? s.candles[0].close;
     const initShares = Math.floor(INITIAL_CASH * 0.5 / initialPrice);
     const initCash = INITIAL_CASH - initShares * initialPrice;
@@ -532,7 +551,7 @@ export default function PatternPracticePage() {
     setCurrentTurn(0);
     setFeedback(null);
     setTurnHistory([]);
-    setTimer(DECISION_TIMERS[round] ?? 10);
+    setTimer(decisionTimers[round] ?? 15);
     setTimerExpired(false);
     setChartOpen(true);
     setPendingAction(null);
@@ -546,7 +565,7 @@ export default function PatternPracticePage() {
       if (c <= 0) { clearInterval(iv); setGamePhase('revealing'); }
       else setCountdownVal(c);
     }, 600);
-  }, [pattern]);
+  }, [pattern, basicStrategy, isBasicStrategy, decisionTimers]);
 
   // ── Handle decision ─────────────────────────────────────
   const handleDecision = useCallback((action: 'buy' | 'sell' | 'skip', pct = 0, isTimeout = false) => {
@@ -621,7 +640,9 @@ export default function PatternPracticePage() {
   const endRound = useCallback(() => {
     if (!scenario) return;
     const finalPrice = scenario.candles[totalCandles - 1].close;
-    const score = calculateRoundScore(trades, cashRemaining, sharesHeld, finalPrice, scenario, startingShares);
+    const score = isBasicStrategy
+      ? calculateBasicRoundScore(trades, cashRemaining, sharesHeld, finalPrice, scenario, startingShares)
+      : calculateRoundScore(trades, cashRemaining, sharesHeld, finalPrice, scenario, startingShares);
     setRoundResults(prev => [...prev, { score, trades, finalCash: cashRemaining, finalShares: sharesHeld, finalAvgCost: avgCostBasis, startingShares, scenario }]);
     setTotalScore(prev => prev + score.total);
     setStreak(prev => score.total >= 8 ? prev + 1 : 0);
@@ -631,7 +652,7 @@ export default function PatternPracticePage() {
 
   const handleNextRound = () => {
     const n = currentRound + 1;
-    if (n >= TOTAL_ROUNDS) setGamePhase('final-result');
+    if (n >= totalRounds) setGamePhase('final-result');
     else { setCurrentRound(n); startRound(n); }
   };
   const handleRetry = () => {
@@ -639,7 +660,15 @@ export default function PatternPracticePage() {
     setGamePhase('intro');
   };
 
-  if (!pattern) return <div className="min-h-screen bg-black flex items-center justify-center"><div className="animate-pulse text-6xl">📊</div></div>;
+  if (!pattern && !basicStrategy) return <div className="min-h-screen bg-black flex items-center justify-center"><div className="animate-pulse text-6xl">📊</div></div>;
+
+  // 공통 표시 정보
+  const displayEmoji = basicStrategy?.emoji ?? pattern?.emoji ?? '📊';
+  const displayName = basicStrategy?.name ?? pattern?.name ?? '';
+  const displayNameEn = basicStrategy?.nameEn ?? pattern?.nameEn ?? '';
+  const introGradient = isBasicStrategy
+    ? 'from-emerald-500 to-teal-600'
+    : 'from-indigo-500 to-purple-600';
 
   // ═══════════════ INTRO ═══════════════════════
   if (gamePhase === 'intro') {
@@ -648,19 +677,19 @@ export default function PatternPracticePage() {
         <div className="pt-12 px-5 max-w-md mx-auto">
           <button onClick={() => router.back()} className="text-gray-500 text-sm mb-4">← 뒤로</button>
           <section className="text-center mt-2">
-            <div className="text-8xl mb-4 animate-bounce">{pattern.emoji}</div>
-            <h1 className="text-3xl font-black text-white tracking-tight">{pattern.name}</h1>
-            <p className="text-base text-gray-500 mt-1">{pattern.nameEn}</p>
-            <div className="mt-4 inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 px-5 py-2 rounded-full border border-indigo-500/40">
+            <div className="text-8xl mb-4 animate-bounce">{displayEmoji}</div>
+            <h1 className="text-3xl font-black text-white tracking-tight">{displayName}</h1>
+            <p className="text-base text-gray-500 mt-1">{displayNameEn}</p>
+            <div className={cn('mt-4 inline-flex items-center gap-2 bg-gradient-to-r px-5 py-2 rounded-full border', isBasicStrategy ? 'from-emerald-500/20 to-teal-500/20 border-emerald-500/40' : 'from-indigo-500/20 to-purple-500/20 border-indigo-500/40')}>
               <Flame className="w-5 h-5 text-orange-400" />
-              <span className="text-lg font-black text-white">{TOTAL_ROUNDS}라운드 · {TURNS_PER_ROUND}턴</span>
+              <span className="text-lg font-black text-white">{totalRounds}라운드 · {turnsPerRound}턴</span>
             </div>
           </section>
           <section className="mt-8 space-y-3">
             {[
               { emoji: '💰', text: `${(INITIAL_CASH / 10000).toFixed(0)}만원으로 시작 (현금 50% + 주식 50%)`, color: 'from-indigo-500/20 to-indigo-600/20 border-indigo-500/30' },
               { emoji: '📈', text: '선 그래프가 자동으로 그려져요', color: 'from-blue-500/20 to-blue-600/20 border-blue-500/30' },
-              { emoji: '🎯', text: `${TURNS_PER_ROUND}턴 동안 % 단위로 사거나 팔거나 기다려요`, color: 'from-green-500/20 to-green-600/20 border-green-500/30' },
+              { emoji: '🎯', text: `${turnsPerRound}턴 동안 % 단위로 사거나 팔거나 기다려요`, color: 'from-green-500/20 to-green-600/20 border-green-500/30' },
               { emoji: '⏱️', text: '조금(25%) / 반반(50%) / 많이(75%) / 전부(100%)', color: 'from-yellow-500/20 to-yellow-600/20 border-yellow-500/30' },
               { emoji: '🏆', text: '끝나면 수익 + 올바른 판단에 따라 점수 매겨요!', color: 'from-red-500/20 to-red-600/20 border-red-500/30' },
             ].map((r, i) => (
@@ -673,7 +702,7 @@ export default function PatternPracticePage() {
         </div>
         <div className="fixed bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black via-black to-transparent">
           <div className="max-w-md mx-auto">
-            <Button onClick={() => { setCurrentRound(0); startRound(0); }} className="w-full h-16 rounded-2xl font-black text-xl text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:opacity-90 shadow-lg shadow-indigo-500/30">
+            <Button onClick={() => { setCurrentRound(0); startRound(0); }} className={cn('w-full h-16 rounded-2xl font-black text-xl text-white bg-gradient-to-r hover:opacity-90 shadow-lg', introGradient)}>
               <Play className="w-6 h-6 mr-2" /> 게임 시작!
             </Button>
           </div>
@@ -686,12 +715,12 @@ export default function PatternPracticePage() {
   if (gamePhase === 'countdown') {
     return (
       <div className="min-h-screen bg-black flex flex-col items-center justify-center">
-        <p className="text-lg text-gray-500 mb-4 font-bold">라운드 {currentRound + 1} / {TOTAL_ROUNDS}</p>
+        <p className="text-lg text-gray-500 mb-4 font-bold">라운드 {currentRound + 1} / {totalRounds}</p>
         <div className="relative">
           <div className="text-[140px] font-black text-white leading-none">{countdownVal}</div>
-          <div className="absolute inset-0 bg-indigo-500/30 blur-[60px] rounded-full -z-10" />
+          <div className={cn('absolute inset-0 blur-[60px] rounded-full -z-10', isBasicStrategy ? 'bg-emerald-500/30' : 'bg-indigo-500/30')} />
         </div>
-        <p className="text-base text-indigo-400 mt-6 font-bold">⏱️ 턴당 15초 · 💰 {(INITIAL_CASH / 10000).toFixed(0)}만원 시작!</p>
+        <p className={cn('text-base mt-6 font-bold', isBasicStrategy ? 'text-emerald-400' : 'text-indigo-400')}>⏱️ 턴당 {decisionTimers[currentRound] ?? 15}초 · 💰 {(INITIAL_CASH / 10000).toFixed(0)}만원 시작!</p>
       </div>
     );
   }
@@ -873,7 +902,7 @@ export default function PatternPracticePage() {
           {/* Cumulative score */}
           <section className="mt-3 bg-[#111] rounded-2xl p-4 border border-white/5 flex items-center justify-between">
             <span className="text-base text-gray-400 font-bold">누적 점수</span>
-            <span className="text-2xl font-black text-yellow-400">{totalScore} <span className="text-sm text-gray-600">/ {TOTAL_ROUNDS * 20}</span></span>
+            <span className="text-2xl font-black text-yellow-400">{totalScore} <span className="text-sm text-gray-600">/ {totalRounds * 20}</span></span>
           </section>
         </main>
         <div className="fixed bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black via-black to-transparent">
@@ -881,8 +910,8 @@ export default function PatternPracticePage() {
             <Button variant="outline" onClick={() => setShowExitDialog(true)} className="h-16 w-16 rounded-2xl bg-[#111] border-white/10 text-white font-bold hover:bg-[#1a1a1a] shrink-0">
               <X className="w-5 h-5" />
             </Button>
-            <Button onClick={handleNextRound} className="flex-1 h-16 rounded-2xl font-black text-xl text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:opacity-90 shadow-lg shadow-indigo-500/30">
-              {currentRound + 1 < TOTAL_ROUNDS ? <>다음 라운드 <ChevronRight className="w-6 h-6 ml-1" /></> : <><Trophy className="w-6 h-6 mr-2" /> 최종 결과</>}
+            <Button onClick={handleNextRound} className={cn('flex-1 h-16 rounded-2xl font-black text-xl text-white bg-gradient-to-r hover:opacity-90 shadow-lg', introGradient)}>
+              {currentRound + 1 < totalRounds ? <>다음 라운드 <ChevronRight className="w-6 h-6 ml-1" /></> : <><Trophy className="w-6 h-6 mr-2" /> 최종 결과</>}
             </Button>
           </div>
         </div>
@@ -909,7 +938,7 @@ export default function PatternPracticePage() {
           {/* 총점 */}
           <section className="mt-6 bg-[#111] rounded-3xl p-6 border border-white/5 text-center">
             <p className="text-sm text-gray-500">최종 점수</p>
-            <p className="text-6xl font-black text-white mt-1">{totalScore}<span className="text-xl text-gray-600">/{TOTAL_ROUNDS * 20}</span></p>
+            <p className="text-6xl font-black text-white mt-1">{totalScore}<span className="text-xl text-gray-600">/{totalRounds * 20}</span></p>
             <p className="text-sm text-gray-500 mt-2">라운드 평균 {avgTurnScore.toFixed(1)}/20점</p>
           </section>
 
@@ -974,8 +1003,8 @@ export default function PatternPracticePage() {
         </main>
         <div className="fixed bottom-0 left-0 right-0 p-5 bg-gradient-to-t from-black via-black to-transparent">
           <div className="max-w-md mx-auto flex gap-3">
-            <Button variant="outline" onClick={() => router.push(`/learn/patterns/${pattern.id}`)} className="flex-1 h-14 rounded-2xl bg-[#111] border-white/10 text-white text-base font-bold hover:bg-[#1a1a1a]">패턴 복습</Button>
-            <Button onClick={handleRetry} className="flex-[2] h-14 rounded-2xl font-black text-lg text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:opacity-90 shadow-lg shadow-indigo-500/30">
+            <Button variant="outline" onClick={() => router.push(`/learn/patterns/${basicStrategy?.id ?? pattern?.id}`)} className="flex-1 h-14 rounded-2xl bg-[#111] border-white/10 text-white text-base font-bold hover:bg-[#1a1a1a]">{isBasicStrategy ? '전략 복습' : '패턴 복습'}</Button>
+            <Button onClick={handleRetry} className={cn('flex-[2] h-14 rounded-2xl font-black text-lg text-white bg-gradient-to-r hover:opacity-90 shadow-lg', introGradient)}>
               <RotateCcw className="w-5 h-5 mr-2" /> 다시 도전
             </Button>
           </div>
@@ -986,7 +1015,7 @@ export default function PatternPracticePage() {
 
   // ═══════════════ PLAYING ═══════════════════════
   if (!scenario) return null;
-  const decSecs = DECISION_TIMERS[currentRound] ?? 15;
+  const decSecs = decisionTimers[currentRound] ?? 15;
   const isDeciding = gamePhase === 'deciding';
   const isFeedback = gamePhase === 'feedback';
   const isRevealing = gamePhase === 'revealing';
@@ -1022,8 +1051,8 @@ export default function PatternPracticePage() {
             <button onClick={() => setShowExitDialog(true)} className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-red-500/30 transition-colors">
               <X className="w-4 h-4 text-gray-400" />
             </button>
-            <span className="text-2xl">{pattern.emoji}</span>
-            <p className="text-sm font-black text-white">R{currentRound + 1} · 턴 {currentTurn + 1}/{TURNS_PER_ROUND}</p>
+            <span className="text-2xl">{displayEmoji}</span>
+            <p className="text-sm font-black text-white">R{currentRound + 1} · 턴 {currentTurn + 1}/{turnsPerRound}</p>
           </div>
           <div className="flex items-center gap-2">
             {streak >= 2 && <span className="text-base font-black text-orange-400 animate-pulse">🔥{streak}</span>}
@@ -1037,9 +1066,13 @@ export default function PatternPracticePage() {
       <main className="pt-14 px-4 max-w-md mx-auto">
         {/* Turn progress */}
         <section className="mt-2 flex gap-2">
-          {Array.from({ length: TURNS_PER_ROUND }).map((_, i) => (
+          {Array.from({ length: turnsPerRound }).map((_, i) => (
             <div key={i} className={cn('h-2.5 flex-1 rounded-full transition-all duration-300',
-              i < currentTurn ? 'bg-indigo-500' : i === currentTurn ? (isDeciding ? 'bg-yellow-400 animate-pulse' : 'bg-indigo-400') : 'bg-[#1a1a1a]',
+              i < currentTurn
+                ? (isBasicStrategy ? 'bg-emerald-500' : 'bg-indigo-500')
+                : i === currentTurn
+                  ? (isDeciding ? 'bg-yellow-400 animate-pulse' : (isBasicStrategy ? 'bg-emerald-400' : 'bg-indigo-400'))
+                  : 'bg-[#1a1a1a]',
             )} />
           ))}
         </section>
@@ -1126,7 +1159,7 @@ export default function PatternPracticePage() {
                 cash={cashRemaining}
                 holdings={sharesHeld}
                 avgPrice={avgCostBasis}
-                stockName={pattern?.name ?? ''}
+                stockName={displayName}
                 hint={scenario?.hint}
                 onSelect={(ratio, label) => {
                   handleDecision(pendingAction === 'buy' ? 'buy' : 'sell', ratio)

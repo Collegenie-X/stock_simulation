@@ -9,6 +9,7 @@ import {
   PATTERN_CATEGORIES,
   type ChartPattern,
 } from '@/data/chart-patterns';
+import { BASIC_STRATEGIES, type BasicStrategy } from '@/data/pattern-practice';
 import { cn } from '@/lib/utils';
 import {
   ChevronLeft,
@@ -21,6 +22,9 @@ import {
   BarChart2,
   ListOrdered,
   Coins,
+  Brain,
+  Waves,
+  Layers,
 } from 'lucide-react';
 import {
   SignalBadge,
@@ -38,20 +42,166 @@ const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: 'profit', label: '수익 계산',   icon: <Coins className="w-3.5 h-3.5" /> },
 ];
 
+// ─── 기본 전략 상세 페이지 ────────────────────────────────────
+function BasicStrategyDetailPage({ strategy }: { strategy: BasicStrategy }) {
+  const router = useRouter();
+
+  return (
+    <div className="min-h-screen bg-[#191919] pb-32">
+      <MobileHeader title={strategy.name} showBack showSettings />
+
+      <main className="pt-16 px-5 max-w-md mx-auto">
+        {/* 히어로 */}
+        <section className="mt-4 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-5 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full blur-2xl -mr-8 -mt-8" />
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/20 border border-white/30">
+                🧠 {strategy.category}
+              </span>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/20 border border-white/30">
+                10턴 연습
+              </span>
+            </div>
+            <h2 className="text-2xl font-bold mb-1">{strategy.emoji} {strategy.name}</h2>
+            <p className="text-sm opacity-70">{strategy.nameEn}</p>
+          </div>
+        </section>
+
+        {/* 전략 설명 */}
+        <section className="mt-3 space-y-3">
+          <div className="bg-[#252525] rounded-xl p-3.5 border border-white/5 flex items-start gap-2">
+            <BookOpen className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+            <p className="text-xs text-gray-300 leading-relaxed">{strategy.description}</p>
+          </div>
+
+          {/* 핵심 학습 */}
+          <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex items-start gap-2">
+            <Brain className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-xs font-bold text-emerald-300 mb-1">핵심 학습 포인트</p>
+              <p className="text-xs text-gray-300 leading-relaxed">{strategy.keyLesson}</p>
+            </div>
+          </div>
+
+          {/* 파동 흐름 */}
+          <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-4 flex items-start gap-2">
+            <Waves className="w-4 h-4 text-cyan-400 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-xs font-bold text-cyan-300 mb-1">파동 흐름 패턴</p>
+              <p className="text-xs text-gray-300 leading-relaxed">{strategy.wavePattern}</p>
+            </div>
+          </div>
+        </section>
+
+        {/* 시나리오 목록 */}
+        <section className="mt-5">
+          <h3 className="text-sm font-bold text-white mb-3 flex items-center gap-2">
+            <Layers className="w-4 h-4 text-indigo-400" />
+            연습 시나리오 ({strategy.scenarios.length}개)
+          </h3>
+          <div className="space-y-3">
+            {strategy.scenarios.map((scenario, idx) => (
+              <div key={scenario.id} className="bg-[#252525] rounded-xl p-4 border border-white/5">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-black flex items-center justify-center shrink-0">
+                    {idx + 1}
+                  </span>
+                  <p className="text-sm font-bold text-white flex-1">{scenario.title}</p>
+                  <span className={cn(
+                    'text-[10px] font-bold px-2 py-0.5 rounded-md border shrink-0',
+                    scenario.signal === 'buy'
+                      ? 'bg-green-500/15 text-green-400 border-green-500/25'
+                      : 'bg-red-500/15 text-red-400 border-red-500/25'
+                  )}>
+                    {scenario.signal === 'buy' ? '↑ 매수' : '↓ 매도'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-gray-400 mb-2 leading-snug">{scenario.theme}</p>
+                <div className="bg-[#1a1a1a] rounded-lg p-2.5 border border-white/5">
+                  <p className="text-[10px] font-bold text-cyan-400 mb-1">📊 파동 흐름</p>
+                  <p className="text-[10px] text-gray-400 leading-relaxed">{scenario.waveDescription}</p>
+                </div>
+                <div className="mt-2 bg-yellow-500/8 rounded-lg p-2.5 border border-yellow-500/15">
+                  <p className="text-[10px] font-bold text-yellow-400 mb-1">💡 전략 팁</p>
+                  <p className="text-[10px] text-gray-400 leading-relaxed">{scenario.strategyTip}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* 게임 규칙 */}
+        <section className="mt-5">
+          <div className="bg-[#1a1a1a] rounded-xl p-4 border border-white/5 space-y-2">
+            <p className="text-xs font-bold text-white mb-3">🎮 게임 규칙</p>
+            {[
+              { emoji: '💰', text: '100만원으로 시작 (현금 50% + 주식 50%)' },
+              { emoji: '📈', text: '10턴 동안 매수 / 매도 / 관망 선택' },
+              { emoji: '⏱️', text: '턴당 20초 — 빠르게 판단하세요!' },
+              { emoji: '🎯', text: '조금(25%) / 반반(50%) / 많이(75%) / 전부(100%)' },
+              { emoji: '🏆', text: '수익 + 올바른 판단으로 점수 획득' },
+            ].map((r, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <span className="text-lg shrink-0">{r.emoji}</span>
+                <p className="text-xs text-gray-300">{r.text}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      </main>
+
+      {/* 하단 고정 버튼 */}
+      <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-[#191919] via-[#191919] to-transparent">
+        <div className="max-w-md mx-auto flex gap-3">
+          <Button
+            variant="outline"
+            onClick={() => router.push('/learn?tab=patterns')}
+            className="flex-1 h-12 rounded-xl bg-[#252525] border-white/10 text-white hover:bg-[#333]"
+          >
+            목록으로
+          </Button>
+          <Button
+            onClick={() => router.push(`/learn/patterns/${strategy.id}/practice`)}
+            className="flex-[2] h-12 rounded-xl font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:opacity-90"
+          >
+            <Brain className="w-4 h-4 mr-2" />
+            전략 연습하기
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function PatternDetailPage() {
   const params = useParams();
   const router = useRouter();
   const [pattern, setPattern] = useState<ChartPattern | null>(null);
+  const [basicStrategy, setBasicStrategy] = useState<BasicStrategy | null>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<TabId>('chart');
 
   useEffect(() => {
-    const found = CHART_PATTERNS.find(p => p.id === params.id);
+    const id = params.id as string;
+    // 기본 전략 ID 먼저 확인
+    const foundBasic = BASIC_STRATEGIES.find(s => s.id === id);
+    if (foundBasic) {
+      setBasicStrategy(foundBasic);
+      return;
+    }
+    // 차트 패턴 확인
+    const found = CHART_PATTERNS.find(p => p.id === id);
     setPattern(found || null);
     if (found) {
       setCurrentIndex(CHART_PATTERNS.findIndex(p => p.id === found.id));
     }
   }, [params.id]);
+
+  // 기본 전략 페이지
+  if (basicStrategy) {
+    return <BasicStrategyDetailPage strategy={basicStrategy} />;
+  }
 
   if (!pattern) {
     return (

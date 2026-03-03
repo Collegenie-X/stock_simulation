@@ -1,4 +1,5 @@
 import { CHART_PATTERNS } from './chart-patterns';
+import BASIC_STRATEGY_DATA from './basic-strategy-scenarios.json';
 
 // ─── Types ───────────────────────────────────────────────
 export interface Candle {
@@ -50,19 +51,20 @@ export interface TradeLog {
 
 // ─── Constants ───────────────────────────────────────────
 export const TOTAL_ROUNDS = 3;
-export const TURNS_PER_ROUND = 8;
+export const TURNS_PER_ROUND = 10;
 export const CANDLES_PER_TURN = 2;
 export const INITIAL_REVEAL = 4;
 export const INITIAL_CASH = 1_000_000;   // 시작 자금 100만원 (현금 50% + 주식 50%)
 // 패턴 연습 턴 제한 시간: 15초 고정 (시나리오 플레이는 30초)
 export const DECISION_TIMERS = [15, 15, 15];
-const TARGET_LENGTH = INITIAL_REVEAL + TURNS_PER_ROUND * CANDLES_PER_TURN + 2; // 22
+const TARGET_LENGTH = INITIAL_REVEAL + TURNS_PER_ROUND * CANDLES_PER_TURN + 2; // 26
 
+// 10턴 기준 최대 점수 25점 (턴당 2.5점)
 const GRADE_MAP: { min: number; grade: Grade; emoji: string; message: string }[] = [
-  { min: 18, grade: 'S', emoji: '🔥', message: '전설적인 매매!' },
-  { min: 15, grade: 'A', emoji: '💪', message: '상위 5% 수준!' },
-  { min: 11, grade: 'B', emoji: '👍', message: '평균 이상' },
-  { min: 7, grade: 'C', emoji: '🤔', message: '아쉬운 판단' },
+  { min: 22, grade: 'S', emoji: '🔥', message: '전설적인 매매!' },
+  { min: 18, grade: 'A', emoji: '💪', message: '상위 5% 수준!' },
+  { min: 13, grade: 'B', emoji: '👍', message: '평균 이상' },
+  { min: 8, grade: 'C', emoji: '🤔', message: '아쉬운 판단' },
   { min: 3, grade: 'D', emoji: '😅', message: '많이 부족해요' },
   { min: 0, grade: 'F', emoji: '💤', message: '매매를 못했어요' },
 ];
@@ -145,218 +147,248 @@ function ensureLength(def: ScenarioDef): ScenarioDef {
 }
 
 // ─── Scenario definitions ────────────────────────────────
+// 모든 시나리오: 파동이 2회 이상 반복 (상승↑하락↓재상승 or 하락↓반등↑재하락)
+// hint: 답 없이 상황 묘사만 — 플레이어가 스스로 판단
 const RAW_SCENARIOS: Record<string, ScenarioDef> = {
   'head-shoulders': {
+    // 상승 → 1차 고점 → 반등 → 더 높은 고점(머리) → 반등 → 낮은 고점 → 하락
     prices: [
-      50000, 51500, 53200, 55000, 57200, 59500,
-      57800, 55800, 54000,
-      56200, 58800, 61500, 63200,
-      61000, 58200, 54200,
-      56000, 58200, 60000,
-      57800, 55200, 53000,
-      51000, 49200, 47500, 46000,
+      46000, 48500, 51000, 53500,           // 초기 상승
+      56000, 58500, 57000, 54500, 52000,    // 1차 상승·하락 (왼쪽 어깨)
+      54500, 57000, 60000, 63000, 61500,    // 2차 상승 (머리)
+      58500, 55000, 52500,                  // 2차 하락
+      54500, 57000, 59500, 58000,           // 3차 반등 (오른쪽 어깨)
+      55500, 52500, 49500, 47000, 44500,    // 넥라인 이탈·하락
     ],
     signal: 'sell',
-    optimalEntry: 19,
+    optimalEntry: 21,
     optimalExit: 25,
-    hint: '세 개의 봉우리(왼쪽 어깨→머리→오른쪽 어깨)를 관찰하세요. 넥라인 이탈 시 매도!',
+    hint: '주가가 세 번 봉우리를 만들고 있어요. 각 봉우리의 높이를 비교해 보세요.',
   },
   'inv-head-shoulders': {
+    // 하락 → 1차 저점 → 반등 → 더 깊은 저점(머리) → 반등 → 얕은 저점 → 상승
     prices: [
-      60000, 58500, 56800, 55000, 52800, 50500,
-      52200, 54200, 56000,
-      53800, 51200, 48500, 46800,
-      49000, 51800, 55800,
-      54000, 51800, 50000,
-      52200, 54800, 57000,
-      59000, 60800, 62500, 64000,
+      64000, 61500, 59000, 56500,           // 초기 하락
+      54000, 51500, 53000, 55500, 58000,    // 1차 하락·반등 (왼쪽 어깨)
+      55500, 53000, 50000, 47000, 49500,    // 2차 하락 (머리)
+      52500, 56000, 58500,                  // 2차 반등
+      56000, 53500, 51000, 52500,           // 3차 하락 (오른쪽 어깨)
+      55500, 58500, 61500, 64000, 66500,    // 넥라인 돌파·상승
     ],
     signal: 'buy',
-    optimalEntry: 19,
+    optimalEntry: 21,
     optimalExit: 25,
-    hint: '세 개의 골짜기를 찾으세요. 넥라인 돌파 시 매수!',
+    hint: '주가가 세 번 바닥을 찍고 있어요. 각 바닥의 깊이를 비교해 보세요.',
   },
   'double-top': {
+    // 상승 → 1차 고점 → 조정 → 재상승 → 같은 고점 저항 → 하락
     prices: [
-      50000, 52000, 54000, 56500, 59000, 61500,
-      59500, 57000, 55000,
-      57000, 59000, 61500,
-      59500, 57000, 54500,
-      52500, 50500, 48500, 47000,
+      46000, 48000, 50500, 53000,           // 초기 상승
+      56000, 59000, 61500, 59500, 57000,    // 1차 고점·조정
+      55000, 57500, 60000, 61500,           // 재상승 시도
+      59500, 57000, 54500,                  // 2차 고점 저항·하락
+      52000, 49500, 47500, 45500,           // 넥라인 이탈·하락
     ],
     signal: 'sell',
-    optimalEntry: 13,
-    optimalExit: 18,
-    hint: '같은 높이의 두 고점(M자)을 확인하세요. 넥라인 이탈 시 매도!',
+    optimalEntry: 15,
+    optimalExit: 20,
+    hint: '주가가 비슷한 높이에서 두 번 막혔어요. 지금 어떤 흐름인지 살펴보세요.',
   },
   'double-bottom': {
+    // 하락 → 1차 저점 → 반등 → 재하락 → 같은 저점 지지 → 상승
     prices: [
-      60000, 58000, 56000, 53500, 51000, 48500,
-      50500, 53000, 55000,
-      53000, 51000, 48500,
-      50500, 53000, 55500,
-      57500, 59500, 61500, 63000,
+      64000, 62000, 59500, 57000,           // 초기 하락
+      54000, 51000, 48500, 50500, 53000,    // 1차 저점·반등
+      55000, 53000, 50500, 48500,           // 재하락 시도
+      50500, 53000, 55500,                  // 2차 저점 지지·반등
+      58000, 60500, 62500, 64500,           // 넥라인 돌파·상승
+    ],
+    signal: 'buy',
+    optimalEntry: 15,
+    optimalExit: 20,
+    hint: '주가가 비슷한 깊이에서 두 번 버텼어요. 지금 어떤 흐름인지 살펴보세요.',
+  },
+  'triple-top': {
+    // 상승 → 고점1 → 조정 → 고점2 → 조정 → 고점3 → 붕괴
+    prices: [
+      46000, 48500, 51000, 54000,           // 초기 상승
+      57000, 60000, 57500, 55000, 52500,    // 1차 고점·조정
+      55000, 57500, 60000,                  // 2차 고점
+      57500, 55000, 52500,                  // 2차 조정
+      55000, 57500, 60000,                  // 3차 고점
+      57000, 54000, 51000,                  // 3차 조정
+      48000, 45500, 43000, 41000,           // 지지선 붕괴·급락
+    ],
+    signal: 'sell',
+    optimalEntry: 20,
+    optimalExit: 24,
+    hint: '같은 가격대에서 반복적으로 막히고 있어요. 몇 번째 시도인지 세어보세요.',
+  },
+  'ascending-triangle': {
+    // 횡보 → 저점 상승 + 고점 수평 → 돌파 → 상승
+    prices: [
+      48000, 50500, 53000, 55500,           // 초기 상승
+      58000, 55000, 58000, 55500, 58000,    // 1차 수렴 (저점↑, 고점 수평)
+      56000, 58000, 56500, 58000,           // 2차 수렴 (저점↑ 계속)
+      57000, 58000, 57500, 58000,           // 3차 수렴 (더 좁아짐)
+      59500, 61500, 63500, 65500, 67500,    // 돌파·급등
+    ],
+    signal: 'buy',
+    optimalEntry: 17,
+    optimalExit: 21,
+    hint: '위쪽은 계속 같은 곳에서 막히는데, 아래쪽은 어떻게 변하고 있나요?',
+  },
+  'descending-triangle': {
+    // 횡보 → 고점 하락 + 저점 수평 → 이탈 → 하락
+    prices: [
+      67500, 65500, 63500, 61500,           // 초기 하락
+      59000, 62000, 59000, 61500, 59000,    // 1차 수렴 (고점↓, 저점 수평)
+      61000, 59000, 60500, 59000,           // 2차 수렴 (고점↓ 계속)
+      60000, 59000, 59500, 59000,           // 3차 수렴 (더 좁아짐)
+      57500, 55500, 53500, 51500, 49500,    // 이탈·급락
+    ],
+    signal: 'sell',
+    optimalEntry: 17,
+    optimalExit: 21,
+    hint: '아래쪽은 계속 같은 곳에서 버티는데, 위쪽은 어떻게 변하고 있나요?',
+  },
+  'symmetrical-triangle': {
+    // 변동성 큰 횡보 → 점점 수렴 → 돌파
+    prices: [
+      50000, 55000, 45500, 54000,           // 초기 큰 변동
+      47000, 53000, 48000, 52000,           // 1차 수렴
+      49000, 51500, 49500, 51000,           // 2차 수렴
+      50000, 50500, 50200, 50800,           // 3차 수렴 (거의 수평)
+      52500, 55000, 57500, 60000, 62500,    // 돌파·급등
+    ],
+    signal: 'buy',
+    optimalEntry: 15,
+    optimalExit: 20,
+    hint: '주가의 변동 폭이 점점 좁아지고 있어요. 에너지가 모이는 중이에요.',
+  },
+  'rising-wedge': {
+    // 상승하지만 상승폭 감소 → 2회 반등 후 이탈
+    prices: [
+      48000, 50000, 49000, 52000,           // 초기 상승
+      51000, 54000, 53000, 56000,           // 1차 상승 (폭 큼)
+      55200, 57500, 56800, 58500,           // 2차 상승 (폭 중간)
+      58000, 59500, 59200, 60000,           // 3차 상승 (폭 작음)
+      59000, 57000, 54500, 52000,           // 하단 이탈·급락
+      49500, 47500,                          // 추가 하락
+    ],
+    signal: 'sell',
+    optimalEntry: 15,
+    optimalExit: 21,
+    hint: '올라가고 있지만 각 상승의 폭이 어떻게 변하는지 살펴보세요.',
+  },
+  'falling-wedge': {
+    // 하락하지만 하락폭 감소 → 2회 반등 후 돌파
+    prices: [
+      67500, 65500, 66500, 63500,           // 초기 하락
+      64500, 61500, 62500, 59500,           // 1차 하락 (폭 큼)
+      60200, 57500, 58200, 56500,           // 2차 하락 (폭 중간)
+      57000, 55500, 55800, 55000,           // 3차 하락 (폭 작음)
+      56500, 59000, 61500, 64000,           // 상단 돌파·반등
+      66500, 68500,                          // 추가 상승
+    ],
+    signal: 'buy',
+    optimalEntry: 15,
+    optimalExit: 21,
+    hint: '내려가고 있지만 각 하락의 폭이 어떻게 변하는지 살펴보세요.',
+  },
+  'doji': {
+    // 상승 → 1차 조정 → 재상승 → 도지 → 하락
+    prices: [
+      48000, 50000, 52000, 54000,           // 초기 상승
+      56000, 58000, 56500, 54500, 56500,    // 1차 상승·조정·재상승
+      58500, 60500, 62500, 62500,           // 2차 상승 → 도지
+      61000, 59000, 57000, 55000, 53500,    // 하락
+    ],
+    signal: 'sell',
+    optimalEntry: 13,
+    optimalExit: 18,
+    hint: '오늘 캔들이 평소와 다른 모양이에요. 시가와 종가를 비교해 보세요.',
+    overrides: { 12: { open: 62600, close: 62500, high: 64500, low: 60500 } },
+  },
+  'hammer': {
+    // 하락 → 1차 반등 → 재하락 → 망치형 → 상승
+    prices: [
+      66000, 64000, 62000, 60000,           // 초기 하락
+      58000, 56000, 57500, 59500, 57500,    // 1차 하락·반등·재하락
+      55500, 53500, 51500, 53500,           // 2차 하락 → 망치형
+      55500, 57500, 59500, 61500, 63500,    // 반등·상승
     ],
     signal: 'buy',
     optimalEntry: 13,
     optimalExit: 18,
-    hint: '같은 깊이의 두 저점(W자)을 확인하세요. 넥라인 돌파 시 매수!',
-  },
-  'triple-top': {
-    prices: [
-      48000, 50000, 52500, 55000, 58000, 61000,
-      59000, 56500, 54500,
-      57000, 59500, 61000,
-      59000, 56500, 54500,
-      57000, 59500, 61000,
-      58500, 56000, 53500,
-      51000, 49000, 47000, 45500,
-    ],
-    signal: 'sell',
-    optimalEntry: 19,
-    optimalExit: 24,
-    hint: '같은 높이의 세 고점을 확인하세요. 세 번 막힌 저항선 이탈 시 매도!',
-  },
-  'ascending-triangle': {
-    prices: [
-      50000, 52000, 54000, 56000, 58000,
-      55500, 58000, 56000, 58000, 56500,
-      58000, 57000, 58000, 57500, 58000,
-      59500, 61500, 63500, 65500, 67000,
-    ],
-    signal: 'buy',
-    optimalEntry: 15,
-    optimalExit: 19,
-    hint: '저점이 점점 높아지면서 같은 저항선에서 막히는 삼각형. 돌파 시 매수!',
-  },
-  'descending-triangle': {
-    prices: [
-      65000, 63000, 61000, 59000, 57000,
-      59500, 57000, 59000, 57000, 58500,
-      57000, 58000, 57000, 57500, 57000,
-      55500, 53500, 51500, 49500, 48000,
-    ],
-    signal: 'sell',
-    optimalEntry: 15,
-    optimalExit: 19,
-    hint: '고점이 점점 낮아지면서 같은 지지선에서 받쳐지는 삼각형. 이탈 시 매도!',
-  },
-  'symmetrical-triangle': {
-    prices: [
-      50000, 54000, 47000, 53000, 48000, 52000,
-      49000, 51500, 49500, 51000, 50000, 50500,
-      52000, 54500, 57000, 59500, 62000, 64000,
-    ],
-    signal: 'buy',
-    optimalEntry: 12,
-    optimalExit: 17,
-    hint: '고점은 낮아지고 저점은 높아지며 수렴하는 삼각형. 이탈 방향 확인!',
-  },
-  'rising-wedge': {
-    prices: [
-      50000, 52000, 51000, 54000, 53000, 56000,
-      55000, 57500, 56800, 58500, 58000, 59500,
-      59200, 60000, 59500,
-      57000, 54500, 52000, 49500, 47500,
-    ],
-    signal: 'sell',
-    optimalEntry: 14,
-    optimalExit: 19,
-    hint: '상승하지만 상승폭이 줄어드는 쐐기형. 하단 이탈 시 매도!',
-  },
-  'falling-wedge': {
-    prices: [
-      65000, 63000, 64000, 61000, 62000, 59000,
-      60000, 57500, 58200, 56500, 57000, 55500,
-      55800, 55000, 55500,
-      58000, 60500, 63000, 65500, 67500,
-    ],
-    signal: 'buy',
-    optimalEntry: 14,
-    optimalExit: 19,
-    hint: '하락하지만 하락폭이 줄어드는 쐐기형. 상단 돌파 시 매수!',
-  },
-  'doji': {
-    prices: [
-      50000, 51500, 53000, 54800, 56500, 58000,
-      59500, 61000, 62500, 62500,
-      61000, 59000, 57000, 55000, 53500,
-    ],
-    signal: 'sell',
-    optimalEntry: 10,
-    optimalExit: 14,
-    hint: '상승 추세 끝 십자가 캔들(도지)을 찾으세요. 확인 후 매도!',
-    overrides: { 9: { open: 62600, close: 62500, high: 64500, low: 60500 } },
-  },
-  'hammer': {
-    prices: [
-      65000, 63500, 62000, 60200, 58500, 57000,
-      55500, 54000, 52500, 53500,
-      55000, 57000, 59000, 61000, 63000,
-    ],
-    signal: 'buy',
-    optimalEntry: 10,
-    optimalExit: 14,
-    hint: '하락 바닥 긴 아래꼬리 캔들(망치형)을 찾으세요. 확인 후 매수!',
-    overrides: { 9: { open: 52800, close: 53500, high: 54000, low: 49000 } },
+    hint: '오늘 캔들의 아래쪽 꼬리 길이가 눈에 띄어요. 어떤 의미일까요?',
+    overrides: { 12: { open: 52800, close: 53500, high: 54200, low: 49000 } },
   },
   'shooting-star': {
+    // 상승 → 1차 조정 → 재상승 → 유성형 → 하락
     prices: [
-      50000, 51500, 53000, 54800, 56500, 58000,
-      59500, 61000, 62500, 62000,
-      60500, 58500, 56500, 54500, 53000,
+      48000, 50000, 52000, 54000,           // 초기 상승
+      56000, 58000, 56500, 54500, 56500,    // 1차 상승·조정·재상승
+      58500, 60500, 62500, 62000,           // 2차 상승 → 유성형
+      60500, 58500, 56500, 54500, 53000,    // 하락
     ],
     signal: 'sell',
-    optimalEntry: 10,
-    optimalExit: 14,
-    hint: '상승 고점 긴 윗꼬리 캔들(유성형)을 찾으세요. 확인 후 매도!',
-    overrides: { 9: { open: 62800, close: 62000, high: 66000, low: 61800 } },
+    optimalEntry: 13,
+    optimalExit: 18,
+    hint: '오늘 캔들의 위쪽 꼬리 길이가 눈에 띄어요. 어떤 의미일까요?',
+    overrides: { 12: { open: 62800, close: 62000, high: 66500, low: 61800 } },
   },
   'bullish-engulfing': {
+    // 하락 → 1차 반등 → 재하락 → 장악형 → 상승
     prices: [
-      65000, 63500, 62000, 60200, 58500, 57000,
-      55500, 54200, 53500, 55500,
-      57500, 59500, 61500, 63500, 65000,
+      66000, 64000, 62000, 60000,           // 초기 하락
+      58000, 56000, 57500, 59500, 57500,    // 1차 하락·반등·재하락
+      55500, 53500, 53500, 55500,           // 2차 하락 → 장악형
+      57500, 59500, 61500, 63500, 65000,    // 반등·상승
     ],
     signal: 'buy',
-    optimalEntry: 10,
-    optimalExit: 14,
-    hint: '하락 중 작은 음봉→큰 양봉 장악형을 찾으세요. 확인 후 매수!',
+    optimalEntry: 13,
+    optimalExit: 18,
+    hint: '어제와 오늘 캔들의 크기와 방향을 비교해 보세요.',
     overrides: {
-      8: { open: 54300, close: 53500, high: 54500, low: 53200 },
-      9: { open: 53200, close: 55500, high: 55800, low: 52800 },
+      11: { open: 54300, close: 53500, high: 54500, low: 53200 },
+      12: { open: 53200, close: 55500, high: 55800, low: 52800 },
     },
   },
   'bearish-engulfing': {
+    // 상승 → 1차 조정 → 재상승 → 장악형 → 하락
     prices: [
-      50000, 51500, 53000, 54800, 56500, 58000,
-      59500, 60800, 61500, 59500,
-      57500, 55500, 53500, 51500, 50000,
+      48000, 50000, 52000, 54000,           // 초기 상승
+      56000, 58000, 56500, 54500, 56500,    // 1차 상승·조정·재상승
+      58500, 60500, 61500, 59500,           // 2차 상승 → 장악형
+      57500, 55500, 53500, 51500, 50000,    // 하락
     ],
     signal: 'sell',
-    optimalEntry: 10,
-    optimalExit: 14,
-    hint: '상승 중 작은 양봉→큰 음봉 장악형을 찾으세요. 확인 후 매도!',
+    optimalEntry: 13,
+    optimalExit: 18,
+    hint: '어제와 오늘 캔들의 크기와 방향을 비교해 보세요.',
     overrides: {
-      8: { open: 60700, close: 61500, high: 61800, low: 60500 },
-      9: { open: 61800, close: 59500, high: 62200, low: 59200 },
+      11: { open: 60700, close: 61500, high: 61800, low: 60500 },
+      12: { open: 61800, close: 59500, high: 62200, low: 59200 },
     },
   },
   'morning-star': {
+    // 하락 → 1차 반등 → 재하락 → 모닝스타 3캔들 → 상승
     prices: [
-      65000, 63200, 61500, 59500, 58000, 56500,
-      55000, 52500, 52000, 53500, 56000,
-      58000, 60000, 62000, 64000, 65500,
+      66000, 64000, 62000, 60000,           // 초기 하락
+      58000, 56000, 57500, 59500, 57500,    // 1차 하락·반등·재하락
+      55500, 53000, 52000, 53500, 56000,    // 2차 하락 → 모닝스타
+      58000, 60000, 62000, 64000, 65500,    // 상승
     ],
     signal: 'buy',
-    optimalEntry: 11,
-    optimalExit: 15,
-    hint: '하락 후 큰 음봉→작은 캔들→큰 양봉 조합(모닝스타)을 찾으세요!',
+    optimalEntry: 14,
+    optimalExit: 19,
+    hint: '최근 3개 캔들의 흐름이 독특해요. 크기와 방향을 순서대로 살펴보세요.',
     overrides: {
-      7: { open: 55200, close: 52500, high: 55500, low: 52000 },
-      8: { open: 52200, close: 52000, high: 52800, low: 51500 },
-      9: { open: 52200, close: 53500, high: 53800, low: 51800 },
-      10: { open: 53800, close: 56000, high: 56500, low: 53500 },
+      10: { open: 55200, close: 52500, high: 55500, low: 52000 },
+      11: { open: 52200, close: 52000, high: 52800, low: 51500 },
+      12: { open: 52200, close: 53500, high: 53800, low: 51800 },
+      13: { open: 53800, close: 56000, high: 56500, low: 53500 },
     },
   },
 };
@@ -795,4 +827,114 @@ export function getTurnFeedback(params: {
   if (hasPosition && (zone === 'exit'))
     return { isGood: false, emoji: '💸', title: '청산 놓쳤어요!', reason: '지금이 이익 실현 타이밍이었는데...!', effect: 'shake' };
   return { isGood: false, emoji: '🤷', title: '관망', reason: '기회를 찾아보세요!', effect: 'neutral' };
+}
+
+// ─── Basic Strategy Types ─────────────────────────────────
+export const BASIC_TURNS_PER_ROUND = 10;
+export const BASIC_CANDLES_PER_TURN = 2;
+export const BASIC_INITIAL_REVEAL = 4;
+export const BASIC_DECISION_TIMERS = [20, 18, 16, 15];
+
+export interface BasicTurnDescription {
+  turn: number;
+  priceIndex: number;
+  event: string;
+  wave: string;
+  hint: string;
+}
+
+export interface BasicScenarioDef {
+  id: string;
+  title: string;
+  stock: string;
+  theme: string;
+  signal: 'buy' | 'sell';
+  optimalEntry: number;
+  optimalExit: number;
+  hint: string;
+  waveDescription: string;
+  strategyTip: string;
+  prices: number[];
+  turnDescriptions: BasicTurnDescription[];
+}
+
+export interface BasicStrategy {
+  id: string;
+  name: string;
+  nameEn: string;
+  emoji: string;
+  category: string;
+  description: string;
+  keyLesson: string;
+  wavePattern: string;
+  scenarios: BasicScenarioDef[];
+}
+
+// ─── Basic Strategy Data Accessors ───────────────────────
+export const BASIC_STRATEGIES: BasicStrategy[] =
+  BASIC_STRATEGY_DATA.strategies as BasicStrategy[];
+
+export function getBasicStrategy(strategyId: string): BasicStrategy | null {
+  return BASIC_STRATEGIES.find(s => s.id === strategyId) ?? null;
+}
+
+export function getBasicScenario(
+  strategyId: string,
+  scenarioIndex: number,
+  round = 0,
+): PatternScenario | null {
+  const strategy = getBasicStrategy(strategyId);
+  if (!strategy) return null;
+  const def = strategy.scenarios[scenarioIndex];
+  if (!def) return null;
+
+  const scales = [1.0, 0.92, 1.08, 0.96];
+  const s = scales[round % scales.length];
+  const scaledPrices = def.prices.map((p, i) => {
+    const noise = 1 + Math.sin(round * 29 + i * 6.1) * 0.006;
+    return Math.round(p * s * noise);
+  });
+
+  return {
+    candles: toOHLC(scaledPrices),
+    signal: def.signal,
+    optimalEntryIndex: def.optimalEntry,
+    optimalExitIndex: def.optimalExit,
+    hint: def.hint,
+  };
+}
+
+export function getBasicScenarioForRound(
+  strategyId: string,
+  round: number,
+): PatternScenario | null {
+  const strategy = getBasicStrategy(strategyId);
+  if (!strategy) return null;
+  const scenarioIndex = round % strategy.scenarios.length;
+  return getBasicScenario(strategyId, scenarioIndex, round);
+}
+
+export function calculateBasicRoundScore(
+  trades: TradeLog[],
+  finalCash: number,
+  finalShares: number,
+  finalPrice: number,
+  scenario: PatternScenario,
+  startingShares = 0,
+): RoundScore {
+  const turnEvals = evaluateTurns(trades, scenario.candles, scenario, finalPrice, startingShares);
+  const rawTotal = turnEvals.reduce((sum, e) => sum + e.score, 0);
+  const total = Math.round(rawTotal);
+
+  const userPnl = (finalCash + finalShares * finalPrice) - INITIAL_CASH;
+
+  const optE = scenario.candles[scenario.optimalEntryIndex]?.close ?? 0;
+  const optX = scenario.candles[scenario.optimalExitIndex]?.close ?? 0;
+  const optimalShares = optE > 0 ? Math.floor(INITIAL_CASH * 0.8 / Math.min(optE, optX)) : 10;
+  const optimalPnl = scenario.signal === 'buy'
+    ? (optX - optE) * optimalShares
+    : (optE - optX) * optimalShares;
+
+  const g = getGrade(total);
+  return { total, ...g, userPnl, optimalPnl, turnEvals };
 }

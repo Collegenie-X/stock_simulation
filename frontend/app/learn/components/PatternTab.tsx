@@ -9,7 +9,8 @@ import {
   type PatternCategory,
   type ChartPattern,
 } from '@/data/chart-patterns';
-import { ChevronDown, ChevronRight, Zap, BookOpen, Waves, TrendingUp, Target } from 'lucide-react';
+import { BASIC_STRATEGIES } from '@/data/pattern-practice';
+import { ChevronDown, ChevronRight, Zap, BookOpen, Waves, TrendingUp, Target, Brain, Layers } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MiniPatternChart } from './MiniPatternChart';
 
@@ -220,18 +221,154 @@ function CategorySection({ category }: { category: PatternCategory }) {
   );
 }
 
+// ─── Basic Strategy Card ─────────────────────────────────────────
+function BasicStrategyCard({ strategy }: { strategy: typeof BASIC_STRATEGIES[number] }) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className={cn(
+      'rounded-2xl border transition-all duration-200',
+      open ? 'bg-[#1a1a2e] border-emerald-500/30' : 'bg-[#252525] border-white/5 hover:border-white/10'
+    )}>
+      <div className="w-full flex items-center gap-3 p-3.5">
+        <div
+          className="flex items-center gap-3 flex-1 min-w-0 cursor-pointer"
+          onClick={() => setOpen(!open)}
+        >
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/25 flex items-center justify-center shrink-0">
+            <span className="text-xl">{strategy.emoji}</span>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <p className="font-bold text-white text-sm truncate">{strategy.name}</p>
+              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/25 shrink-0">
+                {strategy.category}
+              </span>
+            </div>
+            <p className="text-[10px] text-gray-400 line-clamp-1 leading-snug">{strategy.description}</p>
+            <p className="text-[10px] text-emerald-400/70 mt-0.5">{strategy.scenarios.length}개 시나리오 · 10턴</p>
+          </div>
+        </div>
+        <button
+          onClick={() => setOpen(!open)}
+          className="shrink-0 p-2 hover:bg-white/5 rounded-lg transition-colors"
+        >
+          <ChevronDown className={cn('w-4 h-4 text-gray-500 transition-transform duration-200', open && 'rotate-180')} />
+        </button>
+      </div>
+
+      {open && (
+        <div className="px-4 pb-4 border-t border-white/5 space-y-3">
+          {/* 핵심 학습 */}
+          <div className="mt-3 bg-emerald-500/8 border border-emerald-500/20 rounded-xl p-3 flex items-start gap-2">
+            <Brain className="w-3.5 h-3.5 text-emerald-400 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-[10px] font-bold text-emerald-300 mb-0.5">핵심 학습</p>
+              <p className="text-[10px] text-gray-300 leading-relaxed">{strategy.keyLesson}</p>
+            </div>
+          </div>
+
+          {/* 파동 패턴 */}
+          <div className="bg-cyan-500/8 border border-cyan-500/20 rounded-xl p-3 flex items-start gap-2">
+            <Waves className="w-3.5 h-3.5 text-cyan-400 mt-0.5 shrink-0" />
+            <div>
+              <p className="text-[10px] font-bold text-cyan-300 mb-0.5">파동 흐름</p>
+              <p className="text-[10px] text-gray-300 leading-relaxed">{strategy.wavePattern}</p>
+            </div>
+          </div>
+
+          {/* 시나리오 목록 */}
+          <div className="space-y-2">
+            {strategy.scenarios.map((scenario, idx) => (
+              <div key={scenario.id} className="bg-[#1e1e1e] rounded-xl p-3 border border-white/5">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="w-5 h-5 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-black flex items-center justify-center shrink-0">{idx + 1}</span>
+                  <p className="text-xs font-bold text-white truncate">{scenario.title}</p>
+                  <span className={cn(
+                    'text-[9px] font-bold px-1.5 py-0.5 rounded-md shrink-0',
+                    scenario.signal === 'buy'
+                      ? 'bg-green-500/15 text-green-400 border border-green-500/25'
+                      : 'bg-red-500/15 text-red-400 border border-red-500/25'
+                  )}>
+                    {scenario.signal === 'buy' ? '↑ 매수' : '↓ 매도'}
+                  </span>
+                </div>
+                <p className="text-[10px] text-gray-500 leading-snug pl-7">{scenario.theme}</p>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={() => router.push(`/learn/patterns/${strategy.id}`)}
+            className="w-full flex items-center justify-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold rounded-xl py-2.5 transition-colors active:scale-[0.98]"
+          >
+            <Brain className="w-3.5 h-3.5" />
+            <span>전략 연습하기</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Basic Strategy Section ──────────────────────────────────────
+function BasicStrategySection() {
+  const [collapsed, setCollapsed] = useState(false);
+
+  return (
+    <div className="space-y-2">
+      <button onClick={() => setCollapsed(!collapsed)} className="w-full flex items-center gap-2 py-1.5">
+        <span className="text-lg">🧠</span>
+        <h4 className="text-sm font-bold text-white flex-1 text-left">기본 전략</h4>
+        <span className="text-[10px] text-gray-500 bg-white/5 px-2 py-0.5 rounded-full">{BASIC_STRATEGIES.length}개</span>
+        <ChevronDown className={cn('w-3.5 h-3.5 text-gray-500 transition-transform duration-200', collapsed && '-rotate-90')} />
+      </button>
+      {!collapsed && (
+        <div className="space-y-2">
+          <p className="text-[10px] text-gray-500 px-1 leading-relaxed">
+            처분효과·그라데이션 등 실전 투자 심리와 분할매매 전략을 10턴으로 연습해요
+          </p>
+          {BASIC_STRATEGIES.map((strategy) => (
+            <BasicStrategyCard key={strategy.id} strategy={strategy} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Tab Section Header ──────────────────────────────────────────
+function SectionDivider({ label, sub }: { label: string; sub: string }) {
+  return (
+    <div className="flex items-center gap-3 py-1">
+      <div className="flex-1 h-px bg-white/8" />
+      <div className="text-center">
+        <p className="text-[11px] font-black text-gray-400 tracking-widest uppercase">{label}</p>
+        <p className="text-[9px] text-gray-600 mt-0.5">{sub}</p>
+      </div>
+      <div className="flex-1 h-px bg-white/8" />
+    </div>
+  );
+}
+
 // ─── Main Tab ────────────────────────────────────────────────────
 export function PatternTab() {
   const [activeFilter, setActiveFilter] = useState<string>('all');
 
   const filters = [
     { label: '전체', value: 'all', emoji: '📋' },
+    { label: '기본 전략', value: 'basic', emoji: '🧠' },
     ...Object.entries(PATTERN_CATEGORIES).map(([key, val]) => ({
       label: key,
       value: key,
       emoji: val.emoji,
     })),
   ];
+
+  const showBasic = activeFilter === 'all' || activeFilter === 'basic';
+  const showPatterns = activeFilter === 'all' || activeFilter !== 'basic';
 
   const categories = (Object.keys(PATTERN_CATEGORIES) as PatternCategory[]).filter(
     (cat) => activeFilter === 'all' || activeFilter === cat
@@ -260,12 +397,27 @@ export function PatternTab() {
         ))}
       </div>
 
-      {/* 카테고리별 패턴 목록 */}
-      <div className="space-y-5">
-        {categories.map((category) => (
-          <CategorySection key={category} category={category} />
-        ))}
-      </div>
+      {/* 기본 전략 섹션 */}
+      {showBasic && (
+        <>
+          <SectionDivider label="기본 전략" sub="행동심리 · 분할매매 · 10턴 연습" />
+          <BasicStrategySection />
+        </>
+      )}
+
+      {/* 차트 패턴 섹션 */}
+      {showPatterns && (
+        <>
+          {showBasic && (
+            <SectionDivider label="차트 패턴" sub="추세 반전 · 추세 지속 · 캔들스틱" />
+          )}
+          <div className="space-y-5">
+            {categories.map((category) => (
+              <CategorySection key={category} category={category} />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
