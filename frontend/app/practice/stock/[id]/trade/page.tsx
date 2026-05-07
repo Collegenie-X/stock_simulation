@@ -32,19 +32,23 @@ function TradeSuccessPopup({ isBuy, stockName, quantity, profit, profitRate, onD
   }, [onDone])
 
   return (
-    <div className="fixed top-4 left-4 right-4 z-[90] animate-in slide-in-from-top-2 duration-200 pointer-events-none">
+    <div className="fixed top-4 left-4 right-4 z-[90] animate-pop pointer-events-none">
       <div className={cn(
-        "flex items-center gap-3 px-4 py-3 rounded-2xl shadow-lg border",
+        "flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl border backdrop-blur-md",
         isBuy
-          ? "bg-red-500/15 border-red-500/30"
-          : "bg-blue-500/15 border-blue-500/30"
+          ? "bg-red-500/20 border-red-500/40 shadow-red-900/40"
+          : isProfit
+            ? "bg-green-500/20 border-green-500/40 shadow-green-900/40"
+            : "bg-blue-500/20 border-blue-500/40 shadow-blue-900/40"
       )}>
         {/* 아이콘 */}
         <div className={cn(
-          "w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-base",
-          isBuy ? "bg-red-500/20" : "bg-blue-500/20"
+          "w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-lg animate-pop",
+          isBuy ? "bg-red-500/30" : isProfit ? "bg-green-500/30" : "bg-blue-500/30"
         )}>
-          {isBuy ? "📈" : "💰"}
+          <span className="inline-block">
+            {isBuy ? "🚀" : (isProfit ? "🎉" : "💧")}
+          </span>
         </div>
 
         {/* 텍스트 */}
@@ -608,35 +612,35 @@ export default function TradePage() {
           <>
             {/* 현재가 + 종목명 */}
             <div className="mb-4">
-              <div className="flex items-center gap-2 text-sm text-gray-400 mb-1">
-                <span>{isBuy ? "구매할 가격" : "판매할 가격"}</span>
-                <span className="text-gray-600">|</span>
-                <span>현재가 · 시장가</span>
+              <div className="flex items-center gap-1.5 text-sm text-gray-400 mb-1">
+                <span className="text-base inline-block">{isBuy ? "🛒" : "💸"}</span>
+                <span className="font-bold">{stock.name}</span>
+                <span className={cn(
+                  "font-bold ml-auto px-1.5 py-0.5 rounded",
+                  isUp ? "text-red-500 bg-red-500/10" : "text-blue-500 bg-blue-500/10"
+                )}>
+                  {isUp ? "▲" : "▼"} {Math.abs(Number(change))}%
+                </span>
               </div>
-              <div className="flex items-end justify-between">
-                <div className="text-4xl font-bold text-white">{formatNumber(currentPrice)}원</div>
-                <div className={cn("text-sm font-medium", isUp ? "text-red-500" : "text-blue-500")}>
-                  {stock.name} {isUp ? "+" : ""}{change}%
-                </div>
-              </div>
+              <div className="text-4xl font-bold text-white">{formatNumber(currentPrice)}원</div>
             </div>
 
             {/* 보유 현황 요약 카드 */}
             <div className="bg-[#252525] rounded-2xl p-4 mb-4 grid grid-cols-2 gap-x-4 gap-y-3">
               <div>
-                <div className="text-xs text-gray-500 mb-0.5">보유 수량</div>
+                <div className="text-xs text-gray-500 mb-0.5">📦 보유</div>
                 <div className="text-base font-bold text-white">{formatNumber(myQty)}주</div>
               </div>
               <div>
-                <div className="text-xs text-gray-500 mb-0.5">주식 평가금액</div>
+                <div className="text-xs text-gray-500 mb-0.5">💎 평가금</div>
                 <div className="text-base font-bold text-white">{formatNumber(myQty * currentPrice)}원</div>
               </div>
               <div>
-                <div className="text-xs text-gray-500 mb-0.5">남은 현금</div>
+                <div className="text-xs text-gray-500 mb-0.5">💵 현금</div>
                 <div className="text-base font-bold text-white">{formatNumber(cash)}원</div>
               </div>
               <div>
-                <div className="text-xs text-gray-500 mb-0.5">평가 손익</div>
+                <div className="text-xs text-gray-500 mb-0.5">📊 손익</div>
                 {myQty > 0 && myAvg > 0 ? (
                   <div className={cn("text-base font-bold", isProfit ? "text-red-400" : "text-blue-400")}>
                     {isProfit ? "+" : ""}{formatNumber(Math.round((currentPrice - myAvg) * myQty))}원
@@ -649,29 +653,40 @@ export default function TradePage() {
             </div>
 
             <div className="bg-[#252525] rounded-3xl p-6 flex-1 flex flex-col relative mb-4">
-              <div className="text-sm font-bold text-white mb-4">수량</div>
+              <div className="text-sm font-bold text-white mb-4 flex items-center gap-1.5">
+                <span>{isBuy ? "🎯" : "✂️"}</span>
+                <span>수량</span>
+              </div>
 
               <div className="flex-1 flex flex-col items-center justify-center">
                 {inputValue ? (
                   <>
-                    <div className={cn("text-7xl font-bold mb-2", isBuy ? "text-red-500" : "text-blue-500")}>
-                      {formatNumber(Number.parseInt(inputValue))}주
+                    <div
+                      key={inputValue}
+                      className={cn(
+                        "text-7xl font-bold mb-2 flex items-center gap-2 animate-pop",
+                        isBuy ? "text-red-500" : "text-blue-500"
+                      )}
+                    >
+                      <span>{formatNumber(Number.parseInt(inputValue))}주</span>
+                      <span className="text-3xl inline-block">{isBuy ? "🚀" : "💰"}</span>
                     </div>
                     <div className="text-xl text-white font-medium mb-1">{formatNumber(totalAmount)}원</div>
                     {/* 거래 후 예상 현금 */}
                     <div className="text-sm text-gray-400">
-                      {isBuy
-                        ? `거래 후 현금: ${formatNumber(cash - totalAmount)}원`
-                        : `거래 후 현금: ${formatNumber(cash + totalAmount)}원`}
+                      💵 → {isBuy
+                        ? formatNumber(cash - totalAmount)
+                        : formatNumber(cash + totalAmount)}원
                     </div>
                   </>
                 ) : (
-                  <div className="text-4xl font-bold text-gray-600 text-center mb-4">
-                    몇 주 {isBuy ? "구매" : "판매"}할까요?
+                  <div className="text-4xl font-bold text-gray-600 text-center mb-4 flex items-center justify-center gap-2">
+                    <span className="text-3xl inline-block">🤔</span>
+                    <span>몇 주?</span>
                   </div>
                 )}
                 <div className="text-center text-sm text-gray-500 mt-2">
-                  {isBuy ? `구매가능 최대 ${Math.floor(cash / currentPrice)}주` : `판매가능 최대 ${myQty}주`}
+                  ✨ 최대 {isBuy ? Math.floor(cash / currentPrice) : myQty}주
                 </div>
               </div>
 
@@ -685,9 +700,14 @@ export default function TradePage() {
                       setQuantity(val)
                       setInputValue(val.toString())
                     }}
-                    className="flex-1 py-3 rounded-2xl bg-[#333333] text-gray-300 text-sm font-bold hover:bg-gray-700 transition-colors"
+                    className={cn(
+                      "flex-1 py-3 rounded-2xl text-sm font-bold active:scale-90 hover:scale-105 transition-all",
+                      pct === 100
+                        ? "bg-gradient-to-br from-orange-500 to-red-600 text-white shadow-md shadow-red-900/40"
+                        : "bg-[#333333] text-gray-300 hover:bg-gray-700"
+                    )}
                   >
-                    {pct === 100 ? "최대" : `${pct}%`}
+                    {pct === 100 ? "🔥 ALL" : `${pct}%`}
                   </button>
                 ))}
               </div>
@@ -708,11 +728,14 @@ export default function TradePage() {
                     (quantity < 1 || (isBuy ? cash < currentPrice * quantity : myQty < quantity))
                   }
                   className={cn(
-                    "flex-1 h-16 text-xl font-bold rounded-2xl active:scale-[0.98] transition-transform",
-                    isBuy ? "bg-red-500 hover:bg-red-600" : "bg-blue-600 hover:bg-blue-700",
+                    "flex-1 h-16 text-xl font-bold rounded-2xl active:scale-95 hover:scale-[1.02] transition-all flex items-center justify-center gap-2 shadow-lg disabled:shadow-none",
+                    isBuy
+                      ? "bg-gradient-to-br from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 shadow-red-900/50"
+                      : "bg-gradient-to-br from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 shadow-blue-900/50",
                   )}
                 >
-                  {isBuy ? "구매하기" : "판매하기"}
+                  <span className="text-2xl inline-block">{isBuy ? "🚀" : "💰"}</span>
+                  <span>{isBuy ? "구매" : "판매"}</span>
                 </Button>
               </div>
             </div>

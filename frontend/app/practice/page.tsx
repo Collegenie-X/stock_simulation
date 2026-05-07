@@ -171,7 +171,7 @@ export default function CareerModePage() {
                           speedMode: stage.id <= 2 ? "sprint" : stage.id <= 4 ? "standard" : "marathon",
                           timerSeconds: stage.id <= 2 ? 10 : stage.id <= 4 ? 15 : 20,
                           simulationMonths: stage.id === 1 ? 1 : stage.id === 2 ? 2 : stage.id <= 4 ? 3 : stage.id === 5 ? 6 : 12,
-                          dailyOpportunities: stage.id <= 2 ? 2 : 3,
+                          dailyOpportunities: stage.id <= 2 ? 1 : 2,
                           initialCash: parseInt(stage.money.replace(/[^0-9]/g, '')) * 10000,
                         });
                         window.location.href = `/practice/stock/scenario-${stage.id <= 2 ? '1' : '100days'}`;

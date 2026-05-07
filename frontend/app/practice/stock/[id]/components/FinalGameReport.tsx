@@ -17,7 +17,7 @@ import { LABELS } from "../config"
 import { StockDetailPanel } from "./StockDetailPanel"
 import type {
   FinalGameReportProps, FinalGameReportTradeRecord,
-  StockDetailData, AssetHistoryPoint,
+  StockDetailData, AssetHistoryPoint, DecisionTimelineEntry,
 } from "../types"
 
 // ── 등급 ─────────────────────────────────────────────────
@@ -110,6 +110,7 @@ export const FinalGameReport = ({
   aiBestEmoji,
   aiBestProfitRate,
   aiBestTotalValue,
+  decisionTimeline = [],
   onGoHome,
   onPlayAgain,
 }: FinalGameReportProps) => {
@@ -232,27 +233,33 @@ export const FinalGameReport = ({
             </div>
           )}
 
-          {/* 3자 수익률 비교 */}
-          <div className="grid grid-cols-3 gap-2 mt-3">
-            <div className="bg-blue-500/10 rounded-xl p-2 text-center border border-blue-500/20">
-              <div className="text-[8px] text-gray-500 mb-0.5">나</div>
-              <div className={cn("text-sm font-extrabold", userProfitRate >= 0 ? "text-red-400" : "text-blue-400")}>
-                {userProfitRate >= 0 ? "+" : ""}{userProfitRate}%
+          {/* 3자 수익률 비교 — 거래가 있을 때만 의미 있음 */}
+          {tradeHistory.length > 0 ? (
+            <div className="grid grid-cols-3 gap-2 mt-3">
+              <div className="bg-blue-500/10 rounded-xl p-2 text-center border border-blue-500/20">
+                <div className="text-[8px] text-gray-500 mb-0.5">나</div>
+                <div className={cn("text-sm font-extrabold", userProfitRate >= 0 ? "text-red-400" : "text-blue-400")}>
+                  {userProfitRate >= 0 ? "+" : ""}{userProfitRate}%
+                </div>
+              </div>
+              <div className="bg-purple-500/10 rounded-xl p-2 text-center border border-purple-500/20">
+                <div className="text-[8px] text-gray-500 mb-0.5 truncate">{aiSimilarEmoji} {aiSimilarName}</div>
+                <div className={cn("text-sm font-extrabold", aiSimilarProfitRate >= 0 ? "text-red-400" : "text-blue-400")}>
+                  {aiSimilarProfitRate >= 0 ? "+" : ""}{aiSimilarProfitRate.toFixed(1)}%
+                </div>
+              </div>
+              <div className="bg-yellow-500/10 rounded-xl p-2 text-center border border-yellow-500/20">
+                <div className="text-[8px] text-gray-500 mb-0.5 truncate">{aiBestEmoji} {aiBestName}</div>
+                <div className={cn("text-sm font-extrabold", aiBestProfitRate >= 0 ? "text-red-400" : "text-blue-400")}>
+                  {aiBestProfitRate >= 0 ? "+" : ""}{aiBestProfitRate.toFixed(1)}%
+                </div>
               </div>
             </div>
-            <div className="bg-purple-500/10 rounded-xl p-2 text-center border border-purple-500/20">
-              <div className="text-[8px] text-gray-500 mb-0.5 truncate">{aiSimilarEmoji} {aiSimilarName}</div>
-              <div className={cn("text-sm font-extrabold", aiSimilarProfitRate >= 0 ? "text-red-400" : "text-blue-400")}>
-                {aiSimilarProfitRate >= 0 ? "+" : ""}{aiSimilarProfitRate.toFixed(1)}%
-              </div>
+          ) : (
+            <div className="mt-3 text-center text-[10px] text-gray-500 bg-gray-800/40 rounded-xl py-2 border border-gray-700/30">
+              거래 기록이 없어 AI 비교를 생략했어요
             </div>
-            <div className="bg-yellow-500/10 rounded-xl p-2 text-center border border-yellow-500/20">
-              <div className="text-[8px] text-gray-500 mb-0.5 truncate">{aiBestEmoji} {aiBestName}</div>
-              <div className={cn("text-sm font-extrabold", aiBestProfitRate >= 0 ? "text-red-400" : "text-blue-400")}>
-                {aiBestProfitRate >= 0 ? "+" : ""}{aiBestProfitRate.toFixed(1)}%
-              </div>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* ── 탭 ── */}
@@ -351,6 +358,17 @@ export const FinalGameReport = ({
                   </button>
                 )}
               </div>
+
+              {/* 선택 타임라인 — 매 결정마다 나/균형형/공격형 선택과 결과 */}
+              {decisionTimeline.length > 0 && (
+                <DecisionTimelineSection
+                  entries={decisionTimeline}
+                  aiSimilarName={aiSimilarName}
+                  aiSimilarEmoji={aiSimilarEmoji}
+                  aiBestName={aiBestName}
+                  aiBestEmoji={aiBestEmoji}
+                />
+              )}
 
               {/* 최종 순위 */}
               <FinalRanking
@@ -505,6 +523,157 @@ function FinalRanking({ userRate, userValue, simRate, simValue, simName, simEmoj
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+// ── 선택 타임라인 ──────────────────────────────────────────
+function actionLabel(a: "buy" | "sell" | "skip" | "hold"): { label: string; cls: string } {
+  if (a === "buy")  return { label: "매수", cls: "text-red-400 bg-red-500/15" }
+  if (a === "sell") return { label: "매도", cls: "text-blue-400 bg-blue-500/15" }
+  return { label: "관망", cls: "text-gray-400 bg-gray-700/40" }
+}
+
+// 결과 평가: 가격이 올랐을 때 매수가 정답, 내렸을 때 매도가 정답
+function judgeAction(action: "buy" | "sell" | "skip" | "hold", changePct: number): "win" | "lose" | "neutral" {
+  if (action === "buy")  return changePct > 0 ? "win" : changePct < 0 ? "lose" : "neutral"
+  if (action === "sell") return changePct < 0 ? "win" : changePct > 0 ? "lose" : "neutral"
+  // skip/hold: 변동 작으면 정답, 크게 움직였으면 기회 놓침
+  return Math.abs(changePct) < 1 ? "win" : "lose"
+}
+
+const JUDGE_STYLE: Record<"win" | "lose" | "neutral", string> = {
+  win:     "text-green-400",
+  lose:    "text-rose-400",
+  neutral: "text-gray-500",
+}
+const JUDGE_ICON: Record<"win" | "lose" | "neutral", string> = {
+  win: "✓", lose: "✗", neutral: "·",
+}
+
+function DecisionTimelineSection({
+  entries, aiSimilarName, aiSimilarEmoji, aiBestName, aiBestEmoji,
+}: {
+  entries: DecisionTimelineEntry[]
+  aiSimilarName: string; aiSimilarEmoji: string
+  aiBestName: string;    aiBestEmoji: string
+}) {
+  const [expanded, setExpanded] = useState(false)
+  const [visible, setVisible] = useState(true)
+
+  // 승률 집계
+  const totals = entries.reduce(
+    (acc, e) => {
+      const ch = e.changePct ?? 0
+      const u = judgeAction(e.userAction, ch)
+      const s = judgeAction(e.similarAction, ch)
+      const b = judgeAction(e.bestAction, ch)
+      if (u === "win") acc.user++
+      if (s === "win") acc.sim++
+      if (b === "win") acc.best++
+      return acc
+    },
+    { user: 0, sim: 0, best: 0 },
+  )
+  const total = entries.length
+
+  const shown = expanded ? entries : entries.slice(0, 5)
+
+  return (
+    <div className="bg-gray-800/50 rounded-2xl border border-gray-700/30 p-4">
+      <button
+        onClick={() => setVisible(v => !v)}
+        className="w-full flex items-center justify-between mb-3"
+      >
+        <div className="flex items-center gap-2">
+          <BarChart3 className="w-4 h-4 text-cyan-400" />
+          <span className="text-xs font-bold text-white">선택 타임라인</span>
+          <span className="text-[10px] text-gray-500 font-bold">{total}건</span>
+        </div>
+        {visible ? <ChevronUp className="w-3.5 h-3.5 text-gray-500" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-500" />}
+      </button>
+
+      {visible && (
+        <>
+          {/* 정답률 요약 */}
+          <div className="grid grid-cols-3 gap-1.5 mb-3">
+            <div className="bg-blue-500/10 rounded-lg p-2 text-center border border-blue-500/20">
+              <div className="text-[8px] text-gray-500 mb-0.5">나</div>
+              <div className="text-xs font-extrabold text-white">{totals.user}/{total}</div>
+              <div className="text-[8px] text-gray-500">{total > 0 ? Math.round((totals.user / total) * 100) : 0}%</div>
+            </div>
+            <div className="bg-purple-500/10 rounded-lg p-2 text-center border border-purple-500/20">
+              <div className="text-[8px] text-gray-500 mb-0.5 truncate">{aiSimilarEmoji} {aiSimilarName}</div>
+              <div className="text-xs font-extrabold text-white">{totals.sim}/{total}</div>
+              <div className="text-[8px] text-gray-500">{total > 0 ? Math.round((totals.sim / total) * 100) : 0}%</div>
+            </div>
+            <div className="bg-yellow-500/10 rounded-lg p-2 text-center border border-yellow-500/20">
+              <div className="text-[8px] text-gray-500 mb-0.5 truncate">{aiBestEmoji} {aiBestName}</div>
+              <div className="text-xs font-extrabold text-white">{totals.best}/{total}</div>
+              <div className="text-[8px] text-gray-500">{total > 0 ? Math.round((totals.best / total) * 100) : 0}%</div>
+            </div>
+          </div>
+
+          {/* 결정별 상세 */}
+          <div className="space-y-2">
+            {shown.map((e, i) => {
+              const ch = e.changePct ?? 0
+              const u = actionLabel(e.userAction)
+              const s = actionLabel(e.similarAction)
+              const b = actionLabel(e.bestAction)
+              const ju = judgeAction(e.userAction, ch)
+              const js = judgeAction(e.similarAction, ch)
+              const jb = judgeAction(e.bestAction, ch)
+              return (
+                <div key={i} className="bg-gray-900/50 rounded-xl border border-gray-700/20 p-2.5">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[9px] text-gray-500 font-bold">D{e.day ?? "-"}</span>
+                      <span className="text-[11px] font-extrabold text-white truncate">{e.stockName}</span>
+                    </div>
+                    <span className={cn(
+                      "text-[10px] font-extrabold",
+                      ch > 0 ? "text-red-400" : ch < 0 ? "text-blue-400" : "text-gray-500"
+                    )}>
+                      {ch > 0 ? "+" : ""}{ch.toFixed(1)}%
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-1 text-center">
+                    <div>
+                      <div className="text-[8px] text-gray-600 mb-0.5">나</div>
+                      <div className={cn("text-[10px] font-extrabold px-1.5 py-0.5 rounded", u.cls)}>
+                        {u.label} <span className={cn("ml-0.5", JUDGE_STYLE[ju])}>{JUDGE_ICON[ju]}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-[8px] text-gray-600 mb-0.5 truncate">{aiSimilarEmoji}</div>
+                      <div className={cn("text-[10px] font-extrabold px-1.5 py-0.5 rounded", s.cls)}>
+                        {s.label} <span className={cn("ml-0.5", JUDGE_STYLE[js])}>{JUDGE_ICON[js]}</span>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-[8px] text-gray-600 mb-0.5 truncate">{aiBestEmoji}</div>
+                      <div className={cn("text-[10px] font-extrabold px-1.5 py-0.5 rounded", b.cls)}>
+                        {b.label} <span className={cn("ml-0.5", JUDGE_STYLE[jb])}>{JUDGE_ICON[jb]}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          {entries.length > 5 && (
+            <button
+              onClick={() => setExpanded(v => !v)}
+              className="w-full mt-2 text-[10px] text-gray-500 font-bold flex items-center justify-center gap-1"
+            >
+              {expanded ? "접기" : `+${entries.length - 5}건 더보기`}
+              {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+            </button>
+          )}
+        </>
+      )}
     </div>
   )
 }

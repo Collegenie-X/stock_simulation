@@ -67,7 +67,10 @@ export const StockListSection = ({
             {/* 헤더: 레이블 + 총수익 + 탭 */}
             <div className="px-4 pt-3 pb-2">
               <div className="flex items-center justify-between mb-1">
-                <h3 className="text-sm font-bold text-white">{LABELS.sections.myStocks}</h3>
+                <h3 className="text-sm font-bold text-white flex items-center gap-1">
+                  <span>{isTotalProfit ? "🔥" : "💧"}</span>
+                  <span>{LABELS.sections.myStocks.replace("💼 ", "")}</span>
+                </h3>
                 <span className={cn(
                   "text-sm font-bold",
                   isTotalProfit ? "text-red-400" : "text-blue-400"
@@ -91,7 +94,7 @@ export const StockListSection = ({
                           : "text-gray-500 hover:text-gray-300"
                       )}
                     >
-                      {tab}
+                      {tab === "현재가" ? "💹" : "💰"}
                     </button>
                   ))}
                 </div>
@@ -159,36 +162,100 @@ export const StockListSection = ({
           </div>
         )}
 
-        {/* ── 전체 주식 (카테고리별) ── */}
+        {/* ── 전체 주식 (카테고리별 아코디언) ── */}
         <div>
           <h3 className="text-xs font-bold text-gray-400 mb-2">
             {LABELS.sections.allStocks}
+            <span className="text-[10px] text-gray-500 ml-1.5 font-medium">
+              · {Object.keys(stocksByCategory).length}개 카테고리 / {allStocksData.length}종목
+            </span>
           </h3>
-          {Object.entries(stocksByCategory).map(([category, stocks]) => (
-            <div key={category} className="mb-3">
-              <div className="text-[11px] font-bold text-gray-500 mb-1.5 ml-0.5">
-                {category}
-              </div>
-              <div className="space-y-0">
-                {stocks.map((stock) => (
-                  <StockRow
-                    key={stock.id}
-                    stock={stock}
-                    currentTurn={currentTurn}
-                    stockViewTab={stockViewTab}
-                    livePrice={livePrices[stock.id] ?? stock.currentPrice}
-                    tickUp={tickUps[stock.id] ?? true}
-                    isFavorite={favorites.includes(stock.id)}
-                    isAIHolding={(aiHoldings[stock.id] || 0) > 0}
-                    onSelect={() => onSelectStock(stock.id)}
-                    onToggleFavorite={() => onToggleFavorite(stock.id)}
-                  />
-                ))}
-              </div>
-            </div>
-          ))}
+          <div className="space-y-2">
+            {Object.entries(stocksByCategory).map(([category, stocks]) => (
+              <CategoryAccordion
+                key={category}
+                category={category}
+                stocks={stocks}
+                currentTurn={currentTurn}
+                stockViewTab={stockViewTab}
+                livePrices={livePrices}
+                tickUps={tickUps}
+                favorites={favorites}
+                aiHoldings={aiHoldings}
+                onSelectStock={onSelectStock}
+                onToggleFavorite={onToggleFavorite}
+              />
+            ))}
+          </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+// ── 카테고리별 아코디언 서브 컴포넌트 ──────────────────────
+function CategoryAccordion({
+  category,
+  stocks,
+  currentTurn,
+  stockViewTab,
+  livePrices,
+  tickUps,
+  favorites,
+  aiHoldings,
+  onSelectStock,
+  onToggleFavorite,
+}: {
+  category: string
+  stocks: StockListItem[]
+  currentTurn: number
+  stockViewTab: "현재가" | "평가금"
+  livePrices: Record<string, number>
+  tickUps: Record<string, boolean>
+  favorites: string[]
+  aiHoldings: Record<string, number>
+  onSelectStock: (id: string) => void
+  onToggleFavorite: (id: string) => void
+}) {
+  const [open, setOpen] = useState(true)
+
+  return (
+    <div className="bg-[#1a1a1a]/60 rounded-xl border border-gray-800/40 overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-3 py-2 hover:bg-gray-800/30 transition-colors"
+        aria-expanded={open}
+      >
+        <div className="flex items-center gap-1.5">
+          <span className="text-[12px] font-bold text-gray-200">{category}</span>
+          <span className="text-[10px] font-bold text-gray-500 bg-gray-800/60 px-1.5 py-0.5 rounded-full">
+            {stocks.length}
+          </span>
+        </div>
+        {open ? (
+          <ChevronUp className="w-3.5 h-3.5 text-gray-500" />
+        ) : (
+          <ChevronDown className="w-3.5 h-3.5 text-gray-500" />
+        )}
+      </button>
+      {open && (
+        <div className="px-1 pb-1 space-y-0">
+          {stocks.map((stock) => (
+            <StockRow
+              key={stock.id}
+              stock={stock}
+              currentTurn={currentTurn}
+              stockViewTab={stockViewTab}
+              livePrice={livePrices[stock.id] ?? stock.currentPrice}
+              tickUp={tickUps[stock.id] ?? true}
+              isFavorite={favorites.includes(stock.id)}
+              isAIHolding={(aiHoldings[stock.id] || 0) > 0}
+              onSelect={() => onSelectStock(stock.id)}
+              onToggleFavorite={() => onToggleFavorite(stock.id)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

@@ -73,6 +73,8 @@ export interface StockCompareResult {
   bestAction: "buy" | "sell" | "hold"
   bestQty: number
   bestReason: string
+  turn?: number
+  day?: number
 }
 
 interface StrategyParams {
@@ -456,6 +458,8 @@ export function useAICompetitor(initialCash: number) {
         bestAction: "hold",
         bestQty: 0,
         bestReason: "",
+        turn: decision.turn,
+        day: decision.day,
       })
     }
 

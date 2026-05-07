@@ -67,7 +67,7 @@ export interface Portfolio {
 export interface GameSettings {
   difficulty?: "easy" | "medium" | "hard"
   speedMode?: "sprint" | "standard" | "marathon"
-  dailyOpportunities?: 2 | 3
+  dailyOpportunities?: 1 | 2
   timerSeconds?: number
   simulationMonths?: number
   initialCash?: number

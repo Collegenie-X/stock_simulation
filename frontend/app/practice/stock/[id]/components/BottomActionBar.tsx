@@ -77,7 +77,7 @@ export const BottomActionBar = ({
         <div
           className={cn(
             "absolute inset-y-0 left-0 transition-all duration-1000 rounded-r-full",
-            isUrgent ? "bg-red-500" : isCaution ? "bg-yellow-500" : "bg-green-500"
+            isUrgent ? "bg-gradient-to-r from-red-600 to-red-400 animate-pulse" : isCaution ? "bg-gradient-to-r from-yellow-500 to-orange-400" : "bg-gradient-to-r from-green-500 via-emerald-400 to-green-500 animate-gradient-sweep"
           )}
           style={{ width: `${timerProgress * 100}%` }}
         />
@@ -120,26 +120,32 @@ export const BottomActionBar = ({
           </div>
 
           <span className="text-[10px] font-bold text-blue-400">
-            {currentDayPhase} {currentDay}{LABELS.header.dayLabel}
+            {currentDayPhase} D{currentDay}
           </span>
         </div>
 
         {/* 오른쪽: 남은 횟수 + 카운트다운 */}
         <div className="flex items-center gap-2">
           <span className="text-[9px] text-gray-600 font-medium tabular-nums">
-            {totalDecisions}번째 · 남은 {remainingDecisions}회
+            #{totalDecisions} · {remainingDecisions}🎯
           </span>
-          <div className={cn("flex items-center gap-0.5", isTimerPaused ? "opacity-50" : "")}>
-            <span className={cn(
-              "text-lg font-black tabular-nums leading-none",
-              isTimerPaused ? "text-gray-500"
-                : isUrgent ? "text-red-400 animate-pulse"
-                : isCaution ? "text-yellow-400"
-                : "text-green-400"
-            )}>
+          <div className={cn(
+            "flex items-center gap-0.5 px-1.5 py-0.5 rounded-md",
+            isTimerPaused && "opacity-50",
+          )}>
+            <span
+              key={decisionTimer}
+              className={cn(
+                "text-lg font-black tabular-nums leading-none inline-block",
+                isTimerPaused ? "text-gray-500"
+                  : isUrgent ? "text-red-400"
+                  : isCaution ? "text-yellow-400"
+                  : "text-green-400 animate-pop"
+              )}
+            >
               {decisionTimer}
             </span>
-            <span className="text-[8px] text-gray-600 font-bold">초</span>
+            <span className="text-[8px] text-gray-600 font-bold">s</span>
           </div>
         </div>
       </div>
@@ -147,7 +153,7 @@ export const BottomActionBar = ({
       {/* ── 일시정지 알림 ── */}
       {isTimerPaused && (
         <div className="mx-4 mb-1 py-1 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-          <p className="text-[9px] font-bold text-yellow-400/90 text-center">⏸ 일시정지 중</p>
+          <p className="text-[9px] font-bold text-yellow-400/90 text-center">⏸ PAUSED</p>
         </div>
       )}
 
@@ -212,8 +218,8 @@ export const BottomActionBar = ({
                 onClick={onPreviewMiniReport}
                 className="flex-1 py-2 rounded-xl font-bold text-[11px] transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 bg-indigo-500/15 border border-indigo-500/30 text-indigo-400 hover:bg-indigo-500/25"
               >
-                <FileText className="w-3.5 h-3.5" />
-                {currentDay}일차 리포트
+                <span className="text-sm">📋</span>
+                D{currentDay} 리포트
               </button>
             )}
             {onPreviewFinalReport && (
@@ -221,8 +227,8 @@ export const BottomActionBar = ({
                 onClick={onPreviewFinalReport}
                 className="flex-1 py-2 rounded-xl font-bold text-[11px] transition-all active:scale-[0.97] flex items-center justify-center gap-1.5 bg-yellow-500/15 border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/25"
               >
-                <Trophy className="w-3.5 h-3.5" />
-                최종 보고서
+                <span className="text-sm">🏆</span>
+                최종 결과
               </button>
             )}
           </div>
@@ -238,7 +244,8 @@ export const BottomActionBar = ({
             "hover:bg-gray-700/80 hover:text-gray-300",
           )}
         >
-          {LABELS.actions.skip}
+          <span>⏭️</span>
+          <span>NEXT</span>
           <ChevronRight className="w-3.5 h-3.5 text-gray-500" />
         </button>
       </div>

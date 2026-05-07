@@ -8,9 +8,9 @@ export type SpeedMode = "sprint" | "standard" | "marathon"
 export interface SpeedModeData {
   icon: string
   name: string
-  time: string
+  time: Record<"1" | "2", string>
   period: string
-  decisions: string
+  decisions: Record<"1" | "2", string>
   timer: number
   simulationMonths: number
   color: string

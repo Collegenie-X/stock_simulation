@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react"
 import { MobileNav } from "@/components/mobile-nav"
 import { storage } from "@/lib/storage"
-import { Settings, Target } from "lucide-react"
+import { Settings } from "lucide-react"
 import HeroChart from "./components/HeroChart"
 import GameModeCards from "./components/GameModeCards"
 import PlayerStats from "./components/PlayerStats"
 import WhySimulation from "./components/WhySimulation"
+import MyPersonality from "./components/MyPersonality"
 
 export default function HomePage() {
   const [character, setCharacter] = useState<any>(null)
@@ -116,6 +117,9 @@ export default function HomePage() {
           winRate={winRate}
         />
 
+        {/* My Personality DNA */}
+        <MyPersonality />
+
         {/* Hero Chart with Play CTA */}
         <HeroChart
           onPlay={handleQuickPlay}
@@ -125,30 +129,6 @@ export default function HomePage() {
 
         {/* Game Mode Selection */}
         <GameModeCards />
-
-        {/* Daily Missions - Compact */}
-        <div className="mx-5 bg-[#1e1e2e] rounded-2xl p-4 border border-white/5">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-bold text-sm flex items-center gap-2">
-              <Target className="w-4 h-4 text-yellow-400" />
-              오늘의 미션
-            </h3>
-            <span className="text-[10px] text-gray-500 bg-white/5 px-2 py-0.5 rounded-full">0/3</span>
-          </div>
-          <div className="space-y-1.5">
-            {[
-              { text: "스프린트 1판 완료", reward: "+50 EXP" },
-              { text: "수익률 +5% 달성", reward: "+30 EXP" },
-              { text: "3 COMBO 달성", reward: "+20 EXP" },
-            ].map((mission) => (
-              <div key={mission.text} className="flex items-center gap-2.5 p-2.5 bg-[#141420] rounded-xl">
-                <div className="w-1.5 h-1.5 rounded-full bg-gray-600 flex-shrink-0" />
-                <span className="text-xs text-gray-400 flex-1">{mission.text}</span>
-                <span className="text-[10px] text-yellow-500/70 font-medium">{mission.reward}</span>
-              </div>
-            ))}
-          </div>
-        </div>
 
         {/* Why Simulation */}
         <WhySimulation />

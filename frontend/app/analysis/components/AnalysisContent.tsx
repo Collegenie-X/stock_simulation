@@ -22,11 +22,12 @@ import {
   ASSESSMENT_MODE_CONFIG,
 } from "../config";
 import questionsData from "@/data/analysis-questions.json";
+import { playClickSound } from "@/lib/sound";
 import QuestionHeader from "./QuestionHeader";
 import TheoryCard from "./TheoryCard";
 import ChartCard from "./ChartCard";
 import ResultScreen from "./ResultScreen";
-import { ParticleBurst, ScorePop, ScreenFlash, FeedbackTimer } from "./GameEffects";
+import { ParticleBurst, ScorePop, ScreenFlash, FeedbackTimer, ComboBurst, LevelUpRing } from "./GameEffects";
 
 function isChartQuestion(q: AnyQuestion): q is ChartQuestion {
   return "title" in q;
@@ -58,6 +59,7 @@ type Phase = "intro" | "quiz" | "result";
 export default function AnalysisContent() {
   const searchParams = useSearchParams();
   const mode: AssessmentMode = searchParams.get("mode") === "quick" ? "quick" : "detailed";
+  const isReportView = searchParams.get("view") === "report";
   const modeConfig = ASSESSMENT_MODE_CONFIG[mode];
 
   const allQuestions = useMemo(() => {
@@ -87,9 +89,39 @@ export default function AnalysisContent() {
   const [showScorePop, setShowScorePop] = useState(false);
   const [canAdvance, setCanAdvance] = useState(false);
 
+  const [combo, setCombo] = useState(0);
+  const [comboTrigger, setComboTrigger] = useState(0);
+  const [lastType, setLastType] = useState<PersonalityType | null>(null);
+  const [level, setLevel] = useState(1);
+  const [levelUpTrigger, setLevelUpTrigger] = useState(0);
+
   const currentQ = allQuestions[currentIdx];
   const total = allQuestions.length;
   const isChart = currentQ ? isChartQuestion(currentQ) : false;
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("button")) playClickSound();
+    };
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, []);
+
+  // ?view=report: localStorage에서 기존 결과 로드해 곧바로 리포트 표시
+  useEffect(() => {
+    if (!isReportView || typeof window === "undefined") return;
+    try {
+      const raw = localStorage.getItem("compete_dna_result");
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      if (saved?.personalityScores) setPersonalityScores(saved.personalityScores);
+      if (saved?.abilities) setAbilities(saved.abilities);
+      setPhase("result");
+      setShowResult(true);
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isReportView]);
 
   useEffect(() => {
     setChartTrigger((t) => t + 1);
@@ -137,9 +169,23 @@ export default function AnalysisContent() {
         return next;
       });
 
+      setCombo((prev) => {
+        const nextCombo = lastType === option.personalityType ? prev + 1 : 1;
+        if (nextCombo >= 2) setComboTrigger((t) => t + 1);
+        return nextCombo;
+      });
+      setLastType(option.personalityType);
+
+      const answeredCount = currentIdx + 1;
+      const newLevel = Math.floor(answeredCount / 3) + 1;
+      if (newLevel > level) {
+        setLevel(newLevel);
+        setLevelUpTrigger((t) => t + 1);
+      }
+
       setCanAdvance(true);
     },
-    [showFeedback]
+    [showFeedback, lastType, currentIdx, level]
   );
 
   useEffect(() => {
@@ -239,6 +285,8 @@ export default function AnalysisContent() {
       <ScreenFlash personalityType={feedbackType} trigger={particleTrigger} />
       <ParticleBurst personalityType={feedbackType} trigger={particleTrigger} />
       <ScorePop show={showScorePop} personalityType={feedbackType} />
+      <ComboBurst combo={combo} trigger={comboTrigger} personalityType={feedbackType} />
+      <LevelUpRing trigger={levelUpTrigger} />
 
       <div className="w-full max-w-sm mx-auto flex flex-col relative z-10">
         <QuestionHeader
@@ -246,6 +294,14 @@ export default function AnalysisContent() {
           total={total}
           score={Object.values(personalityScores).reduce((a, b) => a + b, 0)}
           isChart={isChart}
+          combo={combo}
+          level={level}
+          leadingType={
+            (Object.entries(personalityScores).reduce(
+              (best, [k, v]) => (v > best[1] ? [k, v] : best),
+              ["", 0] as [string, number]
+            )[0] || null) as PersonalityType | null
+          }
         />
 
         {currentIdx === theoryCount && theoryCount > 0 && (

@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef, useState } from "react"
 import { Heart, Bot } from "lucide-react"
 import { formatNumber } from "@/lib/format"
 import { cn } from "@/lib/utils"
@@ -35,6 +36,18 @@ export const StockRow = ({
 }: StockRowProps) => {
   const chartData = buildChartData(stock, currentTurn)
 
+  // 가격 변동 시 플래시
+  const prevPriceRef = useRef(livePrice)
+  const [flash, setFlash] = useState<"up" | "down" | null>(null)
+  useEffect(() => {
+    if (livePrice !== prevPriceRef.current) {
+      setFlash(livePrice > prevPriceRef.current ? "up" : "down")
+      prevPriceRef.current = livePrice
+      const t = setTimeout(() => setFlash(null), 500)
+      return () => clearTimeout(t)
+    }
+  }, [livePrice])
+
   const liveDailyChange =
     stock.prevPrice > 0 ? ((livePrice - stock.prevPrice) / stock.prevPrice) * 100 : 0
   const liveDailyChangePct = Math.abs(liveDailyChange).toFixed(1)
@@ -47,10 +60,12 @@ export const StockRow = ({
   const liveIsProfit = liveProfit >= 0
 
   return (
-    <div className="flex items-center gap-3 py-2.5">
+    <div className={cn(
+      "flex items-center gap-3 py-2.5 rounded-lg",
+    )}>
       <button
         onClick={onSelect}
-        className="flex-1 flex items-center gap-3 active:opacity-70 transition-opacity"
+        className="flex-1 flex items-center gap-3 active:scale-[0.98] active:opacity-80 transition-all duration-150"
       >
         {/* 미니차트 */}
         <div className="shrink-0 relative">
@@ -81,14 +96,14 @@ export const StockRow = ({
           {showInvestmentInfo && stock.myHoldings > 0 ? (
             stockViewTab === "현재가" ? (
               <div className="text-xs text-gray-500">
-                내 평균 {formatNumber(Math.round(stock.myAvg))}원
+                📍 {formatNumber(Math.round(stock.myAvg))}원
               </div>
             ) : (
-              <div className="text-xs text-gray-500">{stock.myHoldings}주</div>
+              <div className="text-xs text-gray-500">📦 {stock.myHoldings}주</div>
             )
           ) : (
             <div className="text-xs text-gray-500">
-              전일 {formatNumber(Math.round(stock.prevPrice))}원
+              ← {formatNumber(Math.round(stock.prevPrice))}원
             </div>
           )}
         </div>
@@ -96,32 +111,42 @@ export const StockRow = ({
         {/* 오른쪽 가격 (라이브) */}
         {showInvestmentInfo && stock.myHoldings > 0 && stockViewTab === "평가금" ? (
           <div className="text-right shrink-0">
-            <div className={cn(
-              "text-sm font-bold transition-colors duration-300",
-              liveIsProfit ? "text-red-400" : "text-blue-400"
-            )}>
+            <div
+              key={`v-${livePrice}`}
+              className={cn(
+                "text-sm font-bold transition-colors duration-300",
+                liveIsProfit ? "text-red-400" : "text-blue-400",
+                flash && "animate-ticker-pulse",
+              )}
+            >
               {formatNumber(Math.round(livePrice * stock.myHoldings))}원
             </div>
             <div className={cn(
-              "text-xs font-bold",
+              "text-xs font-bold flex items-center justify-end gap-0.5",
               liveIsProfit ? "text-red-500" : "text-blue-500"
             )}>
-              {liveIsProfit ? "+" : "-"}{liveProfitPct}%
+              <span className="text-[8px]">{liveIsProfit ? "▲" : "▼"}</span>
+              {liveProfitPct}%
             </div>
           </div>
         ) : (
           <div className="text-right shrink-0">
-            <div className={cn(
-              "text-sm font-bold transition-colors duration-300",
-              liveDailyIsUp ? "text-red-400" : "text-blue-400"
-            )}>
+            <div
+              key={`p-${livePrice}`}
+              className={cn(
+                "text-sm font-bold transition-colors duration-300",
+                liveDailyIsUp ? "text-red-400" : "text-blue-400",
+                flash && "animate-ticker-pulse",
+              )}
+            >
               {formatNumber(livePrice)}원
             </div>
             <div className={cn(
-              "text-xs font-bold",
+              "text-xs font-bold flex items-center justify-end gap-0.5",
               liveDailyIsUp ? "text-red-500" : "text-blue-500"
             )}>
-              {liveDailyIsUp ? "+" : "-"}{liveDailyChangePct}%
+              <span className="text-[8px]">{liveDailyIsUp ? "▲" : "▼"}</span>
+              {liveDailyChangePct}%
             </div>
           </div>
         )}
@@ -134,8 +159,8 @@ export const StockRow = ({
       >
         <Heart
           className={cn(
-            "w-5 h-5",
-            isFavorite ? "text-red-500 fill-red-500" : "text-gray-600"
+            "w-5 h-5 transition-all",
+            isFavorite ? "text-red-500 fill-red-500 animate-heartbeat" : "text-gray-600 hover:text-gray-400"
           )}
         />
       </button>

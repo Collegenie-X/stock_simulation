@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "1.0",
+  "scenarios": [
+    {
+      "id": "WINTER_AI_2024",
+      "title": "트럼프 당선부터 비상계엄까지",
+      "subtitle": "AI 호황의 마지막 광기와 정치 위기",
+      "era": "2024 Q4",
+      "period": "2024.11.04 ~ 2024.12.13",
+      "difficulty": "standard",
+      "estimatedPlayTimeMin": 20,
+      "totalDays": 30,
+      "totalTurns": 60,
+      "stockCount": 5,
+      "blackswanCount": 1,
+      "majorEventCount": 5,
+      "tags": ["recent", "korean-politics", "ai-boom", "trump-trade", "winter-2024"],
+      "thumbnail": "🇰🇷🇺🇸",
+      "file": "winter-ai-2024.json",
+      "available": true,
+      "highlights": [
+        "트럼프 재당선 (D3)",
+        "NVDA 어닝 서프라이즈 (D13)",
+        "비상계엄 갭다운 -7% (D23)",
+        "TSLA +71% 추세 추종"
+      ]
+    }
+  ],
+
+  "comingSoon": [
+    {
+      "id": "DEEPSEEK_SHOCK_2025",
+      "title": "딥시크 쇼크와 트럼프 관세",
+      "era": "2025 Q1",
+      "period": "2025.01.13 ~ 2025.02.21",
+      "tags": ["recent", "ai-bubble", "tariff", "deepseek"]
+    },
+    {
+      "id": "TARIFF_STORM_2025",
+      "title": "상호관세 폭락",
+      "era": "2025 Q2",
+      "period": "2025.03.17 ~ 2025.04.25",
+      "tags": ["recent", "tariff", "trump", "crash"]
+    }
+  ]
+}

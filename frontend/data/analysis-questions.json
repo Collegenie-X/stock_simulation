@@ -23,9 +23,9 @@
         },
         {
           "emoji": "🧐",
-          "text": "내가 분석한 대로만 되면 돼. 믿는 건 데이터뿐",
+          "text": "공부한 만큼만 들어왔어. 차트가 답이지 📊",
           "personalityType": "analyst",
-          "insight": "숫자가 말해주는 걸 믿는 타입이네 📊 분석력 쩐다!",
+          "insight": "감정보다 데이터를 먼저 보는 분석가 기질! 📊 첫 매수부터 차분한 게 멋있어",
           "abilities": { "analysis": 35, "infoJudgment": 20 }
         },
         {

@@ -130,6 +130,7 @@ export default function GamePlayPage() {
   const [showExitConfirm, setShowExitConfirm] = useState(false)
   const [stockViewTab, setStockViewTab] = useState<"현재가" | "평가금">("현재가")
   const [lastTrade, setLastTrade] = useState<LastTradeToast | null>(null)
+  const [showTimeoutDialog, setShowTimeoutDialog] = useState(false)
 
   // 시나리오 데이터 선택 및 확장
   const allScenarios = [...scenariosData.scenarios, scenarios100DaysData]
@@ -663,17 +664,13 @@ export default function GamePlayPage() {
       setDecisionTimer(prev => {
         if (prev <= 1) {
           clearInterval(timer)
-          const reactions = CHARACTER_REACTIONS.timeout
-          const emoji = reactions[Math.floor(Math.random() * reactions.length)]
           setIsWaitingForDecision(false)
-          setShowCardFeedback(true)
-          setCardFeedbackData({
-            type: "timeout",
-            emoji,
-            message: "시간 초과! 자동 건너뛰기",
-          })
           setTotalDecisions(d => d + 1)
-          setTimeout(() => advanceToNext(), 1500)
+          setShowTimeoutDialog(true)
+          setTimeout(() => {
+            setShowTimeoutDialog(false)
+            advanceToNext()
+          }, 1000)
           return 0
         }
         return prev - 1
@@ -799,9 +796,9 @@ export default function GamePlayPage() {
       // 기본 설정 생성 (backend 없이도 동작)
       const defaultSettings = {
         initialCash: 1000000,
-        duration: 3, // 3개월
+        duration: 3, // 3달
         speedMode: "standard" as const,
-        dailyOpportunities: 3,
+        dailyOpportunities: 2 as const,
         timerSeconds: 30,
         simulationMonths: 3,
       }
@@ -954,6 +951,8 @@ export default function GamePlayPage() {
   const [dailyUserDecisions, setDailyUserDecisions] = useState<UserDayDecision[]>([])
   // 종목별 3자 비교 결과 (하루 요약에서 표시)
   const [stockCompareResults, setStockCompareResults] = useState<StockCompareResult[]>([])
+  // 게임 전체 누적 선택 타임라인 (최종 리포트용)
+  const [decisionTimeline, setDecisionTimeline] = useState<StockCompareResult[]>([])
 
   // AI 대결 시스템
   const { aiCompetitor, bestAICompetitor, simulateDayTrades, calcTotalValue: calcAITotalValue, calcBestAITotalValue, matchedStyle, gapHistory } = useAICompetitor(initialValue)
@@ -968,6 +967,13 @@ export default function GamePlayPage() {
       }
       if (result?.stockCompareResults && result.stockCompareResults.length > 0) {
         setStockCompareResults(result.stockCompareResults)
+        // 누적 타임라인에 day/turn 포함하여 추가
+        const stamped = result.stockCompareResults.map(r => ({
+          ...r,
+          day: r.day ?? currentDay,
+          turn: r.turn ?? currentTurn,
+        }))
+        setDecisionTimeline(prev => [...prev, ...stamped])
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1225,6 +1231,31 @@ export default function GamePlayPage() {
       day: t.day,
     }))
 
+    // 선택 타임라인 + 결과(가격 변화) 계산
+    const timelineWithOutcome = decisionTimeline.map(entry => {
+      const stock = scenario?.stocks.find(s => s.id === entry.stockId)
+      const lastTurn = stock ? stock.turns.length - 1 : 0
+      const priceAfter = stock?.turns[Math.min(lastTurn, currentTurn)]?.price ?? entry.price
+      const changePct = entry.price > 0
+        ? Number((((priceAfter - entry.price) / entry.price) * 100).toFixed(1))
+        : 0
+      return {
+        day: entry.day,
+        turn: entry.turn,
+        stockId: entry.stockId,
+        stockName: entry.stockName,
+        price: entry.price,
+        userAction: entry.userAction,
+        userQty: entry.userQty,
+        similarAction: entry.similarAction,
+        similarQty: entry.similarQty,
+        bestAction: entry.bestAction,
+        bestQty: entry.bestQty,
+        priceAfter,
+        changePct,
+      }
+    })
+
     return (
       <FinalGameReport
         isVisible
@@ -1236,6 +1267,7 @@ export default function GamePlayPage() {
         holdings={holdings}
         tradeHistory={mappedTrades}
         weeklyHistory={weeklyHistory}
+        decisionTimeline={timelineWithOutcome}
         aiSimilarName={aiCompetitor.name}
         aiSimilarEmoji={aiCompetitor.emoji}
         aiSimilarProfitRate={aiSimilarRate}
@@ -1276,6 +1308,16 @@ export default function GamePlayPage() {
 
         {/* 결정 피드백 오버레이 */}
         <CardFeedbackOverlay isVisible={showCardFeedback} data={cardFeedbackData} />
+
+        {/* 타임아웃 다이얼로그 (1초 자동 닫힘) */}
+        {showTimeoutDialog && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+            <div className="animate-pop flex flex-col items-center gap-2 px-8 py-5 rounded-2xl bg-gray-900/90 border border-gray-700/60 shadow-2xl backdrop-blur-sm">
+              <span className="text-4xl">⏰</span>
+              <span className="text-sm font-bold text-gray-300">시간 초과</span>
+            </div>
+          </div>
+        )}
 
         {/* 하루 요약 오버레이 */}
         <DaySummaryOverlay

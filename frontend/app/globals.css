@@ -281,6 +281,35 @@ a,
   max-width: 428px;
   margin: 0 auto;
   width: 100%;
+  background: #191919;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 데스크탑에서 모바일 프레임처럼 보이게 */
+@media (min-width: 480px) {
+  body {
+    background: #2a2a2e;
+  }
+  .mobile-container,
+  .practice-mobile-container {
+    margin-top: 24px;
+    margin-bottom: 24px;
+    min-height: calc(100dvh - 48px);
+    border-radius: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 0 0 8px #1a1a1a,
+      0 0 0 9px rgba(255, 255, 255, 0.06),
+      0 30px 80px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+  }
+  /* fixed 요소도 프레임 안쪽으로 라운드 처리 */
+  .mobile-container .fixed,
+  .practice-mobile-container .fixed {
+    border-bottom-left-radius: 40px;
+    border-bottom-right-radius: 40px;
+  }
 }
 
 /* Practice 섹션 전용 모바일 컨테이너 */
@@ -300,7 +329,8 @@ a,
  * fixed 요소는 부모 max-width를 무시하므로,
  * 직접 max-width + margin:auto 로 중앙 고정
  */
-.practice-mobile-container .fixed {
+.practice-mobile-container .fixed,
+.mobile-container .fixed {
   max-width: 428px !important;
   margin-left: auto !important;
   margin-right: auto !important;
@@ -546,6 +576,34 @@ button {
   animation: glowPulse 2s ease-in-out infinite;
 }
 
+@keyframes comboPop {
+  0%   { opacity: 0; transform: translate(-50%, 40px) scale(0.4) rotate(-8deg); }
+  25%  { opacity: 1; transform: translate(-50%, -10px) scale(1.25) rotate(4deg); }
+  50%  { transform: translate(-50%, 0) scale(1) rotate(-2deg); }
+  75%  { opacity: 1; transform: translate(-50%, -4px) scale(1.05) rotate(0deg); }
+  100% { opacity: 0; transform: translate(-50%, -50px) scale(0.9) rotate(0deg); }
+}
+.animate-comboPop { animation: comboPop 1.6s ease-out forwards; }
+
+@keyframes levelUpRing {
+  0%   { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+.animate-levelUpRing { animation: levelUpRing 1.2s ease-out forwards; }
+
+@keyframes flameJitter {
+  0%, 100% { transform: scale(1) rotate(-2deg); }
+  50%      { transform: scale(1.1) rotate(2deg); }
+}
+.animate-flameJitter { animation: flameJitter 0.6s ease-in-out infinite; }
+
+@keyframes rise {
+  0%   { transform: translateY(0); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translateY(-60px); opacity: 0; }
+}
+.animate-rise { animation: rise 1.4s ease-out forwards; }
+
 .animate-pulse-glow {
   animation: pulse-glow 2s infinite;
 }
@@ -642,6 +700,102 @@ button {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" on, "lnum" on;
 }
+
+/* ========================================
+   게임 인터랙션 애니메이션
+   ======================================== */
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-6deg); }
+  75%      { transform: rotate(6deg); }
+}
+.animate-wiggle { animation: wiggle 0.6s ease-in-out infinite; }
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  10%, 30% { transform: scale(1.15); }
+  20%      { transform: scale(1.05); }
+  40%      { transform: scale(1); }
+}
+.animate-heartbeat { animation: heartbeat 1.4s ease-in-out infinite; }
+
+@keyframes priceFlashUp {
+  0%   { background-color: rgba(239, 68, 68, 0); }
+  30%  { background-color: rgba(239, 68, 68, 0.25); }
+  100% { background-color: rgba(239, 68, 68, 0); }
+}
+.flash-up { animation: priceFlashUp 0.5s ease-out; }
+
+@keyframes priceFlashDown {
+  0%   { background-color: rgba(59, 130, 246, 0); }
+  30%  { background-color: rgba(59, 130, 246, 0.25); }
+  100% { background-color: rgba(59, 130, 246, 0); }
+}
+.flash-down { animation: priceFlashDown 0.5s ease-out; }
+
+@keyframes tickerPulse {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50%      { transform: scale(1.04); filter: brightness(1.25); }
+}
+.animate-ticker-pulse { animation: tickerPulse 0.4s ease-out; }
+
+@keyframes coinSpin {
+  0%   { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+.animate-coin-spin { animation: coinSpin 1.2s linear infinite; }
+
+@keyframes pop {
+  0%   { transform: scale(0.6); opacity: 0; }
+  60%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-pop { animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
+@keyframes sparkle {
+  0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.7; }
+  50%      { transform: scale(1.4) rotate(180deg); opacity: 1; }
+}
+.animate-sparkle { animation: sparkle 1.4s ease-in-out infinite; }
+
+@keyframes pulseRing {
+  0%   { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55); }
+  70%  { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+.animate-pulse-ring { animation: pulseRing 1.6s ease-out infinite; }
+
+@keyframes pulseRingRed {
+  0%   { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.6); }
+  70%  { box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+.animate-pulse-ring-red { animation: pulseRingRed 0.9s ease-out infinite; }
+
+@keyframes timerShake {
+  0%, 100% { transform: translateX(0); }
+  20%      { transform: translateX(-2px); }
+  40%      { transform: translateX(2px); }
+  60%      { transform: translateX(-1px); }
+  80%      { transform: translateX(1px); }
+}
+.animate-timer-shake { animation: timerShake 0.4s ease-in-out infinite; }
+
+@keyframes gradientSweep {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+.animate-gradient-sweep {
+  background-size: 200% 100%;
+  animation: gradientSweep 2.5s linear infinite;
+}
+
+@keyframes ringWave {
+  0%   { transform: scale(0.8); opacity: 0.7; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+.animate-ring-wave { animation: ringWave 1.4s ease-out infinite; }
 
 /* ========================================
    반응형 유틸리티

@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { ArrowLeft, Heart, Bell, MoreHorizontal, Search, TrendingUp, TrendingDown, Newspaper } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatNumber } from "@/lib/format"
@@ -156,6 +156,21 @@ export const DetailView = ({
 
   const chartRef = useRef<HTMLDivElement>(null)
 
+  // 가격 변동 시 플래시
+  const prevPriceRef = useRef(currentPrice)
+  const [priceFlash, setPriceFlash] = useState<"up" | "down" | null>(null)
+  useEffect(() => {
+    if (currentPrice !== prevPriceRef.current) {
+      setPriceFlash(currentPrice > prevPriceRef.current ? "up" : "down")
+      prevPriceRef.current = currentPrice
+      const t = setTimeout(() => setPriceFlash(null), 600)
+      return () => clearTimeout(t)
+    }
+  }, [currentPrice])
+
+  // 큰 변동(±3% 이상) 시 캐릭터 wiggle
+  const isBigMove = Math.abs(Number(change)) >= 3
+
   return (
     <div className="min-h-screen bg-[#191919] text-white flex flex-col">
       {/* 플로팅 종료 버튼 (항상 표시) */}
@@ -220,15 +235,13 @@ export const DetailView = ({
         {/* 날짜 / 주차 */}
         <div className="flex items-center justify-center gap-2 pb-2">
           <span className="text-xs text-blue-400 font-bold bg-blue-500/10 px-2 py-0.5 rounded-full">
-            {currentDayNumber}일차 · {currentWeekNumber}주차
+            D{currentDayNumber} · W{currentWeekNumber}
           </span>
-          <span className="text-xs text-gray-500">
-            {currentDayName} ({currentDayPhase})
-          </span>
+          <span className="text-xs text-gray-500">{currentDayPhase}</span>
           {isPlaying && (
-            <span className="flex items-center gap-1 text-xs text-green-400 animate-pulse">
-              <span className="w-2 h-2 bg-green-400 rounded-full" />
-              진행 중
+            <span className="flex items-center gap-1 text-xs text-green-400 font-bold">
+              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse-ring" />
+              LIVE
             </span>
           )}
         </div>
@@ -236,17 +249,33 @@ export const DetailView = ({
 
       <div className="flex-1 overflow-y-auto pb-32">
         {/* 가격 정보 */}
-        <div className="px-5 pt-2 pb-4">
+        <div className={cn(
+          "px-5 pt-2 pb-4 rounded-lg",
+          priceFlash === "up" && "flash-up",
+          priceFlash === "down" && "flash-down",
+        )}>
           <div className="flex items-center gap-2 mb-1">
+            <span className="text-xl inline-block">
+              {isUp ? (Number(change) >= 3 ? "🚀" : "📈") : (Number(change) <= -3 ? "💥" : "📉")}
+            </span>
             <div className="font-bold text-xl text-white">{stockName}</div>
             <div className="w-6 h-6 rounded-full bg-gray-800 flex items-center justify-center">
               <Search className="w-3 h-3 text-gray-400" />
             </div>
           </div>
-          <div className="text-4xl font-bold mb-2">{formatNumber(currentPrice)}원</div>
-          <div className={cn("text-sm font-medium flex items-center gap-1", isUp ? "text-red-500" : "text-blue-500")}>
-            어제보다 {isUp ? "+" : ""}
-            {formatNumber(Math.abs(currentPrice - prevPrice))}원 ({change}%)
+          <div
+            key={currentPrice}
+            className={cn(
+              "text-4xl font-bold mb-2 inline-block",
+              priceFlash && "animate-ticker-pulse",
+            )}
+          >
+            {formatNumber(currentPrice)}원
+          </div>
+          <div className={cn("text-sm font-bold flex items-center gap-1.5", isUp ? "text-red-500" : "text-blue-500")}>
+            <span>{isUp ? "▲" : "▼"}</span>
+            <span>{formatNumber(Math.abs(currentPrice - prevPrice))}원</span>
+            <span className="opacity-80">({isUp ? "+" : ""}{change}%)</span>
           </div>
         </div>
 
@@ -480,16 +509,18 @@ export const DetailView = ({
             <button
               onClick={onSell}
               disabled={currentHoldings === 0}
-              className="flex-1 h-14 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-800 disabled:text-gray-600 text-white rounded-2xl font-bold text-lg transition-colors active:scale-[0.98]"
+              className="flex-1 h-14 bg-gradient-to-br from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 disabled:bg-gray-800 disabled:from-gray-800 disabled:to-gray-800 disabled:text-gray-600 text-white rounded-2xl font-bold text-lg transition-all active:scale-95 hover:scale-[1.02] flex items-center justify-center gap-2 shadow-lg shadow-blue-900/40 disabled:shadow-none"
             >
-              {LABELS.actions.sell}
+              <span className="text-xl">💰</span>
+              <span>판매</span>
             </button>
             <button
               onClick={onBuy}
               disabled={cash < currentPrice}
-              className="flex-1 h-14 bg-red-500 hover:bg-red-600 disabled:bg-gray-800 disabled:text-gray-600 text-white rounded-2xl font-bold text-lg transition-colors active:scale-[0.98]"
+              className="flex-1 h-14 bg-gradient-to-br from-red-500 to-red-700 hover:from-red-600 hover:to-red-800 disabled:bg-gray-800 disabled:from-gray-800 disabled:to-gray-800 disabled:text-gray-600 text-white rounded-2xl font-bold text-lg transition-all active:scale-95 hover:scale-[1.02] flex items-center justify-center gap-2 shadow-lg shadow-red-900/40 disabled:shadow-none"
             >
-              {LABELS.actions.buy}
+              <span className="text-xl">🚀</span>
+              <span>구매</span>
             </button>
           </div>
         </div>

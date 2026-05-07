@@ -70,6 +70,68 @@ export function ParticleBurst({ personalityType, trigger }: { personalityType: P
   );
 }
 
+// ─── Combo Burst ────────────────────────────────────────────────────────────────
+
+export function ComboBurst({
+  combo,
+  trigger,
+  personalityType,
+}: {
+  combo: number;
+  trigger: number;
+  personalityType: PersonalityType | null;
+}) {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    if (combo < 2 || trigger === 0) return;
+    setShow(true);
+    const t = setTimeout(() => setShow(false), 1500);
+    return () => clearTimeout(t);
+  }, [combo, trigger]);
+
+  if (!show || !personalityType) return null;
+  const meta = PERSONALITY_META[personalityType];
+  const tier =
+    combo >= 5 ? "MEGA COMBO!" : combo >= 4 ? "SUPER COMBO!" : combo >= 3 ? "COMBO!" : "콤보!";
+
+  return (
+    <div className="fixed top-28 left-1/2 -translate-x-1/2 z-50 pointer-events-none animate-comboPop">
+      <div
+        className={`px-5 py-3 rounded-2xl border-2 ${meta.border} ${meta.bg} ${meta.glow} flex flex-col items-center gap-1`}
+      >
+        <span className="text-3xl animate-flameJitter inline-block">🔥</span>
+        <span className={`text-base font-black ${meta.text} tracking-wide`}>
+          x{combo} {tier}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Level Up Ring ──────────────────────────────────────────────────────────────
+
+export function LevelUpRing({ trigger }: { trigger: number }) {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    if (trigger === 0) return;
+    setShow(true);
+    const t = setTimeout(() => setShow(false), 1500);
+    return () => clearTimeout(t);
+  }, [trigger]);
+
+  if (!show) return null;
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-40 flex items-center justify-center">
+      <div className="absolute w-40 h-40 rounded-full border-4 border-yellow-400 animate-levelUpRing" />
+      <div className="absolute w-40 h-40 rounded-full border-4 border-yellow-300/60 animate-levelUpRing" style={{ animationDelay: "0.2s" }} />
+      <div className="text-yellow-300 font-black text-3xl animate-bounceIn drop-shadow-[0_0_24px_rgba(250,204,21,0.8)]">
+        LEVEL UP! ⬆️
+      </div>
+    </div>
+  );
+}
+
 // ─── Score Pop ──────────────────────────────────────────────────────────────────
 
 export function ScorePop({ show, personalityType }: { show: boolean; personalityType: PersonalityType | null }) {

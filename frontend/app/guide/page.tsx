@@ -284,7 +284,7 @@ export default function GuidePage() {
       initialCash,
     })
 
-    let characterType = "balanced"
+    let characterType: "conservative" | "aggressive" | "balanced" = "balanced"
 
     if (investorType.includes("보수적") || investorType.includes("안정")) {
       characterType = "conservative"

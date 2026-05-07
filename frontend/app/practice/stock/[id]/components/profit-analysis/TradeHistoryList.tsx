@@ -1,6 +1,7 @@
 "use client"
 
 import labelsData from "@/data/profit-analysis-labels.json"
+import { formatNumber } from "@/lib/format"
 import { LABELS } from "../../config"
 import type { TradeRecord } from "../../types"
 import { TradeHistoryItem } from "./TradeHistoryItem"

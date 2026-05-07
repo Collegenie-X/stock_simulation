@@ -1,115 +1,116 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-const CHART_DATA = [70, 68, 65, 60, 40, 25, 30, 42, 38, 45, 50, 48, 55, 60, 58, 65];
-const COLORS = {
-  stroke: '#eab308',
-  fill1: 'rgba(234,179,8,0.25)',
-  fill2: 'rgba(234,179,8,0)',
-  dot: 'rgba(234,179,8,0.2)',
-};
+const NEWS_FEED = [
+  { icon: '🚨', tag: '긴급', tagColor: 'text-red-400', bg: 'bg-red-500/15 border-red-500/30', title: '테슬라 실적 쇼크, 예상치 30% 하회' },
+  { icon: '⚡', tag: '속보', tagColor: 'text-yellow-400', bg: 'bg-yellow-500/15 border-yellow-500/30', title: '엔비디아 신규 AI칩 발표 — 시간외 +8%' },
+  { icon: '📉', tag: '경고', tagColor: 'text-orange-400', bg: 'bg-orange-500/15 border-orange-500/30', title: 'SK하이닉스, HBM 공급 차질 우려' },
+];
 
 export function EventScenarioPreview({ trigger }: { trigger: number }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const W = 300, H = 80;
+  const [newsIdx, setNewsIdx] = useState(0);
+  const [countdown, setCountdown] = useState(15);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    const dpr = window.devicePixelRatio || 1;
-    const W = 300;
-    const H = 90;
-    canvas.width = W * dpr;
-    canvas.height = H * dpr;
-    ctx.scale(dpr, dpr);
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-
-    const pts = CHART_DATA;
-    const total = pts.length;
-    const xStep = W / (total - 1);
-    const norm = (v: number) => H - (v / 100) * H * 0.85 - H * 0.05;
-
-    let drawn = 0;
-    let raf: number;
-
-    function frame() {
-      drawn += 0.25;
-      ctx!.clearRect(0, 0, W, H);
-      const count = Math.min(Math.floor(drawn), total);
-      if (count < 2) {
-        raf = requestAnimationFrame(frame);
-        return;
-      }
-
-      const grad = ctx!.createLinearGradient(0, 0, 0, H);
-      grad.addColorStop(0, COLORS.fill1);
-      grad.addColorStop(1, COLORS.fill2);
-      ctx!.beginPath();
-      ctx!.moveTo(0, norm(pts[0]));
-      for (let i = 1; i < count; i++) ctx!.lineTo(i * xStep, norm(pts[i]));
-      ctx!.lineTo((count - 1) * xStep, H);
-      ctx!.lineTo(0, H);
-      ctx!.closePath();
-      ctx!.fillStyle = grad;
-      ctx!.fill();
-
-      ctx!.beginPath();
-      ctx!.moveTo(0, norm(pts[0]));
-      for (let i = 1; i < count; i++) ctx!.lineTo(i * xStep, norm(pts[i]));
-      ctx!.strokeStyle = COLORS.stroke;
-      ctx!.lineWidth = 2;
-      ctx!.lineJoin = 'round';
-      ctx!.lineCap = 'round';
-      ctx!.stroke();
-
-      const lx = (count - 1) * xStep;
-      const ly = norm(pts[count - 1]);
-      ctx!.beginPath();
-      ctx!.arc(lx, ly, 3, 0, Math.PI * 2);
-      ctx!.fillStyle = COLORS.stroke;
-      ctx!.fill();
-      ctx!.beginPath();
-      ctx!.arc(lx, ly, 7, 0, Math.PI * 2);
-      ctx!.fillStyle = COLORS.dot;
-      ctx!.fill();
-
-      if (drawn < total) raf = requestAnimationFrame(frame);
-    }
-    raf = requestAnimationFrame(frame);
-    return () => cancelAnimationFrame(raf);
+    setNewsIdx(0);
+    setCountdown(15);
+    const newsTimer = setInterval(() => setNewsIdx(i => (i + 1) % NEWS_FEED.length), 2400);
+    const cdTimer = setInterval(() => setCountdown(c => (c <= 1 ? 15 : c - 1)), 1000);
+    return () => { clearInterval(newsTimer); clearInterval(cdTimer); };
   }, [trigger]);
 
+  const news = NEWS_FEED[newsIdx];
+
   return (
-    <div className="bg-[#0a0a0a] rounded-2xl border border-white/5 overflow-hidden">
-      <div className="h-24 p-2">
-        <canvas ref={canvasRef} className="w-full h-full" />
-      </div>
-      <div className="px-3 pb-3 space-y-2">
-        <div className="bg-red-500/15 border border-red-500/30 rounded-xl px-3 py-2">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-sm">🚨</span>
-            <span className="text-[10px] font-black text-red-400">긴급 뉴스</span>
-          </div>
-          <p className="text-[10px] text-gray-300 leading-snug">
-            &quot;A사 실적 쇼크, 예상치 40% 하회&quot;
-          </p>
+    <div className="bg-gradient-to-b from-[#0a0a0a] to-[#050505] rounded-2xl border border-white/5 overflow-hidden">
+      {/* 충격 차트 */}
+      <div className="relative h-20">
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-full" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="es-fill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#ef4444" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#ef4444" stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,30 L40,28 L70,32 L100,38 L130,35 L150,40 L165,55 L180,68 L200,62 L230,58 L260,52 L300,48 L300,80 L0,80 Z"
+            fill="url(#es-fill)"
+          />
+          <path
+            d="M0,30 L40,28 L70,32 L100,38 L130,35 L150,40 L165,55 L180,68 L200,62 L230,58 L260,52 L300,48"
+            fill="none"
+            stroke="#ef4444"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeDasharray="500"
+            strokeDashoffset="500"
+          >
+            <animate attributeName="stroke-dashoffset" from="500" to="0" dur="1s" fill="freeze" />
+          </path>
+          {/* 폭락 화살표 */}
+          <g transform="translate(170,50)">
+            <circle r="14" fill="#ef4444" opacity="0.2">
+              <animate attributeName="r" values="10;18;10" dur="1.4s" repeatCount="indefinite" />
+            </circle>
+            <text textAnchor="middle" y="4" fontSize="14">⚠️</text>
+          </g>
+        </svg>
+
+        {/* 카운트다운 배지 */}
+        <div className="absolute top-2 right-2 bg-black/70 backdrop-blur rounded-full px-2 py-0.5 flex items-center gap-1 border border-white/10">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+          <span className="text-[9px] font-black text-white tabular-nums">{countdown}s</span>
         </div>
-        <div className="flex gap-1.5">
-          <div className="flex-1 h-9 rounded-lg bg-red-500/20 border border-red-500/30 flex items-center justify-center gap-1">
-            <span className="text-[10px] font-black text-red-400">즉시 매도</span>
-          </div>
-          <div className="flex-1 h-9 rounded-lg bg-yellow-500/20 border border-yellow-500/30 flex items-center justify-center gap-1">
-            <span className="text-[10px] font-black text-yellow-400">일부 매도</span>
-          </div>
-          <div className="flex-1 h-9 rounded-lg bg-blue-500/20 border border-blue-500/30 flex items-center justify-center gap-1">
-            <span className="text-[10px] font-black text-blue-400">홀딩</span>
-          </div>
+
+        {/* 가격 변동 */}
+        <div className="absolute top-2 left-2">
+          <p className="text-[8px] text-gray-500">실시간</p>
+          <p className="text-[11px] font-black text-red-400">-7.42%</p>
         </div>
       </div>
+
+      {/* 뉴스 카드 */}
+      <div className="px-3 pt-2">
+        <div
+          key={newsIdx}
+          className={`${news.bg} border rounded-xl px-2.5 py-2 animate-news-in`}
+        >
+          <div className="flex items-center gap-1.5 mb-0.5">
+            <span className="text-xs">{news.icon}</span>
+            <span className={`text-[9px] font-black ${news.tagColor}`}>{news.tag}</span>
+            <span className="ml-auto text-[8px] text-gray-500">방금 전</span>
+          </div>
+          <p className="text-[10px] text-gray-200 leading-snug font-bold">{news.title}</p>
+        </div>
+      </div>
+
+      {/* 선택지 */}
+      <div className="px-3 pt-2 pb-3">
+        <div className="grid grid-cols-3 gap-1.5">
+          <button className="h-9 rounded-lg bg-red-500/20 border border-red-500/30 flex flex-col items-center justify-center active:scale-95 transition">
+            <span className="text-[9px]">💥</span>
+            <span className="text-[9px] font-black text-red-400">즉시 매도</span>
+          </button>
+          <button className="h-9 rounded-lg bg-yellow-500/20 border border-yellow-500/30 flex flex-col items-center justify-center active:scale-95 transition">
+            <span className="text-[9px]">✂️</span>
+            <span className="text-[9px] font-black text-yellow-400">일부 매도</span>
+          </button>
+          <button className="h-9 rounded-lg bg-blue-500/20 border border-blue-500/30 flex flex-col items-center justify-center active:scale-95 transition">
+            <span className="text-[9px]">💎</span>
+            <span className="text-[9px] font-black text-blue-400">홀딩</span>
+          </button>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes newsIn {
+          from { opacity: 0; transform: translateX(12px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        .animate-news-in { animation: newsIn 0.35s ease-out; }
+      `}</style>
     </div>
   );
 }

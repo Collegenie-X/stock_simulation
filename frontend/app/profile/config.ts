@@ -68,6 +68,16 @@ export const PROFILE_LABELS = {
   },
 
   logout: "로그아웃",
+
+  simulationDetail: {
+    pageTitle: "시뮬레이션 상세",
+    dailyReturnsTitle: "일별 수익률 (%)",
+    buyLabel: "매수",
+    sellLabel: "매도",
+    waveAccuracyLabel: "파도 정확도",
+    rankLabel: "순위",
+    tradesTitle: "거래 내역",
+  },
 } as const
 
 // ============================================================

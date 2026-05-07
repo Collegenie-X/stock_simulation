@@ -320,6 +320,23 @@ export interface AssetHistoryPoint {
   aiBest?: number
 }
 
+export interface DecisionTimelineEntry {
+  day?: number
+  turn?: number
+  stockId: string
+  stockName: string
+  price: number
+  userAction: "buy" | "sell" | "skip"
+  userQty: number
+  similarAction: "buy" | "sell" | "hold"
+  similarQty: number
+  bestAction: "buy" | "sell" | "hold"
+  bestQty: number
+  // 결정 시점 이후의 가격 변화 (최종 또는 N틱 후)
+  priceAfter?: number
+  changePct?: number
+}
+
 export interface FinalGameReportProps {
   isVisible: boolean
   totalDays: number
@@ -330,6 +347,8 @@ export interface FinalGameReportProps {
   holdings: Holdings
   tradeHistory: FinalGameReportTradeRecord[]
   weeklyHistory: { turn: number; value: number }[]
+  // 누적 선택 타임라인 (게임 전체)
+  decisionTimeline?: DecisionTimelineEntry[]
   // 자산 히스토리 (AI 포함)
   assetHistory?: AssetHistoryPoint[]
   // 종목 상세 데이터
