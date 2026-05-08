@@ -401,7 +401,7 @@ export default function ResultScreen({ personalityScores, abilities, totalQuesti
           </button>
         )}
         <button
-          onClick={() => window.location.reload()}
+          onClick={() => { window.location.href = `/analysis?mode=${mode}`; }}
           className="w-full py-3 rounded-2xl border border-white/8 text-white/40 text-sm font-semibold hover:text-white/60 active:scale-[0.98] transition-all"
         >
           {LABELS.retryBtn}
