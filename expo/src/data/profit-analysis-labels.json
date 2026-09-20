@@ -1,0 +1,40 @@
+{
+  "pieChart": {
+    "colors": [
+      "#EF4444",
+      "#3B82F6",
+      "#F59E0B",
+      "#10B981",
+      "#8B5CF6",
+      "#EC4899",
+      "#06B6D4",
+      "#84CC16",
+      "#F97316",
+      "#6366F1"
+    ],
+    "centerLabel": "거래",
+    "legendBuy": "매수",
+    "legendSell": "매도"
+  },
+  "summaryItems": [
+    { "key": "sellProfit", "label": "판매수익", "icon": "📈" },
+    { "key": "dividend", "label": "배당금", "icon": "💰" },
+    { "key": "rentalFee", "label": "대여료", "icon": "🏦" },
+    { "key": "bondInterest", "label": "채권 이자·만기수익", "icon": "📋" },
+    { "key": "accountInterest", "label": "계좌이자", "icon": "🏧" }
+  ],
+  "periodNavigator": {
+    "dailyFormat": "M월 D일 (ddd)",
+    "weeklyFormat": "M월 W주차",
+    "monthlyFormat": "YYYY년 M월"
+  },
+  "actionLabels": {
+    "buy": "매수",
+    "sell": "매도"
+  },
+  "emptyState": {
+    "icon": "📊",
+    "message": "거래 내역이 없습니다",
+    "subMessage": "주식을 사고 팔면 여기에 기록됩니다"
+  }
+}

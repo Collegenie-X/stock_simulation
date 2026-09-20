@@ -1,0 +1,14 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "expo-web",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd expo && npx expo start --web --port 8099"
+      ],
+      "port": 8099
+    }
+  ]
+}

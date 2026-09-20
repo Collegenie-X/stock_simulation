@@ -1,0 +1,623 @@
+{
+  "id": "WINTER_AI_2024",
+  "version": 1,
+  "title": "트럼프 당선부터 비상계엄까지",
+  "subtitle": "AI 호황의 마지막 광기와 정치 위기",
+  "era": "2024 Q4",
+  "period": {
+    "start": "2024-11-04",
+    "end": "2024-12-13"
+  },
+  "totalDays": 30,
+  "totalTurns": 60,
+  "turnsPerDay": 2,
+  "turnTimes": ["09:00", "14:00"],
+  "initialCapital": 100000000,
+  "initialFxRate": 1375,
+  "currency": "KRW",
+  "difficulty": "standard",
+  "estimatedPlayTimeMin": 20,
+
+  "stocks": [
+    {
+      "id": "K01",
+      "ticker": "005930",
+      "name": "삼성전자",
+      "market": "KR",
+      "exchange": "KOSPI",
+      "currency": "KRW",
+      "sector": "semiconductor",
+      "character": "bluechip",
+      "marketCap": "XL",
+      "startPrice": 58000,
+      "endPrice": 54500,
+      "totalReturn": -0.0603,
+      "role": "안전 자산 (계엄 직격)"
+    },
+    {
+      "id": "K21",
+      "ticker": "012450",
+      "name": "한화에어로스페이스",
+      "market": "KR",
+      "exchange": "KOSPI",
+      "currency": "KRW",
+      "sector": "defense",
+      "character": "growth",
+      "marketCap": "L",
+      "startPrice": 280000,
+      "endPrice": 342000,
+      "totalReturn": 0.2214,
+      "role": "트럼프 수혜 대표"
+    },
+    {
+      "id": "K07",
+      "ticker": "373220",
+      "name": "LG에너지솔루션",
+      "market": "KR",
+      "exchange": "KOSPI",
+      "currency": "KRW",
+      "sector": "battery",
+      "character": "growth",
+      "marketCap": "XL",
+      "startPrice": 390000,
+      "endPrice": 370000,
+      "totalReturn": -0.0513,
+      "role": "트럼프 직격 (IRA 위험)"
+    },
+    {
+      "id": "U05",
+      "ticker": "NVDA",
+      "name": "Nvidia",
+      "market": "US",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "sector": "semiconductor",
+      "character": "growth",
+      "marketCap": "XL",
+      "startPrice": 135.00,
+      "endPrice": 138.00,
+      "totalReturn": 0.0222,
+      "role": "AI 호황 마지막 광기"
+    },
+    {
+      "id": "U07",
+      "ticker": "TSLA",
+      "name": "Tesla",
+      "market": "US",
+      "exchange": "NASDAQ",
+      "currency": "USD",
+      "sector": "ev-mobility",
+      "character": "volatile",
+      "marketCap": "XL",
+      "startPrice": 245.00,
+      "endPrice": 420.00,
+      "totalReturn": 0.7143,
+      "role": "머스크 트럼프 랠리"
+    }
+  ],
+
+  "calendar": [
+    { "day": 1,  "date": "2024-11-04", "weekday": "월", "isHoliday": false, "marketStatus": "open" },
+    { "day": 2,  "date": "2024-11-05", "weekday": "화", "isHoliday": false, "marketStatus": "open", "note": "미국 대선일" },
+    { "day": 3,  "date": "2024-11-06", "weekday": "수", "isHoliday": false, "marketStatus": "open", "note": "트럼프 당선 확정" },
+    { "day": 4,  "date": "2024-11-07", "weekday": "목", "isHoliday": false, "marketStatus": "open" },
+    { "day": 5,  "date": "2024-11-08", "weekday": "금", "isHoliday": false, "marketStatus": "open" },
+    { "day": 6,  "date": "2024-11-11", "weekday": "월", "isHoliday": false, "marketStatus": "open" },
+    { "day": 7,  "date": "2024-11-12", "weekday": "화", "isHoliday": false, "marketStatus": "open" },
+    { "day": 8,  "date": "2024-11-13", "weekday": "수", "isHoliday": false, "marketStatus": "open" },
+    { "day": 9,  "date": "2024-11-14", "weekday": "목", "isHoliday": false, "marketStatus": "open" },
+    { "day": 10, "date": "2024-11-15", "weekday": "금", "isHoliday": false, "marketStatus": "open" },
+    { "day": 11, "date": "2024-11-18", "weekday": "월", "isHoliday": false, "marketStatus": "open" },
+    { "day": 12, "date": "2024-11-19", "weekday": "화", "isHoliday": false, "marketStatus": "open" },
+    { "day": 13, "date": "2024-11-20", "weekday": "수", "isHoliday": false, "marketStatus": "open", "note": "NVDA 어닝 발표" },
+    { "day": 14, "date": "2024-11-21", "weekday": "목", "isHoliday": false, "marketStatus": "open" },
+    { "day": 15, "date": "2024-11-22", "weekday": "금", "isHoliday": false, "marketStatus": "open" },
+    { "day": 16, "date": "2024-11-25", "weekday": "월", "isHoliday": false, "marketStatus": "open" },
+    { "day": 17, "date": "2024-11-26", "weekday": "화", "isHoliday": false, "marketStatus": "open" },
+    { "day": 18, "date": "2024-11-27", "weekday": "수", "isHoliday": false, "marketStatus": "open" },
+    { "day": 19, "date": "2024-11-28", "weekday": "목", "isHoliday": false, "marketStatus": "us_closed", "note": "미국 추수감사절 휴장" },
+    { "day": 20, "date": "2024-11-29", "weekday": "금", "isHoliday": false, "marketStatus": "open" },
+    { "day": 21, "date": "2024-12-02", "weekday": "월", "isHoliday": false, "marketStatus": "open" },
+    { "day": 22, "date": "2024-12-03", "weekday": "화", "isHoliday": false, "marketStatus": "open", "note": "비상계엄 선포 (밤 22:23, 시장 마감 후)" },
+    { "day": 23, "date": "2024-12-04", "weekday": "수", "isHoliday": false, "marketStatus": "open", "note": "🔥 비상계엄 충격 갭다운" },
+    { "day": 24, "date": "2024-12-05", "weekday": "목", "isHoliday": false, "marketStatus": "open" },
+    { "day": 25, "date": "2024-12-06", "weekday": "금", "isHoliday": false, "marketStatus": "open" },
+    { "day": 26, "date": "2024-12-09", "weekday": "월", "isHoliday": false, "marketStatus": "open" },
+    { "day": 27, "date": "2024-12-10", "weekday": "화", "isHoliday": false, "marketStatus": "open" },
+    { "day": 28, "date": "2024-12-11", "weekday": "수", "isHoliday": false, "marketStatus": "open" },
+    { "day": 29, "date": "2024-12-12", "weekday": "목", "isHoliday": false, "marketStatus": "open", "note": "탄핵 표결 임박" },
+    { "day": 30, "date": "2024-12-13", "weekday": "금", "isHoliday": false, "marketStatus": "open", "note": "결산" }
+  ],
+
+  "priceSeries": {
+    "K01": [
+      58000, 58200, 58300, 58000, 57000, 56800, 56500, 56800, 56700, 56500,
+      56500, 56800, 56500, 56200, 56500, 56800, 57000, 57200, 57000, 56800,
+      58500, 58800, 58500, 58200, 58000, 58500, 60000, 60500, 59500, 59000,
+      58500, 58200, 58000, 57800, 57500, 57800, 58000, 58000, 58200, 58500,
+      58500, 58200, 58000, 58200, 54200, 53800, 55000, 56200, 55500, 55200,
+      55000, 54800, 54500, 54500, 54200, 54300, 54000, 54200, 54500, 54500
+    ],
+    "K21": [
+      280000, 281500, 282000, 281000, 295000, 305000, 308000, 311000, 310000, 312000,
+      315000, 320000, 322000, 325000, 326000, 327000, 328000, 330000, 332000, 330000,
+      332000, 333000, 333000, 332000, 333000, 334000, 336000, 335000, 334000, 335000,
+      335000, 334000, 333000, 334000, 335000, 336000, 336000, 337000, 338000, 338000,
+      339000, 340000, 340000, 341000, 332000, 330000, 335000, 338000, 340000, 339000,
+      340000, 341000, 345000, 348000, 346000, 344000, 343000, 342000, 343000, 342000
+    ],
+    "K07": [
+      390000, 391000, 392000, 390500, 365000, 357000, 355000, 358000, 360000, 360000,
+      357000, 358000, 350000, 348000, 355000, 360000, 362000, 365000, 365000, 367000,
+      368000, 370000, 372000, 375000, 374000, 375000, 378000, 380000, 378000, 376000,
+      375000, 373000, 372000, 373000, 372000, 374000, 375000, 375000, 376000, 377000,
+      380000, 382000, 383000, 385000, 358000, 355000, 360000, 362000, 365000, 365000,
+      366000, 366000, 367000, 368000, 369000, 370000, 369000, 370000, 371000, 370000
+    ],
+    "U05": [
+      135.00, 135.50, 136.00, 137.00, 138.00, 140.00, 138.50, 139.00, 139.50, 140.00,
+      140.50, 141.00, 140.50, 141.50, 142.00, 141.50, 142.50, 143.00, 143.50, 142.50,
+      142.00, 141.50, 143.00, 144.00, 147.00, 146.50, 145.00, 143.00, 141.00, 140.00,
+      138.50, 138.00, 137.50, 138.00, 138.50, 139.00, 139.50, 139.50, 138.00, 138.50,
+      139.00, 138.50, 139.00, 140.00, 140.50, 139.00, 138.00, 137.00, 136.50, 136.00,
+      135.50, 135.00, 135.50, 136.00, 137.00, 137.50, 138.00, 138.50, 138.50, 138.00
+    ],
+    "U07": [
+      245.00, 246.00, 248.00, 251.00, 280.00, 288.00, 290.00, 295.00, 296.00, 300.00,
+      305.00, 310.00, 320.00, 330.00, 332.00, 335.00, 340.00, 345.00, 348.00, 350.00,
+      352.00, 350.00, 348.00, 350.00, 355.00, 360.00, 362.00, 365.00, 360.00, 358.00,
+      360.00, 365.00, 370.00, 375.00, 378.00, 380.00, 380.00, 380.00, 385.00, 388.00,
+      390.00, 392.00, 395.00, 400.00, 402.00, 405.00, 408.00, 412.00, 415.00, 418.00,
+      420.00, 422.00, 425.00, 428.00, 430.00, 432.00, 435.00, 425.00, 422.00, 420.00
+    ]
+  },
+
+  "fxSeries": [
+    1375, 1375, 1378, 1378, 1395, 1400, 1395, 1392, 1395, 1395,
+    1395, 1395, 1398, 1400, 1395, 1392, 1390, 1390, 1388, 1388,
+    1388, 1385, 1385, 1385, 1388, 1388, 1385, 1385, 1388, 1388,
+    1400, 1402, 1405, 1403, 1402, 1400, 1398, 1398, 1395, 1395,
+    1395, 1395, 1395, 1395, 1442, 1440, 1430, 1425, 1430, 1432,
+    1435, 1438, 1440, 1442, 1445, 1448, 1450, 1452, 1450, 1448
+  ],
+
+  "events": [
+    {
+      "id": "E1",
+      "turn": 5,
+      "day": 3,
+      "time": "09:00",
+      "type": "major",
+      "category": "macro-political",
+      "severity": "high",
+      "headline": "[속보] 트럼프 재당선 확정 — 47대 미국 대통령",
+      "body": "공화당 도널드 트럼프 후보가 미국 대선에서 승리. 방산·전통에너지·EV(테슬라) 수혜 기대, IRA 폐지 우려로 2차전지 직격탄.",
+      "source": "AP통신 · 2024.11.06",
+      "realCase": "2024.11.05 미국 대선 트럼프 재당선",
+      "affectedStocks": [
+        { "id": "K21", "magnitude": 0.05, "direction": "up", "reason": "방산 수혜" },
+        { "id": "K07", "magnitude": -0.07, "direction": "down", "reason": "IRA 폐지 우려" },
+        { "id": "U07", "magnitude": 0.12, "direction": "up", "reason": "머스크-트럼프 동맹" },
+        { "id": "K01", "magnitude": -0.02, "direction": "down", "reason": "관세 우려" }
+      ],
+      "fxImpact": 0.012,
+      "preSignal": {
+        "type": "exit_polls",
+        "description": "출구조사 발표 후 분위기 전환",
+        "visibleFromTurn": 3
+      },
+      "learningTags": ["sector_divergence", "trump_trade", "policy_split"]
+    },
+    {
+      "id": "E2",
+      "turn": 21,
+      "day": 11,
+      "time": "09:00",
+      "type": "minor",
+      "category": "shareholder-return",
+      "severity": "low",
+      "headline": "삼성전자, 자사주 매입 1조원 발표",
+      "body": "삼성전자가 향후 1년간 1조원 규모 자사주 매입을 결정. 주가 부양 차원의 주주환원 강화.",
+      "source": "전자공시 · 2024.11.18",
+      "realCase": "2024.11 삼성전자 자사주 매입",
+      "affectedStocks": [
+        { "id": "K01", "magnitude": 0.03, "direction": "up", "reason": "주주환원 강화" }
+      ],
+      "fxImpact": 0,
+      "preSignal": null,
+      "learningTags": ["shareholder_return", "buyback"]
+    },
+    {
+      "id": "E3",
+      "turn": 25,
+      "day": 13,
+      "time": "09:00",
+      "type": "major",
+      "category": "earnings",
+      "severity": "high",
+      "headline": "[속보] NVDA 어닝 서프라이즈 — 컨센 +47% 상회",
+      "body": "엔비디아 분기 매출 351억$ (+94% YoY), 영업이익 컨센 47% 상회. AI 슈퍼사이클 지속 확인.",
+      "source": "외신 · 2024.11.20",
+      "realCase": "2024.11.20 NVDA Q3 어닝",
+      "affectedStocks": [
+        { "id": "U05", "magnitude": 0.05, "direction": "up", "reason": "어닝 서프" },
+        { "id": "K01", "magnitude": 0.04, "direction": "up", "reason": "HBM 동조 (시차 1턴)", "lag": 1 }
+      ],
+      "fxImpact": 0,
+      "preSignal": {
+        "type": "consensus_buildup",
+        "description": "발표 직전 거래량·기대감 상승",
+        "visibleFromTurn": 23
+      },
+      "learningTags": ["earnings_surprise", "cross_market_correlation", "ai_cycle"]
+    },
+    {
+      "id": "E4",
+      "turn": 45,
+      "day": 23,
+      "time": "09:00",
+      "type": "blackswan",
+      "category": "macro-political",
+      "severity": "extreme",
+      "headline": "🔥 [속보] 비상계엄 후폭풍 — 코스피 -7%, 환율 1,442원 폭등",
+      "body": "윤석열 대통령이 12월 3일 밤 비상계엄을 전격 선포. 6시간만에 해제됐으나 시장 충격. 외국인 대규모 매도, 환율 1,442원 돌파.",
+      "source": "전 언론 · 2024.12.04",
+      "realCase": "2024.12.03 22:23 비상계엄 선포 → 12.04 시장 충격",
+      "affectedStocks": [
+        { "id": "K01", "magnitude": -0.07, "direction": "down", "reason": "전종목 갭다운" },
+        { "id": "K21", "magnitude": -0.025, "direction": "down", "reason": "방산은 buffer" },
+        { "id": "K07", "magnitude": -0.07, "direction": "down", "reason": "전종목 갭다운" },
+        { "id": "U05", "magnitude": 0.005, "direction": "up", "reason": "미국주는 영향 미미" },
+        { "id": "U07", "magnitude": 0.005, "direction": "up", "reason": "미국주는 영향 미미" }
+      ],
+      "fxImpact": 0.04,
+      "preSignal": null,
+      "recovery": {
+        "startTurn": 47,
+        "magnitude": 0.04,
+        "description": "다음날 V자 회복 시도"
+      },
+      "learningTags": ["blackswan", "v_recovery", "fx_hedge", "panic_buying"]
+    },
+    {
+      "id": "E5",
+      "turn": 54,
+      "day": 27,
+      "time": "14:00",
+      "type": "minor",
+      "category": "contract",
+      "severity": "low",
+      "headline": "한화에어로 폴란드 K9 추가 수주설",
+      "body": "한화에어로스페이스가 폴란드와 K9 자주포 추가 계약 임박 보도. 외신 발 루머지만 신뢰도 높음.",
+      "source": "Defense News · 2024.12.10",
+      "realCase": "2024.12 한화에어로 K9 추가 수주",
+      "affectedStocks": [
+        { "id": "K21", "magnitude": 0.025, "direction": "up", "reason": "메가 수주 기대" }
+      ],
+      "fxImpact": 0,
+      "preSignal": {
+        "type": "foreign_media",
+        "description": "외신 사전 보도",
+        "visibleFromTurn": 53
+      },
+      "learningTags": ["contract_megadeal", "defense_cycle"]
+    }
+  ],
+
+  "noiseNewsTemplates": [
+    {
+      "id": "N01",
+      "weight": 1.0,
+      "category": "earnings_priced_in",
+      "headline": "분기 실적 시장 예상치 하회, 전망 하향",
+      "body": "매출 성장 둔화, 수익성 약화 전망",
+      "badge": "어제 발표 · 주가 이미 반영",
+      "marketImpact": 0
+    },
+    {
+      "id": "N02",
+      "weight": 0.8,
+      "category": "earnings_priced_in",
+      "headline": "분기 실적 컨센서스 부합",
+      "body": "특이사항 없음, 시장 영향 미미",
+      "badge": "이미 반영",
+      "marketImpact": 0
+    },
+    {
+      "id": "N03",
+      "weight": 1.0,
+      "category": "neutral",
+      "headline": "기관 소폭 매수, 거래량 평이",
+      "body": "특별한 매매 동향 없음",
+      "badge": "관망",
+      "marketImpact": 0
+    },
+    {
+      "id": "N04",
+      "weight": 0.9,
+      "category": "neutral",
+      "headline": "외신 AI 보도, 시장 영향 미미",
+      "body": "지난 주 발표 내용 재인용",
+      "badge": "이미 반영",
+      "marketImpact": 0
+    },
+    {
+      "id": "N05",
+      "weight": 1.0,
+      "category": "neutral",
+      "headline": "주말 앞두고 관망세",
+      "body": "거래량 평소보다 적음",
+      "badge": "관망",
+      "marketImpact": 0
+    },
+    {
+      "id": "N06",
+      "weight": 0.7,
+      "category": "rumor",
+      "headline": "OO 신사업 진출 검토 보도",
+      "body": "회사 측 '확정된 바 없음' 공시",
+      "badge": "루머 · 회사 부인",
+      "marketImpact": 0
+    },
+    {
+      "id": "N07",
+      "weight": 0.9,
+      "category": "neutral",
+      "headline": "월요일 시초 안정세",
+      "body": "지수 ±0.3% 등락",
+      "badge": "평이",
+      "marketImpact": 0
+    },
+    {
+      "id": "N08",
+      "weight": 0.8,
+      "category": "fx",
+      "headline": "원/달러 환율 보합권",
+      "body": "달러 강세 진정",
+      "badge": "관망",
+      "marketImpact": 0
+    },
+    {
+      "id": "N09",
+      "weight": 0.7,
+      "category": "neutral",
+      "headline": "외국인 미세 순매수",
+      "body": "특별한 방향성 없음",
+      "badge": "평이",
+      "marketImpact": 0
+    },
+    {
+      "id": "N10",
+      "weight": 0.8,
+      "category": "neutral",
+      "headline": "코스피 박스권 거래",
+      "body": "지수 2,500 부근 등락",
+      "badge": "관망",
+      "marketImpact": 0
+    },
+    {
+      "id": "N11",
+      "weight": 0.6,
+      "category": "rumor",
+      "headline": "신제품 출시 임박설",
+      "body": "구체적 일정 미정",
+      "badge": "루머",
+      "marketImpact": 0
+    },
+    {
+      "id": "N12",
+      "weight": 0.7,
+      "category": "neutral",
+      "headline": "DRAM 현물가 보합",
+      "body": "수급 균형 유지",
+      "badge": "평이",
+      "marketImpact": 0
+    },
+    {
+      "id": "N13",
+      "weight": 0.6,
+      "category": "neutral",
+      "headline": "WTI 유가 박스권",
+      "body": "$70 부근 등락",
+      "badge": "평이",
+      "marketImpact": 0
+    },
+    {
+      "id": "N14",
+      "weight": 0.7,
+      "category": "neutral",
+      "headline": "기관 매매 균형",
+      "body": "매수·매도 비슷",
+      "badge": "평이",
+      "marketImpact": 0
+    },
+    {
+      "id": "N15",
+      "weight": 0.5,
+      "category": "rumor",
+      "headline": "M&A 가능성 보도",
+      "body": "양사 모두 부인",
+      "badge": "루머 · 부인",
+      "marketImpact": 0
+    },
+    {
+      "id": "N16",
+      "weight": 0.6,
+      "category": "neutral",
+      "headline": "원자재 가격 안정",
+      "body": "구리·니켈 보합",
+      "badge": "평이",
+      "marketImpact": 0
+    },
+    {
+      "id": "N17",
+      "weight": 0.7,
+      "category": "neutral",
+      "headline": "공매도 잔고 변동 미미",
+      "body": "전주 대비 +0.1%",
+      "badge": "평이",
+      "marketImpact": 0
+    },
+    {
+      "id": "N18",
+      "weight": 0.5,
+      "category": "rumor",
+      "headline": "임원 일부 매도 공시",
+      "body": "정기 매도, 양 미미",
+      "badge": "공시",
+      "marketImpact": 0
+    },
+    {
+      "id": "N19",
+      "weight": 0.6,
+      "category": "neutral",
+      "headline": "글로벌 IB 목표가 유지",
+      "body": "기존 의견 변화 없음",
+      "badge": "평이",
+      "marketImpact": 0
+    },
+    {
+      "id": "N20",
+      "weight": 0.5,
+      "category": "rumor",
+      "headline": "신기술 개발 루머",
+      "body": "회사 측 무대응",
+      "badge": "루머",
+      "marketImpact": 0
+    }
+  ],
+
+  "noiseNewsConfig": {
+    "probabilityPerTurn": 0.3,
+    "maxPerTurn": 1,
+    "skipOnEventTurn": true
+  },
+
+  "correlations": [
+    {
+      "source": "U05",
+      "target": "K01",
+      "lag": 1,
+      "strength": 0.6,
+      "description": "NVDA 어닝 → 다음턴 삼성전자 (HBM 동조)"
+    },
+    {
+      "source": "U07",
+      "target": "K07",
+      "lag": 1,
+      "strength": 0.4,
+      "description": "TSLA → LG엔솔 (EV 동조, but 트럼프 반전)"
+    }
+  ],
+
+  "fxSensitivity": {
+    "U05": 1.0,
+    "U07": 1.0,
+    "K01": -0.2,
+    "K07": -0.3,
+    "K21": 0.1
+  },
+
+  "learningGoals": [
+    {
+      "id": "L1",
+      "title": "잔잔한 날 인내",
+      "description": "1주차와 4주차는 큰 변동이 없다. 관망도 결정이다.",
+      "relevantTurns": [1, 2, 3, 4, 8, 9, 10, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40]
+    },
+    {
+      "id": "L2",
+      "title": "섹터 갈림길 (Trump trade)",
+      "description": "같은 트럼프 당선이 한화에어로 +5%, LG엔솔 -7%. 정책에 따라 승자/패자가 갈린다.",
+      "relevantTurns": [5, 6, 7]
+    },
+    {
+      "id": "L3",
+      "title": "시차 동조 (NVDA → 삼전)",
+      "description": "미국 대장주 변동은 다음날 한국 동조주에 반영된다.",
+      "relevantTurns": [25, 26, 27, 28]
+    },
+    {
+      "id": "L4",
+      "title": "환율 헤지",
+      "description": "한국 위기 시 환율 +4% → 미국주 자동 +4% 환차익. 해외 분산의 가치.",
+      "relevantTurns": [45, 46, 47, 48]
+    },
+    {
+      "id": "L5",
+      "title": "블랙스완 V자 매수",
+      "description": "비상계엄 갭다운 다음날 +5% 회복. 패닉 매도자가 가장 손해.",
+      "relevantTurns": [45, 46, 47, 48]
+    },
+    {
+      "id": "L6",
+      "title": "추세 추종 (TSLA)",
+      "description": "$245 → $420. 거대 추세는 끝까지 탄다. 일찍 익절하면 후회.",
+      "relevantTurns": [5, 11, 21, 41, 51, 60]
+    }
+  ],
+
+  "expectedOutcome": {
+    "S": {
+      "label": "S 등급",
+      "profitRange": [0.25, 0.35],
+      "senseRange": [850, 950],
+      "description": "트럼프 트레이드 정확, NVDA 어닝 보유, 계엄 V자 매수, TSLA 추세 추종"
+    },
+    "A": {
+      "label": "A 등급",
+      "profitRange": [0.05, 0.15],
+      "senseRange": [500, 700],
+      "description": "한화에어로 잡았으나 TSLA 놓침, NVDA 추격 매수, 계엄 일부 손절"
+    },
+    "B": {
+      "label": "B 등급",
+      "profitRange": [-0.05, 0.05],
+      "senseRange": [350, 500],
+      "description": "큰 함정 1~2개 걸렸으나 손실 제한"
+    },
+    "C": {
+      "label": "C 등급",
+      "profitRange": [-0.20, -0.05],
+      "senseRange": [200, 350],
+      "description": "LG엔솔 매수 (트럼프 우려 무시), 계엄 패닉 매도"
+    },
+    "D": {
+      "label": "D 등급",
+      "profitRange": [-0.40, -0.20],
+      "senseRange": [0, 200],
+      "description": "여러 함정 걸림, 패닉 반복"
+    },
+    "F": {
+      "label": "F 등급 (게임오버)",
+      "profitRange": [-1.0, -0.50],
+      "senseRange": [0, 100],
+      "description": "올인 후 폭락, 자산 -50% 이하"
+    }
+  },
+
+  "uiHints": {
+    "actBoundaries": [
+      { "act": 1, "startTurn": 1, "endTurn": 20, "title": "탐색기 — 잔잔한 긴장" },
+      { "act": 2, "startTurn": 21, "endTurn": 40, "title": "격동기 — AI 광기와 환율 폭주" },
+      { "act": 3, "startTurn": 41, "endTurn": 60, "title": "결전기 — 비상계엄과 회복" }
+    ],
+    "weekBoundaries": [
+      { "week": 1, "startDay": 1, "endDay": 5, "theme": "잔잔한 긴장" },
+      { "week": 2, "startDay": 6, "endDay": 10, "theme": "트럼프 후폭풍" },
+      { "week": 3, "startDay": 11, "endDay": 15, "theme": "NVDA 어닝 광기" },
+      { "week": 4, "startDay": 16, "endDay": 20, "theme": "환율 폭주" },
+      { "week": 5, "startDay": 21, "endDay": 25, "theme": "🔥 비상계엄" },
+      { "week": 6, "startDay": 26, "endDay": 30, "theme": "정국 안정화" }
+    ],
+    "climaxTurn": 45
+  },
+
+  "metadata": {
+    "createdAt": "2026-05-07",
+    "author": "stock-simulation-team",
+    "schemaVersion": "1.0",
+    "sourceDoc": "docs/SCENARIO_WINTER_AI_2024.md",
+    "tags": ["recent", "korean-politics", "ai-boom", "trump-trade", "winter-2024"]
+  }
+}

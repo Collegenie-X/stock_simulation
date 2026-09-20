@@ -1,0 +1,36 @@
+{
+  "items": [
+    {
+      "id": "insider_tip",
+      "name": "내부자 정보",
+      "description": "다음 턴의 주가 등락 방향을 미리 알 수 있습니다.",
+      "icon": "🕵️",
+      "cost": 500,
+      "type": "info"
+    },
+    {
+      "id": "double_yield",
+      "name": "수익 2배 부스터",
+      "description": "이번 턴의 수익률이 2배로 적용됩니다. (손실도 2배)",
+      "icon": "🚀",
+      "cost": 800,
+      "type": "buff"
+    },
+    {
+      "id": "risk_shield",
+      "name": "손실 방어막",
+      "description": "이번 턴에 주가가 하락해도 손실을 입지 않습니다.",
+      "icon": "🛡️",
+      "cost": 600,
+      "type": "defense"
+    },
+    {
+      "id": "market_analysis",
+      "name": "전문가 분석",
+      "description": "현재 주가의 저평가/고평가 여부를 알려줍니다.",
+      "icon": "📊",
+      "cost": 300,
+      "type": "info"
+    }
+  ]
+}

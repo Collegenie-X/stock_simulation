@@ -1,0 +1,91 @@
+{
+  "category": "반도체",
+  "scenarios": [
+    {
+      "id": "legend-1",
+      "order": 1,
+      "title": "삼성전자, 반도체 사이클의 끝?",
+      "subtitle": "실적 악화 속 저점 매수 판단",
+      "emoji": "💎",
+      "category": "실적 분석",
+      "difficulty": 2,
+      "difficultyLabel": "초급",
+      "gradientFrom": "from-blue-500",
+      "gradientTo": "to-indigo-600",
+      "stock": {
+        "name": "삼성전자",
+        "code": "005930",
+        "sector": "반도체",
+        "initialPrice": 72000
+      },
+      "description": "삼성전자 반도체가 큰 적자를 냈어요. 반도체 가격이 계속 떨어지고 있는데... 이럴 때 사야 할까요, 팔아야 할까요?",
+      "keyLesson": "반도체는 떨어졌다가 다시 올라와요. 바닥에서 사는 용기가 중요!",
+      "survivalTip": "실적이 나빠도 바로 바닥은 아니에요. 생산을 줄이면 → 물건이 귀해지고 → 가격이 올라요!",
+      "tags": ["삼성전자", "반도체", "사이클", "실적"],
+      "events": [
+        { "turn": 1, "title": "분기 실적 발표, 영업이익 -96% 충격", "description": "삼성전자가 분기 실적을 발표했습니다. 반도체 부문 영업이익이 전년 대비 -96% 급감. 시장 예상보다 더 나쁜 \"어닝 쇼크\"입니다. 100주를 보유 중인 당신, 주가는 장 초반 -4%까지 빠졌다가 저가 매수세로 -2.8% 마감. 기관은 매도, 외국인은 소폭 매수. 삼성전자를 더 사야 할까, 손절해야 할까?", "priceChange": "-2.8%", "sentiment": "shock" },
+        { "turn": 2, "title": "메모리 반도체 가격 추가 하락", "description": "시장조사기관 트렌드포스가 다음 분기 DRAM 가격이 추가 -10% 하락할 것으로 전망했습니다. 메모리 반도체 재고가 역대 최고 수준. 경쟁사 마이크론도 실적이 부진합니다. 주가 -1.5% 하락. 하지만 일부 애널리스트는 \"이미 가격에 반영됐다\"는 의견을 내고 있습니다. 20일 이동평균선 아래로 내려온 상태.", "priceChange": "-1.5%", "sentiment": "negative" },
+        { "turn": 3, "title": "감산 결정 발표, 수급 개선 기대", "description": "삼성전자가 NAND 생산량을 15% 감축하겠다고 발표했습니다! 업계 전체의 감산이 본격화되면서 수급 개선 기대감이 형성. +2.2% 반등. 역사적으로 삼성전자의 감산 발표는 주가 바닥 신호였습니다. 외국인이 2거래일 연속 순매수로 전환. RSI가 32에서 반등하며 과매도 탈출 신호.", "priceChange": "+2.2%", "sentiment": "positive" },
+        { "turn": 4, "title": "미중 갈등, 수출규제 우려", "description": "미국이 중국 반도체 수출규제를 강화한다는 뉴스가 나왔습니다. 삼성전자의 시안 공장이 영향을 받을 수 있다는 우려. -2.5% 하락. 하지만 한국은 \"1년 유예\" 대상이라는 분석도 있습니다. 지정학적 리스크가 주가에 얼마나 반영돼야 할지 판단이 어려운 구간입니다.", "priceChange": "-2.5%", "sentiment": "negative" },
+        { "turn": 5, "title": "AI 서버 수요 폭증 뉴스", "description": "엔비디아 CEO가 \"AI 서버 수요가 공급을 초과하고 있다\"고 발표. AI에 들어가는 고대역폭메모리(HBM)는 삼성전자의 핵심 제품. 시장이 \"AI = 메모리 수혜\"로 반응하며 +3.1% 급등. 거래량이 전일의 2배. 외국인이 1,000억원 이상 순매수. 반도체 다운사이클의 끝이 보이기 시작합니다.", "priceChange": "+3.1%", "sentiment": "positive" },
+        { "turn": 6, "title": "외국인 5거래일 연속 순매수", "description": "외국인이 5거래일 연속 삼성전자를 순매수하고 있습니다. 글로벌 반도체 ETF로도 자금이 유입 중. +1.8% 상승하며 20일 이동평균선을 돌파. 기술적으로 매수 신호가 나왔습니다. 개인 투자자들도 \"삼전 줍줍\" 대열에 합류. 여기서 추가 매수? 아니면 반등에 일부 차익실현?", "priceChange": "+1.8%", "sentiment": "positive" },
+        { "turn": 7, "title": "미국 반도체법 수혜 기대", "description": "미국 CHIPS법 보조금 대상에 삼성전자 텍사스 공장이 포함될 수 있다는 보도. 최대 6조원 보조금 기대감에 +2.4% 상승. 60일 이동평균선도 돌파하며 중기 추세 전환 확정. 증권사들이 목표가를 일제히 상향. \"반도체 봄이 오고 있다\"는 리포트가 쏟아집니다.", "priceChange": "+2.4%", "sentiment": "positive" },
+        { "turn": 8, "title": "HBM3E 양산 성공 발표", "description": "삼성전자가 차세대 HBM3E 양산에 성공했다고 발표! AI 시대의 핵심 부품을 선점. +3.2% 급등하며 최근 저점 대비 +10% 이상 회복. 반도체 사이클이 확실히 반등 국면에 진입. 바닥에서 매수한 투자자들은 큰 수익을 얻고 있습니다.", "priceChange": "+3.2%", "sentiment": "positive" }
+      ],
+      "strategies": [
+        { "id": "s1-1", "title": "바닥 분할 매수", "emoji": "📊", "description": "하락 구간에서 3단계 분할 매수", "steps": ["1~2턴: 관망 (바닥 확인)", "3턴: 감산 발표에 1차 매수 (30%)", "5턴: AI 수혜 확인 후 2차 매수 (30%)"], "risk": "보통", "expectedReturn": "+5% ~ +12%", "difficulty": 3 },
+        { "id": "s1-2", "title": "추세 전환 매수", "emoji": "📈", "description": "기술적 반등 확인 후 진입", "steps": ["1~5턴: 관망", "6턴: 이평선 돌파 시 100% 매수", "7~8턴: 추가 상승 시 홀딩"], "risk": "낮음", "expectedReturn": "+3% ~ +8%", "difficulty": 2 },
+        { "id": "s1-3", "title": "보수적 관망", "emoji": "🛡️", "description": "사이클 확정까지 대기", "steps": ["1~8턴: 전량 관망", "사이클 반등 확정 후 다음 기회 대기"], "risk": "매우 낮음", "expectedReturn": "0%", "difficulty": 1 }
+      ],
+      "aiResponses": [
+        { "personality": "conservative", "strategyId": "s1-3", "finalReturn": "0%", "reasoning": "사이클 바닥이 확정될 때까지 기다렸습니다. 안전이 최우선!" },
+        { "personality": "aggressive", "strategyId": "s1-1", "finalReturn": "+10.5%", "reasoning": "감산 발표와 AI 수혜를 포착해 분할 매수! 좋은 수익을 얻었습니다." },
+        { "personality": "balanced", "strategyId": "s1-2", "finalReturn": "+6.2%", "reasoning": "기술적 반등을 확인한 후 안전하게 진입했습니다." }
+      ],
+      "stats": { "avgClearRate": 82, "avgSurvivalRate": 91, "bestStrategy": "바닥 분할 매수" }
+    },
+    {
+      "id": "legend-11",
+      "order": 11,
+      "title": "마이크론, 메모리 사이클의 폭풍",
+      "subtitle": "삼성보다 2배 빠른 변동성",
+      "emoji": "🌪️",
+      "category": "사이클 분석",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-blue-600",
+      "gradientTo": "to-purple-600",
+      "stock": {
+        "name": "마이크론",
+        "code": "MU",
+        "sector": "반도체",
+        "initialPrice": 85
+      },
+      "description": "마이크론은 삼성전자보다 변동성이 2배 큽니다. 메모리 사이클 저점에서 용기 있게 들어갈 수 있나요?",
+      "keyLesson": "사이클주는 변동성이 클수록 수익도 크지만, 손실도 큽니다!",
+      "survivalTip": "미국 데이터센터 수요를 보면 마이크론의 미래가 보입니다.",
+      "tags": ["마이크론", "메모리", "사이클", "고변동성"],
+      "events": [
+        { "turn": 1, "title": "분기 실적 -80% 충격", "description": "마이크론이 분기 영업이익 -80% 급감을 발표했습니다. DRAM 가격이 전분기 대비 -15% 하락. 주가는 -8.5% 폭락. 삼성전자보다 훨씬 큰 낙폭입니다. 애널리스트들은 \"바닥이 아직\"이라고 경고.", "priceChange": "-8.5%", "sentiment": "shock" },
+        { "turn": 2, "title": "재고 증가, 추가 하락 전망", "description": "마이크론의 재고가 역대 최고 수준으로 증가. 시장은 추가 가격 하락을 예상하며 -5.2% 하락. 공포 지수가 최고조에 달했습니다.", "priceChange": "-5.2%", "sentiment": "negative" },
+        { "turn": 3, "title": "감산 발표, 수급 개선 기대", "description": "마이크론이 생산량 20% 감축을 발표! 업계 전체 감산으로 수급 개선 기대감. +6.8% 급등. 바닥 신호일까요?", "priceChange": "+6.8%", "sentiment": "positive" },
+        { "turn": 4, "title": "중국 수출 규제 우려", "description": "미국이 중국 반도체 수출 규제를 강화. 마이크론의 중국 매출 비중이 25%라 타격 우려. -4.3% 하락.", "priceChange": "-4.3%", "sentiment": "negative" },
+        { "turn": 5, "title": "AI 서버 수요 폭증", "description": "엔비디아가 AI 서버 수요 폭증을 발표. 마이크론의 HBM 수주가 급증할 것이라는 기대감에 +9.2% 급등!", "priceChange": "+9.2%", "sentiment": "positive" },
+        { "turn": 6, "title": "외국인 대량 매수", "description": "외국인이 3거래일 연속 대량 매수. +5.5% 상승하며 기술적 반등 신호 확정.", "priceChange": "+5.5%", "sentiment": "positive" },
+        { "turn": 7, "title": "DRAM 가격 반등 시작", "description": "DRAM 현물가가 3개월 만에 처음으로 상승 전환. +4.8% 상승하며 사이클 반등 확정.", "priceChange": "+4.8%", "sentiment": "positive" },
+        { "turn": 8, "title": "HBM 공급 계약 체결", "description": "마이크론이 엔비디아와 HBM 장기 공급 계약 체결! +7.1% 급등하며 저점 대비 +25% 회복.", "priceChange": "+7.1%", "sentiment": "positive" }
+      ],
+      "strategies": [
+        { "id": "s11-1", "title": "사이클 저점 매수", "emoji": "🎯", "description": "감산 발표 후 분할 매수", "steps": ["1~2턴: 관망", "3턴: 감산 발표에 50% 매수", "5턴: AI 수혜 확인 후 50% 추가"], "risk": "높음", "expectedReturn": "+20% ~ +30%", "difficulty": 4 },
+        { "id": "s11-2", "title": "반등 추격 매수", "emoji": "🚀", "description": "기술적 반등 확인 후 매수", "steps": ["1~5턴: 관망", "6턴: 이평선 돌파 시 100% 매수", "7~8턴: 추가 상승 시 홀딩"], "risk": "보통", "expectedReturn": "+10% ~ +15%", "difficulty": 3 },
+        { "id": "s11-3", "title": "보수적 관망", "emoji": "🛡️", "description": "변동성이 너무 커서 관망", "steps": ["1~8턴: 전량 관망", "사이클 확정 후 다음 기회 대기"], "risk": "낮음", "expectedReturn": "0%", "difficulty": 1 }
+      ],
+      "aiResponses": [
+        { "personality": "conservative", "strategyId": "s11-3", "finalReturn": "0%", "reasoning": "변동성이 너무 커서 관망했습니다. 안전이 최우선!" },
+        { "personality": "aggressive", "strategyId": "s11-1", "finalReturn": "+28.5%", "reasoning": "사이클 저점에서 과감하게 매수! 큰 수익을 얻었습니다." },
+        { "personality": "balanced", "strategyId": "s11-2", "finalReturn": "+12.8%", "reasoning": "기술적 반등 확인 후 안전하게 매수했습니다." }
+      ],
+      "stats": { "avgClearRate": 65, "avgSurvivalRate": 75, "bestStrategy": "사이클 저점 매수" }
+    }
+  ]
+}

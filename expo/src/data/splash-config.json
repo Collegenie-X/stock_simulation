@@ -1,0 +1,14 @@
+{
+  "appName": "파도를 타라",
+  "tagline": "차트로 배우는 실전 투자",
+  "subTagline": "AI와 대결하며 성장하는 투자 교육",
+  "icon": "📈",
+  "version": "v2.0",
+  "versionMeta": "100% 무료 · 회원가입 불필요",
+  "loadingText": "로딩 중...",
+  "readyText": "준비 완료!",
+  "redirectDelay": 2200,
+  "progressInterval": 80,
+  "progressStep": 5,
+  "chartLine": "0,600 40,580 80,560 120,530 160,550 200,480 240,420 280,380 320,340 360,280 400,220"
+}

@@ -1,0 +1,333 @@
+{
+  "category": "플랫폼",
+  "scenarios": [
+    {
+      "id": "legend-2",
+      "order": 2,
+      "title": "카카오, 규제의 칼날",
+      "subtitle": "플랫폼 독점 규제 대응",
+      "emoji": "💬",
+      "category": "위기 관리",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-yellow-400",
+      "gradientTo": "to-amber-600",
+      "stock": {
+        "name": "카카오",
+        "code": "035720",
+        "sector": "플랫폼",
+        "initialPrice": 58000
+      },
+      "description": "카카오톡이 먹통이 됐어요! 여기에 정부 규제까지 겹쳤어요. 한때 잘 나가던 카카오, 이 위기를 어떻게 넘길까요?",
+      "keyLesson": "큰 회사도 위기가 와요. 겁먹지 말고 '핵심 사업은 괜찮은지' 확인하세요!",
+      "survivalTip": "나쁜 뉴스가 겹쳐도 겁먹고 팔면 안 돼요. '잠깐인지 오래갈지' 구분하는 게 중요!",
+      "tags": [
+        "카카오",
+        "규제",
+        "플랫폼",
+        "위기관리"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "카카오톡 먹통 사태 발생",
+          "description": "카카오 판교 데이터센터에서 화재가 발생하여 카카오톡, 카카오맵, 카카오택시 등 주요 서비스가 수시간 동안 마비됐습니다. \"국민 인프라\"의 취약점이 드러나며 100주 보유 중인 이 종목은 장 시작부터 급락. -3.2% 마감. 기관 매도가 쏟아지고, 여론도 악화. 이 사태가 일시적일까, 구조적 문제일까?",
+          "priceChange": "-3.2%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 2,
+          "title": "국회 청문회 + 규제 예고",
+          "description": "국회에서 \"카카오 먹통\" 관련 긴급 청문회가 열렸습니다. 데이터센터 이중화 의무화 법안이 추진되고, 공정위도 플랫폼 독점 조사를 예고. -2.5% 추가 하락. 개인 투자자 게시판에서는 \"카카오 끝났다\" vs \"과매도, 기회다\" 논쟁이 뜨겁습니다. RSI 28로 극심한 과매도 구간.",
+          "priceChange": "-2.5%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 3,
+          "title": "SM엔터 인수전 후폭풍",
+          "description": "SM엔터 인수 과정에서의 \"시세 조종\" 의혹이 불거지며 검찰 수사가 시작됐습니다. 카카오 경영진에 대한 신뢰도가 바닥. -1.8% 추가 하락. 외국인은 3주째 순매도 중. 하지만 카카오의 핵심 사업인 톡비즈(광고), 카카오페이, 카카오뱅크는 여전히 성장 중입니다.",
+          "priceChange": "-1.8%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 4,
+          "title": "경영쇄신 계획 발표",
+          "description": "카카오가 \"경영쇄신 특별위원회\"를 구성하고, 비핵심 사업 정리 + 데이터센터 이중화 투자 계획을 발표. 시장이 긍정적으로 반응하며 +1.2% 반등. 하지만 구조조정 비용이 단기 실적에 부담이 될 수 있다는 우려도 있습니다. 바닥을 찍고 반등하는 건지, 일시적 반등인지 판단이 필요합니다.",
+          "priceChange": "+1.2%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 5,
+          "title": "공정위 과징금 부과",
+          "description": "공정위가 카카오에 약 500억원의 과징금을 부과하고, 일부 사업 분야의 행위 제한을 명령했습니다. 시장은 \"예상보다 세다\" vs \"불확실성 해소\"로 의견이 갈리며 -2.8% 하락. 하지만 과징금 규모가 카카오 연간 매출 대비 1% 미만이라는 분석도 나옵니다.",
+          "priceChange": "-2.8%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 6,
+          "title": "실적 발표, 예상 상회",
+          "description": "카카오 분기 실적이 발표됐습니다. 톡비즈 광고 매출이 +15% 성장하고, 카카오페이 거래액도 신기록. 실적이 시장 예상을 상회하며 +0.5% 소폭 상승. \"사업은 여전히 건재하다\"는 평가. 하지만 규제 리스크가 완전히 해소되지 않아 상승폭은 제한적.",
+          "priceChange": "+0.5%",
+          "sentiment": "neutral"
+        },
+        {
+          "turn": 7,
+          "title": "외국인 순매수 전환",
+          "description": "카카오의 밸류에이션이 역사적 저점 수준(PER 15배)에 도달하자 외국인이 3거래일 연속 순매수로 전환. +2.3% 상승. 증권사들도 \"규제 리스크 대부분 반영\"이라며 투자의견을 상향. 20일 이동평균선을 돌파하며 기술적 반등 신호.",
+          "priceChange": "+2.3%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "신사업 모멘텀, 회복 본격화",
+          "description": "카카오가 AI 챗봇, 카카오모빌리티 IPO 계획 등 신사업 모멘텀을 제시. +1.8% 추가 상승. 위기를 기회로 바꾸는 모습. 먹통 사태 때 손절했다면 큰 손실, 과매도 구간에서 매수했다면 반등 수익. 위기 속 냉정한 판단이 결과를 갈랐습니다.",
+          "priceChange": "+1.8%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s2-1",
+          "title": "즉시 손절 + 재진입",
+          "emoji": "✂️",
+          "description": "악재 초기에 매도하고, 규제 해소 후 재매수",
+          "steps": [
+            "1턴: 전량 매도",
+            "4~5턴: 경영쇄신 확인 후 관망",
+            "7턴: 외국인 매수 전환 시 재진입"
+          ],
+          "risk": "보통",
+          "expectedReturn": "-3% ~ +5%",
+          "difficulty": 2
+        },
+        {
+          "id": "s2-2",
+          "title": "과매도 역발상 매수",
+          "emoji": "🎯",
+          "description": "공포 구간에서 분할 매수",
+          "steps": [
+            "2턴: RSI 30 이하 → 1차 매수 (25%)",
+            "4턴: 경영쇄신 발표 → 2차 매수",
+            "7턴: 추세 전환 확인 후 보유"
+          ],
+          "risk": "높음",
+          "expectedReturn": "-5% ~ +12%",
+          "difficulty": 4
+        },
+        {
+          "id": "s2-3",
+          "title": "부분 매도 + 관망",
+          "emoji": "🔄",
+          "description": "리스크 축소 후 상황 관찰",
+          "steps": [
+            "1턴: 50% 매도",
+            "4턴: 상황 개선 시 보유 유지",
+            "7~8턴: 반등에서 나머지 정리 또는 추가 매수"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "-2% ~ +5%",
+          "difficulty": 2
+        }
+      ],
+      "aiStrategies": [
+        {
+          "name": "안정왕 김철수",
+          "type": "안정형",
+          "emoji": "🛡️",
+          "color": "green",
+          "actions": [
+            "1턴: 70% 매도 (리스크 축소)",
+            "3턴: 나머지 보유 유지",
+            "7턴: 외국인 매수에 30% 재매수",
+            "8턴: 보유"
+          ],
+          "result": "빠른 리스크 관리 → +1.5%",
+          "returnRate": "+1.5%"
+        },
+        {
+          "name": "공격왕 박영희",
+          "type": "공격형",
+          "emoji": "⚡",
+          "color": "red",
+          "actions": [
+            "1턴: 홀딩",
+            "2턴: 과매도에 30% 추가 매수",
+            "5턴: 과징금에 패닉 → 전량 매도",
+            "결과: 타이밍 실패"
+          ],
+          "result": "감정적 매매로 -6.2%",
+          "returnRate": "-6.2%"
+        },
+        {
+          "name": "균형왕 이준호",
+          "type": "균형형",
+          "emoji": "⚖️",
+          "color": "blue",
+          "actions": [
+            "1턴: 30% 매도",
+            "2턴: 과매도에 20% 재매수",
+            "6턴: 실적 확인 후 보유",
+            "8턴: 반등에서 정리"
+          ],
+          "result": "침착한 대응으로 +3.2%",
+          "returnRate": "+3.2%"
+        }
+      ],
+      "stats": {
+        "avgClearRate": 55,
+        "avgSurvivalRate": 68,
+        "bestStrategy": "부분 매도 + 관망"
+      }
+    },
+    {
+      "id": "legend-12",
+      "order": 12,
+      "title": "구글, 앱마켓 독점 소송",
+      "subtitle": "규제 리스크 vs 실제 영향",
+      "emoji": "⚖️",
+      "category": "규제 리스크",
+      "difficulty": 3,
+      "difficultyLabel": "중급",
+      "gradientFrom": "from-yellow-500",
+      "gradientTo": "to-orange-600",
+      "stock": {
+        "name": "구글(알파벳)",
+        "code": "GOOGL",
+        "sector": "플랫폼",
+        "initialPrice": 142
+      },
+      "description": "구글이 앱마켓 독점 소송에서 패소했습니다. 규제 리스크가 주가에 얼마나 반영돼야 할까요?",
+      "keyLesson": "규제 뉴스와 실제 영향을 구분하는 능력이 핵심!",
+      "survivalTip": "소송 패소 뉴스에 과도하게 반응하면 손해를 봅니다.",
+      "tags": [
+        "구글",
+        "규제",
+        "독점",
+        "소송"
+      ],
+      "events": [
+        {
+          "turn": 1,
+          "title": "앱마켓 독점 소송 패소",
+          "description": "구글이 앱마켓 독점 소송에서 패소! 법원은 \"30% 수수료가 독점적\"이라고 판결. 주가 -6.2% 폭락. 시장은 패닉 상태.",
+          "priceChange": "-6.2%",
+          "sentiment": "shock"
+        },
+        {
+          "turn": 2,
+          "title": "항소 계획 발표",
+          "description": "구글이 즉시 항소하겠다고 발표. 최종 판결까지 2~3년 소요 예상. -2.1% 추가 하락하지만 낙폭은 축소.",
+          "priceChange": "-2.1%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 3,
+          "title": "애널리스트 \"영향 제한적\"",
+          "description": "증권사들이 \"앱마켓 수익은 전체의 5% 미만\"이라며 영향이 제한적이라고 분석. +3.5% 반등.",
+          "priceChange": "+3.5%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 4,
+          "title": "EU 추가 조사 착수",
+          "description": "유럽연합이 구글의 검색 독점에 대한 추가 조사를 시작. 규제 리스크 확대 우려에 -3.8% 하락.",
+          "priceChange": "-3.8%",
+          "sentiment": "negative"
+        },
+        {
+          "turn": 5,
+          "title": "클라우드 실적 호조",
+          "description": "구글 클라우드 부문이 예상을 뛰어넘는 실적 발표. AI 수요 급증으로 +4.2% 상승. 규제보다 실적이 중요!",
+          "priceChange": "+4.2%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 6,
+          "title": "자사주 매입 발표",
+          "description": "구글이 700억 달러 규모 자사주 매입 계획 발표. 주주 환원 강화에 +2.8% 상승.",
+          "priceChange": "+2.8%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 7,
+          "title": "AI 검색 출시",
+          "description": "구글이 AI 검색 \"Bard Search\" 출시. 검색 시장 지배력 유지 기대감에 +3.1% 상승.",
+          "priceChange": "+3.1%",
+          "sentiment": "positive"
+        },
+        {
+          "turn": 8,
+          "title": "소송 합의 가능성 부상",
+          "description": "구글이 소송 합의를 검토 중이라는 보도. 불확실성 해소 기대감에 +2.5% 상승. 규제 리스크 극복!",
+          "priceChange": "+2.5%",
+          "sentiment": "positive"
+        }
+      ],
+      "strategies": [
+        {
+          "id": "s12-1",
+          "title": "패닉 저점 매수",
+          "emoji": "🎯",
+          "description": "소송 패소 직후 매수",
+          "steps": [
+            "1턴: 패소 뉴스에 100% 매수",
+            "3~8턴: 홀딩"
+          ],
+          "risk": "높음",
+          "expectedReturn": "+10% ~ +15%",
+          "difficulty": 4
+        },
+        {
+          "id": "s12-2",
+          "title": "실적 확인 후 매수",
+          "emoji": "📊",
+          "description": "클라우드 실적 확인 후 매수",
+          "steps": [
+            "1~4턴: 관망",
+            "5턴: 실적 호조 확인 후 100% 매수"
+          ],
+          "risk": "보통",
+          "expectedReturn": "+8% ~ +12%",
+          "difficulty": 3
+        },
+        {
+          "id": "s12-3",
+          "title": "규제 리스크 회피",
+          "emoji": "🛡️",
+          "description": "불확실성 해소까지 관망",
+          "steps": [
+            "1~8턴: 전량 관망"
+          ],
+          "risk": "낮음",
+          "expectedReturn": "0%",
+          "difficulty": 1
+        }
+      ],
+      "aiResponses": [
+        {
+          "personality": "conservative",
+          "strategyId": "s12-3",
+          "finalReturn": "0%",
+          "reasoning": "규제 리스크가 해소될 때까지 기다렸습니다."
+        },
+        {
+          "personality": "aggressive",
+          "strategyId": "s12-1",
+          "finalReturn": "+13.2%",
+          "reasoning": "패닉 매도에 과감하게 매수! 규제보다 실적이 중요합니다."
+        },
+        {
+          "personality": "balanced",
+          "strategyId": "s12-2",
+          "finalReturn": "+10.5%",
+          "reasoning": "실적 확인 후 안전하게 매수했습니다."
+        }
+      ],
+      "stats": {
+        "avgClearRate": 68,
+        "avgSurvivalRate": 78,
+        "bestStrategy": "패닉 저점 매수"
+      }
+    }
+  ]
+}

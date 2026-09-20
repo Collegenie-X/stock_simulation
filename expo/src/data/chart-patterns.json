@@ -1,0 +1,1203 @@
+{
+  "patterns": [
+    {
+      "id": "head-shoulders",
+      "name": "헤드앤숄더",
+      "nameEn": "Head & Shoulders",
+      "emoji": "👤",
+      "category": "추세 반전",
+      "type": "반전",
+      "signal": "매도",
+      "difficulty": 3,
+      "reliability": 5,
+      "description": "주가가 봉우리 3개를 만들어요. 가운데가 제일 높고(머리), 양쪽이 낮아요(어깨). 이 모양이 나오면 곧 떨어질 수 있다는 신호!",
+      "howToRead": "① 봉우리 3개 찾기 (왼쪽 어깨 → 머리 → 오른쪽 어깨) ② 가운데 머리가 제일 높은지 확인 ③ 골짜기를 이은 선 아래로 내려가면 매도!",
+      "tradingTip": "골짜기 선 아래로 떨어질 때 거래가 많으면 더 확실한 신호예요.",
+      "keyPoints": [
+        "봉우리 3개 찾기 (가운데가 제일 높음)",
+        "골짜기 선 아래로 떨어지면 매도!",
+        "거래량 많으면 더 확실"
+      ],
+      "example": {
+        "situation": "삼성전자가 8만원 → 9만원 → 8.5만원으로 봉우리 3개",
+        "action": "바닥선(7.8만원) 아래로 떨어질 때 팔기",
+        "result": "7.2만원까지 떨어짐 (-8%)"
+      },
+      "chartData": {
+        "points": [[0,70],[8,55],[18,35],[28,62],[40,18],[52,62],[62,38],[70,64],[76,70],[82,68],[87,77],[93,86],[100,93]],
+        "necklineY": 62,
+        "highlights": [
+          {"x": 18, "y": 35, "label": "왼쪽 어깨", "type": "info", "position": "above"},
+          {"x": 40, "y": 18, "label": "머리", "type": "info", "position": "above"},
+          {"x": 62, "y": 38, "label": "오른쪽 어깨", "type": "info", "position": "above"},
+          {"x": 87, "y": 77, "label": "📉 매도!", "type": "sell", "position": "below"}
+        ]
+      },
+      "steps": [
+        {
+          "phase": "before",
+          "emoji": "📈",
+          "title": "상승 추세 진행 중",
+          "description": "주가가 꾸준히 올라가고 있어요. 투자자들이 기대감에 사고 있는 상태예요.",
+          "priceNote": "예) 삼성전자 7만원 → 8만원 상승 중"
+        },
+        {
+          "phase": "forming",
+          "emoji": "👁️",
+          "title": "왼쪽 어깨 & 머리 형성",
+          "description": "첫 번째 봉우리(어깨)를 만든 후, 더 높은 봉우리(머리)를 만들어요. 아직은 올라갈 것 같아 보여요.",
+          "priceNote": "왼쪽 어깨: 8만원 / 머리: 9만원"
+        },
+        {
+          "phase": "forming",
+          "emoji": "🔍",
+          "title": "오른쪽 어깨 형성",
+          "description": "또 올라가지만 이번엔 머리보다 낮아요. 힘이 빠지고 있다는 신호! 살 사람은 다 샀어요.",
+          "priceNote": "오른쪽 어깨: 8.5만원 (머리 9만원보다 낮음)"
+        },
+        {
+          "phase": "signal",
+          "emoji": "⚡",
+          "title": "넥라인 이탈! → 매도 타이밍",
+          "description": "두 골짜기를 연결한 '넥라인' 아래로 떨어지면 강한 매도 신호! 여기서 빠르게 팔아야 해요.",
+          "priceNote": "넥라인(7.8만원) 아래로 떨어질 때 매도!"
+        },
+        {
+          "phase": "after",
+          "emoji": "🎯",
+          "title": "목표가까지 하락",
+          "description": "보통 '머리에서 넥라인까지의 거리'만큼 더 떨어져요. 이 거리를 미리 계산해 두세요.",
+          "priceNote": "목표가: 7.2만원 (-8% 손실 방어)"
+        }
+      ],
+      "profitScenario": {
+        "stock": "삼성전자",
+        "entryPrice": 78000,
+        "shares": 100,
+        "targetPrice": 72000,
+        "stopLoss": 82000,
+        "entryNote": "넥라인(7.8만원) 이탈 시 매도 (공매도 or 손절)",
+        "signalType": "sell"
+      }
+    },
+    {
+      "id": "inv-head-shoulders",
+      "name": "역 헤드앤숄더",
+      "nameEn": "Inverse Head & Shoulders",
+      "emoji": "🙃",
+      "category": "추세 반전",
+      "type": "반전",
+      "signal": "매수",
+      "difficulty": 3,
+      "reliability": 5,
+      "description": "주가가 골짜기 3개를 만들어요. 가운데가 제일 깊고(머리), 양쪽이 얕아요(어깨). 이 모양이 나오면 곧 올라갈 수 있다는 신호!",
+      "howToRead": "① 골짜기 3개 찾기 (왼쪽 어깨 → 머리 → 오른쪽 어깨) ② 가운데가 제일 깊은지 확인 ③ 봉우리를 이은 선 위로 올라가면 매수!",
+      "tradingTip": "무서워도 괜찮아요! 이 모양이 확인되면 강한 매수 신호예요.",
+      "keyPoints": [
+        "골짜기 3개 찾기 (가운데가 제일 깊음)",
+        "봉우리 선 위로 올라가면 매수!",
+        "바닥 탈출의 대표 신호"
+      ],
+      "example": {
+        "situation": "카카오가 5만원 → 4.2만원 → 4.6만원으로 골짜기 3개",
+        "action": "봉우리선(5.2만원) 위로 올라갈 때 사기",
+        "result": "6만원까지 상승 (+15%)"
+      },
+      "chartData": {
+        "points": [[0,30],[8,45],[18,65],[28,38],[40,82],[52,38],[62,60],[70,36],[76,30],[82,32],[87,23],[93,13],[100,8]],
+        "necklineY": 38,
+        "highlights": [
+          {"x": 18, "y": 65, "label": "왼쪽 어깨", "type": "info", "position": "below"},
+          {"x": 40, "y": 82, "label": "머리", "type": "info", "position": "below"},
+          {"x": 62, "y": 60, "label": "오른쪽 어깨", "type": "info", "position": "below"},
+          {"x": 87, "y": 23, "label": "📈 매수!", "type": "buy", "position": "above"}
+        ]
+      },
+      "steps": [
+        {
+          "phase": "before",
+          "emoji": "📉",
+          "title": "하락 추세 진행 중",
+          "description": "주가가 꾸준히 떨어지고 있어요. 많은 투자자들이 겁먹고 팔고 있는 상태예요.",
+          "priceNote": "예) 카카오 6만원 → 5만원으로 하락 중"
+        },
+        {
+          "phase": "forming",
+          "emoji": "👁️",
+          "title": "왼쪽 어깨 & 머리 형성",
+          "description": "두 번 반등하지만 계속 다시 떨어져요. 두 번째 골짜기(머리)가 첫 번째보다 더 깊어요.",
+          "priceNote": "왼쪽 어깨 바닥: 4.8만원 / 머리 바닥: 4.2만원"
+        },
+        {
+          "phase": "forming",
+          "emoji": "🔍",
+          "title": "오른쪽 어깨 형성",
+          "description": "세 번째 하락이 오지만 이번엔 머리보다 얕아요! '팔 사람은 다 팔았다'는 강력한 신호예요.",
+          "priceNote": "오른쪽 어깨 바닥: 4.6만원 (머리 4.2만원보다 얕음)"
+        },
+        {
+          "phase": "signal",
+          "emoji": "⚡",
+          "title": "넥라인 돌파! → 매수 타이밍",
+          "description": "세 골짜기의 봉우리를 연결한 '넥라인'을 위로 뚫으면 강한 매수 신호! 거래량도 급증해요.",
+          "priceNote": "넥라인(5.2만원) 위로 올라갈 때 바로 매수!"
+        },
+        {
+          "phase": "after",
+          "emoji": "🎯",
+          "title": "목표가까지 상승",
+          "description": "보통 '머리에서 넥라인까지의 거리'만큼 상승해요. 이걸 '목표가'로 미리 계산해 두세요.",
+          "priceNote": "목표가: 6만원 (+15% 수익 기대)"
+        }
+      ],
+      "profitScenario": {
+        "stock": "카카오",
+        "entryPrice": 52000,
+        "shares": 100,
+        "targetPrice": 60000,
+        "stopLoss": 48000,
+        "entryNote": "넥라인(5.2만원) 돌파 시 매수",
+        "signalType": "buy"
+      }
+    },
+    {
+      "id": "double-top",
+      "name": "더블탑",
+      "nameEn": "Double Top",
+      "emoji": "🏔️",
+      "category": "추세 반전",
+      "type": "반전",
+      "signal": "매도",
+      "difficulty": 2,
+      "reliability": 4,
+      "description": "주가가 같은 높이에서 2번 막혀요. 알파벳 M 모양! 더 이상 못 올라간다는 뜻이라 떨어질 수 있어요.",
+      "howToRead": "① 비슷한 높이의 봉우리 2개 찾기 ② M자 모양인지 확인 ③ 가운데 골짜기보다 아래로 내려가면 매도!",
+      "tradingTip": "두 번째 봉우리에서 거래량이 줄면 힘이 빠졌다는 뜻이에요.",
+      "keyPoints": [
+        "M자 모양 확인",
+        "같은 높이에서 2번 막힘",
+        "골짜기 아래로 내려가면 매도"
+      ],
+      "example": {
+        "situation": "네이버가 38만원에서 2번 막힘, M자 모양",
+        "action": "가운데 골짜기(36만원) 아래로 내려갈 때 팔기",
+        "result": "34만원까지 떨어짐 (-6%)"
+      },
+      "chartData": {
+        "points": [[0,80],[12,48],[25,22],[35,57],[45,22],[58,52],[68,62],[78,72],[88,80],[100,88]],
+        "necklineY": 57,
+        "highlights": [
+          {"x": 25, "y": 22, "label": "1봉우리", "type": "info", "position": "above"},
+          {"x": 45, "y": 22, "label": "2봉우리", "type": "info", "position": "above"},
+          {"x": 68, "y": 62, "label": "📉 매도!", "type": "sell", "position": "below"}
+        ]
+      },
+      "steps": [
+        {
+          "phase": "before",
+          "emoji": "📈",
+          "title": "상승 후 첫 번째 봉우리",
+          "description": "주가가 올라가다가 처음으로 저항에 부딪혀 내려와요.",
+          "priceNote": "예) 네이버 36만원 → 38만원 → 다시 36만원으로 하락"
+        },
+        {
+          "phase": "forming",
+          "emoji": "👁️",
+          "title": "두 번째 봉우리 도전",
+          "description": "다시 올라가서 같은 높이를 시도해요. 하지만 또 막혀요! M자가 완성되고 있어요.",
+          "priceNote": "네이버 다시 38만원 도달 → 또 하락"
+        },
+        {
+          "phase": "signal",
+          "emoji": "⚡",
+          "title": "넥라인 이탈! → 매도 타이밍",
+          "description": "두 봉우리 사이 골짜기(넥라인)를 아래로 뚫으면 확실한 매도 신호!",
+          "priceNote": "넥라인(36만원) 아래로 떨어지면 매도!"
+        },
+        {
+          "phase": "after",
+          "emoji": "🎯",
+          "title": "목표가까지 하락",
+          "description": "두 봉우리 높이에서 넥라인까지 거리만큼 추가 하락이 예상돼요.",
+          "priceNote": "목표가: 34만원 (-6% 하락)"
+        }
+      ],
+      "profitScenario": {
+        "stock": "네이버",
+        "entryPrice": 360000,
+        "shares": 10,
+        "targetPrice": 340000,
+        "stopLoss": 375000,
+        "entryNote": "넥라인(36만원) 이탈 시 매도",
+        "signalType": "sell"
+      }
+    },
+    {
+      "id": "double-bottom",
+      "name": "더블바텀",
+      "nameEn": "Double Bottom",
+      "emoji": "⛰️",
+      "category": "추세 반전",
+      "type": "반전",
+      "signal": "매수",
+      "difficulty": 2,
+      "reliability": 4,
+      "description": "주가가 같은 깊이에서 2번 버텨요. 알파벳 W 모양! 더 이상 안 떨어진다는 뜻이라 올라갈 수 있어요.",
+      "howToRead": "① 비슷한 깊이의 골짜기 2개 찾기 ② W자 모양인지 확인 ③ 가운데 봉우리보다 위로 올라가면 매수!",
+      "tradingTip": "두 번째 골짜기에서 거래량이 늘면 바닥을 다졌다는 뜻이에요.",
+      "keyPoints": [
+        "W자 모양 확인",
+        "같은 깊이에서 2번 버팀",
+        "봉우리 위로 올라가면 매수"
+      ],
+      "example": {
+        "situation": "현대차가 18만원에서 2번 버팀, W자 모양",
+        "action": "가운데 봉우리(19.5만원) 위로 올라갈 때 사기",
+        "result": "21.5만원까지 상승 (+10%)"
+      },
+      "chartData": {
+        "points": [[0,20],[12,52],[25,78],[35,43],[45,78],[58,48],[68,38],[78,28],[88,20],[100,10]],
+        "necklineY": 43,
+        "highlights": [
+          {"x": 25, "y": 78, "label": "1바닥", "type": "info", "position": "below"},
+          {"x": 45, "y": 78, "label": "2바닥", "type": "info", "position": "below"},
+          {"x": 68, "y": 38, "label": "📈 매수!", "type": "buy", "position": "above"}
+        ]
+      },
+      "steps": [
+        {
+          "phase": "before",
+          "emoji": "📉",
+          "title": "하락 후 첫 번째 바닥",
+          "description": "주가가 떨어지다가 처음으로 지지를 받아 올라와요.",
+          "priceNote": "예) 현대차 21만원 → 18만원 → 다시 반등"
+        },
+        {
+          "phase": "forming",
+          "emoji": "👁️",
+          "title": "두 번째 바닥 테스트",
+          "description": "다시 내려와서 같은 바닥을 시험해요. 두 번 버팀! W자가 완성되고 있어요.",
+          "priceNote": "현대차 다시 18만원 → 또 반등"
+        },
+        {
+          "phase": "signal",
+          "emoji": "⚡",
+          "title": "넥라인 돌파! → 매수 타이밍",
+          "description": "두 바닥 사이 봉우리(넥라인)를 위로 뚫으면 확실한 매수 신호!",
+          "priceNote": "넥라인(19.5만원) 위로 올라가면 매수!"
+        },
+        {
+          "phase": "after",
+          "emoji": "🎯",
+          "title": "목표가까지 상승",
+          "description": "두 바닥 깊이에서 넥라인까지 거리만큼 추가 상승이 예상돼요.",
+          "priceNote": "목표가: 21.5만원 (+10% 수익)"
+        }
+      ],
+      "profitScenario": {
+        "stock": "현대차",
+        "entryPrice": 195000,
+        "shares": 50,
+        "targetPrice": 215000,
+        "stopLoss": 178000,
+        "entryNote": "넥라인(19.5만원) 돌파 시 매수",
+        "signalType": "buy"
+      }
+    },
+    {
+      "id": "triple-top",
+      "name": "트리플탑",
+      "nameEn": "Triple Top",
+      "emoji": "🏔️🏔️🏔️",
+      "category": "추세 반전",
+      "type": "반전",
+      "signal": "매도",
+      "difficulty": 3,
+      "reliability": 5,
+      "description": "주가가 같은 높이에서 3번이나 막혀요! 더블탑보다 더 확실한 하락 신호. 3번 못 넘으면 포기하고 떨어져요.",
+      "howToRead": "① 비슷한 높이의 봉우리 3개 찾기 ② 3번 다 같은 곳에서 막히는지 확인 ③ 바닥선 아래로 내려가면 매도!",
+      "tradingTip": "3번이나 못 넘은 곳은 앞으로도 넘기 어려워요.",
+      "keyPoints": [
+        "3번 같은 높이에서 막힘",
+        "더블탑보다 더 확실한 신호",
+        "바닥선 아래로 내려가면 매도"
+      ],
+      "example": {
+        "situation": "LG에너지솔루션이 55만원에서 3번 막힘",
+        "action": "바닥선(52만원) 아래로 떨어질 때 팔기",
+        "result": "48만원까지 떨어짐 (-8%)"
+      },
+      "chartData": {
+        "points": [[0,75],[8,38],[15,20],[23,58],[30,20],[38,58],[45,20],[55,58],[62,67],[72,77],[85,85],[100,93]],
+        "necklineY": 58,
+        "highlights": [
+          {"x": 15, "y": 20, "label": "1봉우리", "type": "info", "position": "above"},
+          {"x": 30, "y": 20, "label": "2봉우리", "type": "info", "position": "above"},
+          {"x": 45, "y": 20, "label": "3봉우리", "type": "info", "position": "above"},
+          {"x": 62, "y": 67, "label": "📉 매도!", "type": "sell", "position": "below"}
+        ]
+      },
+      "steps": [
+        {
+          "phase": "before",
+          "emoji": "📈",
+          "title": "상승 후 첫 번째 저항",
+          "description": "주가가 올라가다가 강한 저항선에 부딪혀 내려와요.",
+          "priceNote": "예) LG엔솔 50만원 → 55만원 → 하락"
+        },
+        {
+          "phase": "forming",
+          "emoji": "👁️",
+          "title": "두 번째, 세 번째 시도",
+          "description": "두 번이나 더 같은 높이를 도전하지만 계속 막혀요. 3번 모두 같은 곳에서 막히면 패턴 완성!",
+          "priceNote": "세 번 모두 55만원 근처에서 막힘"
+        },
+        {
+          "phase": "signal",
+          "emoji": "⚡",
+          "title": "지지선 이탈! → 매도 타이밍",
+          "description": "3번의 골짜기를 이은 지지선 아래로 떨어지면 강한 매도 신호!",
+          "priceNote": "지지선(52만원) 아래로 떨어지면 매도!"
+        },
+        {
+          "phase": "after",
+          "emoji": "🎯",
+          "title": "목표가까지 하락",
+          "description": "강한 매도 신호인 만큼 큰 폭으로 떨어질 수 있어요.",
+          "priceNote": "목표가: 48만원 (-8% 하락)"
+        }
+      ],
+      "profitScenario": {
+        "stock": "LG에너지솔루션",
+        "entryPrice": 520000,
+        "shares": 5,
+        "targetPrice": 480000,
+        "stopLoss": 545000,
+        "entryNote": "지지선(52만원) 이탈 시 매도",
+        "signalType": "sell"
+      }
+    },
+    {
+      "id": "ascending-triangle",
+      "name": "상승 삼각형",
+      "nameEn": "Ascending Triangle",
+      "emoji": "🔺",
+      "category": "추세 지속",
+      "type": "지속",
+      "signal": "매수",
+      "difficulty": 2,
+      "reliability": 4,
+      "description": "위쪽은 같은 선에서 막히는데, 아래쪽이 점점 올라오는 삼각형! 사려는 사람이 늘어나서 결국 위로 뚫어요.",
+      "howToRead": "① 위쪽이 수평선에서 막히는지 확인 ② 아래쪽이 점점 올라오는지 확인 ③ 위쪽 선을 뚫으면 매수!",
+      "tradingTip": "위로 뚫을 때 거래량이 많으면 더 믿을 만해요.",
+      "keyPoints": [
+        "아래쪽이 점점 올라옴",
+        "위쪽 선을 뚫으면 매수!",
+        "거래량 확인 필수"
+      ],
+      "example": {
+        "situation": "셀트리온이 19만원에서 막히고, 바닥은 17만→17.5만→18만 상승",
+        "action": "19만원 위로 뚫릴 때 사기",
+        "result": "21만원까지 상승 (+11%)"
+      },
+      "chartData": {
+        "points": [[0,72],[8,32],[15,65],[22,32],[30,57],[36,32],[45,50],[52,32],[58,44],[62,32],[65,28],[72,20],[82,13],[92,8],[100,5]],
+        "necklineY": 32,
+        "highlights": [
+          {"x": 65, "y": 28, "label": "돌파!", "type": "buy", "position": "above"}
+        ]
+      },
+      "steps": [
+        {
+          "phase": "before",
+          "emoji": "↔️",
+          "title": "가격이 박스권에서 횡보",
+          "description": "주가가 특정 구간에서 왔다 갔다 해요. 위는 막히고 아래는 버티는 상태예요.",
+          "priceNote": "예) 셀트리온 17만원~19만원 구간"
+        },
+        {
+          "phase": "forming",
+          "emoji": "👁️",
+          "title": "삼각형 수렴 진행",
+          "description": "위는 계속 같은 높이에서 막히지만, 아래 바닥이 점점 올라와요. 사는 사람이 점점 많아지는 증거예요.",
+          "priceNote": "바닥: 17만→17.5만→18만원 상승"
+        },
+        {
+          "phase": "signal",
+          "emoji": "⚡",
+          "title": "저항선 돌파! → 매수 타이밍",
+          "description": "위쪽 수평선을 강하게 뚫고 올라가면 매수 신호! 이때 거래량이 늘면 더 확실해요.",
+          "priceNote": "저항선(19만원) 위로 돌파 시 매수!"
+        },
+        {
+          "phase": "after",
+          "emoji": "🎯",
+          "title": "목표가까지 상승",
+          "description": "삼각형 높이만큼 추가 상승이 예상돼요.",
+          "priceNote": "목표가: 21만원 (+11% 수익)"
+        }
+      ],
+      "profitScenario": {
+        "stock": "셀트리온",
+        "entryPrice": 190000,
+        "shares": 50,
+        "targetPrice": 210000,
+        "stopLoss": 178000,
+        "entryNote": "저항선(19만원) 돌파 시 매수",
+        "signalType": "buy"
+      }
+    },
+    {
+      "id": "descending-triangle",
+      "name": "하락 삼각형",
+      "nameEn": "Descending Triangle",
+      "emoji": "🔻",
+      "category": "추세 지속",
+      "type": "지속",
+      "signal": "매도",
+      "difficulty": 2,
+      "reliability": 4,
+      "description": "아래쪽은 같은 선에서 버티는데, 위쪽이 점점 내려오는 삼각형! 팔려는 사람이 늘어나서 결국 아래로 뚫려요.",
+      "howToRead": "① 아래쪽이 수평선에서 버티는지 확인 ② 위쪽이 점점 내려오는지 확인 ③ 아래쪽 선이 뚫리면 매도!",
+      "tradingTip": "아래로 뚫리면 빠르게 떨어질 수 있으니 미리 준비하세요.",
+      "keyPoints": [
+        "위쪽이 점점 내려옴",
+        "아래쪽 선이 뚫리면 매도!",
+        "빠른 하락 주의"
+      ],
+      "example": {
+        "situation": "카카오뱅크가 2.5만원에서 버티고, 위는 3만→2.8만→2.6만 하락",
+        "action": "2.5만원 아래로 뚫릴 때 팔기",
+        "result": "2.1만원까지 떨어짐 (-16%)"
+      },
+      "chartData": {
+        "points": [[0,28],[8,68],[15,35],[22,68],[30,42],[36,68],[45,48],[52,68],[58,52],[62,68],[65,72],[72,80],[82,87],[92,92],[100,95]],
+        "necklineY": 68,
+        "highlights": [
+          {"x": 65, "y": 72, "label": "📉 매도!", "type": "sell", "position": "below"}
+        ]
+      },
+      "steps": [
+        {
+          "phase": "before",
+          "emoji": "↔️",
+          "title": "가격이 박스권에서 횡보",
+          "description": "주가가 특정 구간에서 왔다 갔다 해요. 위는 점점 낮아지고 아래는 버티는 상태예요.",
+          "priceNote": "예) 카카오뱅크 2.5만원~3만원 구간"
+        },
+        {
+          "phase": "forming",
+          "emoji": "👁️",
+          "title": "삼각형 수렴 진행",
+          "description": "아래는 같은 높이를 버티지만, 위쪽 봉우리가 점점 낮아져요. 파는 사람이 점점 많아지는 증거예요.",
+          "priceNote": "봉우리: 3만→2.8만→2.6만원 하락"
+        },
+        {
+          "phase": "signal",
+          "emoji": "⚡",
+          "title": "지지선 이탈! → 매도 타이밍",
+          "description": "아래쪽 수평선이 뚫리면 강한 매도 신호! 빠르게 대응해야 해요.",
+          "priceNote": "지지선(2.5만원) 아래로 이탈 시 매도!"
+        },
+        {
+          "phase": "after",
+          "emoji": "🎯",
+          "title": "목표가까지 하락",
+          "description": "삼각형 높이만큼 추가 하락이 예상돼요. 빠른 낙폭에 주의하세요.",
+          "priceNote": "목표가: 2.1만원 (-16% 하락)"
+        }
+      ],
+      "profitScenario": {
+        "stock": "카카오뱅크",
+        "entryPrice": 25000,
+        "shares": 200,
+        "targetPrice": 21000,
+        "stopLoss": 27000,
+        "entryNote": "지지선(2.5만원) 이탈 시 매도",
+        "signalType": "sell"
+      }
+    },
+    {
+      "id": "symmetrical-triangle",
+      "name": "대칭 삼각형",
+      "nameEn": "Symmetrical Triangle",
+      "emoji": "🔷",
+      "category": "추세 지속",
+      "type": "지속",
+      "signal": "양방향",
+      "difficulty": 3,
+      "reliability": 3,
+      "description": "위는 내려오고 아래는 올라오면서 점점 좁아지는 삼각형! 힘이 모이다가 어느 한쪽으로 터져요.",
+      "howToRead": "① 점점 좁아지는 삼각형 모양 확인 ② 위로 뚫리면 매수, 아래로 뚫리면 매도 ③ 뚫리는 순간을 기다리세요!",
+      "tradingTip": "미리 방향을 예측하지 말고, 뚫린 후에 따라가세요!",
+      "keyPoints": [
+        "점점 좁아지는 삼각형",
+        "뚫리는 방향으로 따라가기",
+        "미리 예측하지 말 것"
+      ],
+      "example": {
+        "situation": "삼성SDI의 위는 내려오고 아래는 올라오면서 삼각형 수렴",
+        "action": "위로 뚫리면 사기 / 아래로 뚫리면 팔기",
+        "result": "위로 뚫려서 +12% 상승"
+      },
+      "chartData": {
+        "points": [[0,30],[8,65],[15,38],[22,60],[30,43],[38,58],[45,46],[52,55],[58,49],[62,52],[65,50],[68,40],[75,30],[85,20],[95,12],[100,8]],
+        "necklineY": null,
+        "highlights": [
+          {"x": 68, "y": 40, "label": "돌파!", "type": "buy", "position": "above"}
+        ]
+      },
+      "steps": [
+        {
+          "phase": "before",
+          "emoji": "↔️",
+          "title": "가격이 좁아지며 수렴 중",
+          "description": "위쪽 봉우리는 점점 낮아지고, 아래쪽 바닥은 점점 올라오면서 삼각형이 만들어져요.",
+          "priceNote": "예) 삼성SDI 36만원~40만원 → 37만원~39만원으로 수렴"
+        },
+        {
+          "phase": "forming",
+          "emoji": "⏳",
+          "title": "힘이 모이는 중...",
+          "description": "삼각형이 점점 좁아지면서 에너지가 쌓이고 있어요. 곧 한방향으로 터질 준비를 해요.",
+          "priceNote": "변동폭이 계속 줄어드는 것을 확인!"
+        },
+        {
+          "phase": "signal",
+          "emoji": "⚡",
+          "title": "방향 결정! → 뚫리는 쪽으로",
+          "description": "위로 뚫리면 매수, 아래로 뚫리면 매도! 방향 확인 후 즉시 대응해요.",
+          "priceNote": "방향 없이 기다리다가 뚫리면 빠르게 진입"
+        },
+        {
+          "phase": "after",
+          "emoji": "🎯",
+          "title": "목표가까지 이동",
+          "description": "삼각형 높이만큼 이동이 예상돼요.",
+          "priceNote": "목표가: 위로 뚫리면 +12%, 아래로 뚫리면 -12%"
+        }
+      ],
+      "profitScenario": {
+        "stock": "삼성SDI",
+        "entryPrice": 400000,
+        "shares": 10,
+        "targetPrice": 448000,
+        "stopLoss": 376000,
+        "entryNote": "삼각형 돌파 시 방향에 따라 진입",
+        "signalType": "buy"
+      }
+    },
+    {
+      "id": "rising-wedge",
+      "name": "상승 쐐기",
+      "nameEn": "Rising Wedge",
+      "emoji": "📐",
+      "category": "추세 지속",
+      "type": "반전",
+      "signal": "매도",
+      "difficulty": 4,
+      "reliability": 4,
+      "description": "주가가 올라가는데 올라가는 힘이 점점 약해지는 모양이에요. 겉보기에는 상승이지만 사실은 떨어질 준비를 하고 있어요!",
+      "howToRead": "① 주가가 올라가지만 점점 좁아지는 모양 확인 ② 올라가는 각도가 점점 작아지는지 확인 ③ 아래쪽 선이 뚫리면 매도!",
+      "tradingTip": "'올라가는데 뭔가 이상하다' 느낌이 들면 이 패턴을 의심하세요.",
+      "keyPoints": [
+        "올라가지만 힘이 약해짐",
+        "아래쪽 선 뚫리면 급락 가능",
+        "속이기 쉬운 패턴 주의"
+      ],
+      "example": {
+        "situation": "바이오 종목이 서서히 오르지만 상승폭 감소",
+        "action": "아래쪽 선이 뚫릴 때 바로 팔기",
+        "result": "뚫린 후 -15% 급락"
+      },
+      "chartData": {
+        "points": [[0,78],[8,60],[15,52],[22,62],[28,47],[35,56],[42,44],[50,52],[56,40],[62,48],[66,37],[70,42],[74,35],[78,42],[82,65],[90,78],[100,88]],
+        "necklineY": null,
+        "highlights": [
+          {"x": 82, "y": 65, "label": "📉 급락!", "type": "sell", "position": "below"}
+        ]
+      },
+      "steps": [
+        {
+          "phase": "before",
+          "emoji": "📈",
+          "title": "상승 중이지만 힘이 약해짐",
+          "description": "주가가 올라가고 있지만 상승폭이 점점 줄어들어요. '올라가는 것 같은데 왜 이상하지?' 하는 느낌이에요.",
+          "priceNote": "예) 바이오 종목 5만→5.3만→5.5만원 (점점 폭 감소)"
+        },
+        {
+          "phase": "forming",
+          "emoji": "⚠️",
+          "title": "쐐기 모양 완성",
+          "description": "위아래 모두 올라가지만 점점 좁아져요. 에너지가 빠지고 있는 신호예요!",
+          "priceNote": "위아래 추세선이 수렴하며 쐐기 완성"
+        },
+        {
+          "phase": "signal",
+          "emoji": "⚡",
+          "title": "아래 선 이탈! → 매도 타이밍",
+          "description": "아래쪽 지지선을 뚫으면 급락 시작! 빠르게 매도해야 해요.",
+          "priceNote": "아래 지지선 이탈 즉시 매도!"
+        },
+        {
+          "phase": "after",
+          "emoji": "💥",
+          "title": "급락 진행",
+          "description": "쐐기 패턴은 이탈 후 급격히 떨어지는 경우가 많아요. 손실 관리가 중요해요.",
+          "priceNote": "이탈 후 -15% 급락 예상"
+        }
+      ],
+      "profitScenario": {
+        "stock": "바이오 종목",
+        "entryPrice": 55000,
+        "shares": 100,
+        "targetPrice": 46750,
+        "stopLoss": 58000,
+        "entryNote": "아래 지지선 이탈 시 매도",
+        "signalType": "sell"
+      }
+    },
+    {
+      "id": "falling-wedge",
+      "name": "하락 쐐기",
+      "nameEn": "Falling Wedge",
+      "emoji": "📏",
+      "category": "추세 지속",
+      "type": "반전",
+      "signal": "매수",
+      "difficulty": 4,
+      "reliability": 4,
+      "description": "주가가 떨어지는데 떨어지는 힘이 점점 약해지는 모양이에요. 겉보기에는 하락이지만 사실은 올라갈 준비를 하고 있어요!",
+      "howToRead": "① 주가가 떨어지지만 점점 좁아지는 모양 확인 ② 떨어지는 각도가 점점 작아지는지 확인 ③ 위쪽 선을 뚫으면 매수!",
+      "tradingTip": "무서워 보여도 기회예요! 떨어지는 힘이 빠지면 반등이 와요.",
+      "keyPoints": [
+        "떨어지지만 힘이 약해짐",
+        "위쪽 선 뚫리면 반등!",
+        "공포 속 기회를 찾아요"
+      ],
+      "example": {
+        "situation": "NAVER가 서서히 떨어지지만 하락폭 감소",
+        "action": "위쪽 선을 뚫을 때 사기",
+        "result": "뚫린 후 +18% 반등"
+      },
+      "chartData": {
+        "points": [[0,22],[8,40],[15,32],[22,48],[28,36],[35,52],[42,40],[50,55],[56,44],[62,58],[66,48],[70,55],[74,48],[78,53],[82,30],[90,18],[100,8]],
+        "necklineY": null,
+        "highlights": [
+          {"x": 82, "y": 30, "label": "📈 반등!", "type": "buy", "position": "above"}
+        ]
+      },
+      "steps": [
+        {
+          "phase": "before",
+          "emoji": "📉",
+          "title": "하락 중이지만 힘이 약해짐",
+          "description": "주가가 떨어지고 있지만 하락폭이 점점 줄어들어요. '이상하게 많이 안 떨어지네?' 하는 느낌이에요.",
+          "priceNote": "예) NAVER 30만→28만→27만원 (점점 폭 감소)"
+        },
+        {
+          "phase": "forming",
+          "emoji": "🔍",
+          "title": "하락 쐐기 모양 완성",
+          "description": "위아래 모두 내려가지만 점점 좁아져요. 매도 압력이 줄어들고 있다는 신호!",
+          "priceNote": "위아래 추세선이 수렴하며 쐐기 완성"
+        },
+        {
+          "phase": "signal",
+          "emoji": "⚡",
+          "title": "위 선 돌파! → 매수 타이밍",
+          "description": "위쪽 저항선을 뚫으면 반등 시작! 이때 매수하면 좋아요.",
+          "priceNote": "위 저항선 돌파 즉시 매수!"
+        },
+        {
+          "phase": "after",
+          "emoji": "🚀",
+          "title": "강한 반등 진행",
+          "description": "하락 쐐기는 이탈 후 강하게 반등하는 경우가 많아요.",
+          "priceNote": "이탈 후 +18% 반등 예상"
+        }
+      ],
+      "profitScenario": {
+        "stock": "NAVER",
+        "entryPrice": 270000,
+        "shares": 10,
+        "targetPrice": 318600,
+        "stopLoss": 254000,
+        "entryNote": "위 저항선 돌파 시 매수",
+        "signalType": "buy"
+      }
+    },
+    {
+      "id": "doji",
+      "name": "도지",
+      "nameEn": "Doji",
+      "emoji": "✚",
+      "category": "캔들스틱",
+      "type": "반전",
+      "signal": "양방향",
+      "difficulty": 1,
+      "reliability": 3,
+      "description": "시작 가격과 끝 가격이 거의 같아서 십자가(+) 모양이 돼요. 사는 사람과 파는 사람이 팽팽하다는 뜻! 방향이 바뀔 수 있어요.",
+      "howToRead": "① 십자가 모양의 캔들을 찾아요 ② 올라가던 중 나오면 → 떨어질 수 있음 ③ 떨어지던 중 나오면 → 올라갈 수 있음",
+      "tradingTip": "도지 하나만으로 결정하지 말고, 다음 날 어떻게 움직이는지 꼭 확인!",
+      "keyPoints": [
+        "십자가(+) 모양 캔들",
+        "방향 전환의 경고 신호",
+        "다음 날 방향 확인 필수"
+      ],
+      "example": {
+        "situation": "5일 연속 올라간 후 십자가 모양 캔들 등장",
+        "action": "다음 날 떨어지면 팔 준비",
+        "result": "다음 날부터 -3% 하락 시작"
+      },
+      "chartData": {
+        "points": [[0,80],[10,65],[20,55],[30,48],[40,42],[50,38],[57,37],[60,37],[65,50],[75,60],[85,68],[100,75]],
+        "necklineY": null,
+        "highlights": [
+          {"x": 57, "y": 37, "label": "도지 캔들", "type": "info", "position": "above"},
+          {"x": 65, "y": 50, "label": "방향 전환", "type": "sell", "position": "below"}
+        ]
+      },
+      "steps": [
+        {
+          "phase": "before",
+          "emoji": "📈",
+          "title": "상승 추세 진행 중",
+          "description": "주가가 며칠째 올라가고 있어요. 투자자들이 기대감에 계속 사고 있어요.",
+          "priceNote": "예) 5일 연속 상승 중"
+        },
+        {
+          "phase": "forming",
+          "emoji": "⚖️",
+          "title": "도지 캔들 등장",
+          "description": "시가와 종가가 거의 같아요. 오늘 하루 동안 사고 팔고를 반복했지만 결국 제자리! 균형이 깨지기 직전이에요.",
+          "priceNote": "캔들 몸통이 거의 없는 십자가 모양"
+        },
+        {
+          "phase": "signal",
+          "emoji": "⚡",
+          "title": "다음 날 방향 확인!",
+          "description": "도지 다음 날이 중요해요! 아래로 떨어지면 매도 신호, 위로 올라가면 상승 지속 신호예요.",
+          "priceNote": "다음 날 가격 방향이 확인되면 대응!"
+        },
+        {
+          "phase": "after",
+          "emoji": "🎯",
+          "title": "방향에 따라 매매",
+          "description": "도지 이후 방향이 확인된 쪽으로 매매해요. 단독으로 쓰면 위험하니 다른 신호와 함께 사용해요.",
+          "priceNote": "하락 신호 확인 시 빠른 손절도 중요!"
+        }
+      ],
+      "profitScenario": {
+        "stock": "삼성전자",
+        "entryPrice": 75000,
+        "shares": 100,
+        "targetPrice": 72750,
+        "stopLoss": 76500,
+        "entryNote": "도지 이후 하락 확인 시 매도",
+        "signalType": "sell"
+      }
+    },
+    {
+      "id": "hammer",
+      "name": "망치형",
+      "nameEn": "Hammer",
+      "emoji": "🔨",
+      "category": "캔들스틱",
+      "type": "반전",
+      "signal": "매수",
+      "difficulty": 1,
+      "reliability": 4,
+      "description": "떨어지던 주가 바닥에서 나오는 망치 모양! 아래로 긴 꼬리가 달렸는데, '여기가 바닥이야!'라는 신호예요.",
+      "howToRead": "① 아래 꼬리가 길고 몸통이 작은 캔들 찾기 ② 떨어지던 중에 나왔는지 확인 ③ 다음 날 올라가면 매수!",
+      "tradingTip": "떨어지던 중에 나와야 의미가 있어요. 다음 날 올라가면 더 확실!",
+      "keyPoints": [
+        "긴 아래 꼬리 = 바닥 신호",
+        "떨어지던 중에만 의미 있음",
+        "다음 날 상승으로 확인"
+      ],
+      "example": {
+        "situation": "일주일간 떨어진 후 긴 아래 꼬리 망치 모양 등장",
+        "action": "다음 날 올라가는 거 확인 후 사기",
+        "result": "바닥 확인 → +8% 반등"
+      },
+      "chartData": {
+        "points": [[0,25],[12,42],[22,55],[30,65],[38,72],[46,78],[52,85],[55,95],[57,80],[60,72],[70,62],[80,52],[90,45],[100,38]],
+        "necklineY": null,
+        "highlights": [
+          {"x": 55, "y": 95, "label": "망치 하단", "type": "info", "position": "below"},
+          {"x": 57, "y": 80, "label": "🔨 망치형!", "type": "buy", "position": "below"},
+          {"x": 70, "y": 62, "label": "반등 확인", "type": "buy", "position": "above"}
+        ]
+      },
+      "steps": [
+        {
+          "phase": "before",
+          "emoji": "📉",
+          "title": "며칠째 하락 중",
+          "description": "주가가 며칠간 계속 떨어지고 있어요. 공포감이 최고조에 달한 상태예요.",
+          "priceNote": "예) 일주일간 -15% 하락 중"
+        },
+        {
+          "phase": "forming",
+          "emoji": "🔨",
+          "title": "망치형 캔들 등장!",
+          "description": "장중에 크게 떨어졌지만 결국 거의 다시 올라왔어요. 긴 아래 꼬리가 달린 망치 모양이에요. '팔 사람은 다 팔았다'는 신호!",
+          "priceNote": "아래 꼬리가 몸통의 2배 이상이면 강한 신호"
+        },
+        {
+          "phase": "signal",
+          "emoji": "⚡",
+          "title": "다음 날 상승 확인! → 매수",
+          "description": "망치형 다음 날 주가가 올라가면 바닥 확정! 이때 매수하면 좋아요.",
+          "priceNote": "다음 날 양봉(상승) 확인 후 매수!"
+        },
+        {
+          "phase": "after",
+          "emoji": "📈",
+          "title": "반등 진행",
+          "description": "바닥이 확인되면 강한 반등이 올 수 있어요.",
+          "priceNote": "바닥 확인 후 +8% 반등 기대"
+        }
+      ],
+      "profitScenario": {
+        "stock": "카카오",
+        "entryPrice": 43000,
+        "shares": 100,
+        "targetPrice": 46440,
+        "stopLoss": 40850,
+        "entryNote": "망치형 다음 날 상승 확인 시 매수",
+        "signalType": "buy"
+      }
+    },
+    {
+      "id": "shooting-star",
+      "name": "유성형",
+      "nameEn": "Shooting Star",
+      "emoji": "🌠",
+      "category": "캔들스틱",
+      "type": "반전",
+      "signal": "매도",
+      "difficulty": 1,
+      "reliability": 4,
+      "description": "올라가던 주가 꼭대기에서 나오는 별똥별 모양! 위로 긴 꼬리가 달렸는데, '여기가 천장이야!'라는 신호예요.",
+      "howToRead": "① 위 꼬리가 길고 몸통이 작은 캔들 찾기 ② 올라가던 중에 나왔는지 확인 ③ 다음 날 떨어지면 매도!",
+      "tradingTip": "올라가던 중에 나와야 의미가 있어요. 다음 날 떨어지면 더 확실!",
+      "keyPoints": [
+        "긴 위 꼬리 = 천장 신호",
+        "올라가던 중에만 의미 있음",
+        "다음 날 하락으로 확인"
+      ],
+      "example": {
+        "situation": "일주일간 올라간 후 긴 위 꼬리 별똥별 모양 등장",
+        "action": "다음 날 떨어지는 거 확인 후 팔기",
+        "result": "꼭대기 확인 → -6% 하락"
+      },
+      "chartData": {
+        "points": [[0,75],[12,58],[22,45],[30,35],[38,28],[46,22],[52,15],[55,5],[57,20],[60,28],[70,38],[80,48],[90,55],[100,62]],
+        "necklineY": null,
+        "highlights": [
+          {"x": 55, "y": 5, "label": "유성 상단", "type": "info", "position": "above"},
+          {"x": 57, "y": 20, "label": "🌠 유성형!", "type": "sell", "position": "above"},
+          {"x": 70, "y": 38, "label": "하락 확인", "type": "sell", "position": "below"}
+        ]
+      },
+      "steps": [
+        {
+          "phase": "before",
+          "emoji": "📈",
+          "title": "며칠째 상승 중",
+          "description": "주가가 며칠간 계속 올라가고 있어요. 다들 흥분해서 사고 있는 상태예요.",
+          "priceNote": "예) 일주일간 +20% 상승 중"
+        },
+        {
+          "phase": "forming",
+          "emoji": "🌠",
+          "title": "유성형 캔들 등장!",
+          "description": "장중에 크게 올랐지만 결국 거의 다 내려왔어요. 위로 긴 꼬리가 달린 별똥별 모양이에요. '살 사람은 다 샀다'는 신호!",
+          "priceNote": "위 꼬리가 몸통의 2배 이상이면 강한 신호"
+        },
+        {
+          "phase": "signal",
+          "emoji": "⚡",
+          "title": "다음 날 하락 확인! → 매도",
+          "description": "유성형 다음 날 주가가 떨어지면 꼭대기 확정! 이때 매도하거나 손절 준비해요.",
+          "priceNote": "다음 날 음봉(하락) 확인 후 매도!"
+        },
+        {
+          "phase": "after",
+          "emoji": "📉",
+          "title": "하락 진행",
+          "description": "꼭대기가 확인되면 강한 하락이 올 수 있어요.",
+          "priceNote": "꼭대기 확인 후 -6% 하락 예상"
+        }
+      ],
+      "profitScenario": {
+        "stock": "현대차",
+        "entryPrice": 240000,
+        "shares": 20,
+        "targetPrice": 225600,
+        "stopLoss": 247200,
+        "entryNote": "유성형 다음 날 하락 확인 시 매도",
+        "signalType": "sell"
+      }
+    },
+    {
+      "id": "bullish-engulfing",
+      "name": "상승 장악형",
+      "nameEn": "Bullish Engulfing",
+      "emoji": "🟢",
+      "category": "캔들스틱",
+      "type": "반전",
+      "signal": "매수",
+      "difficulty": 2,
+      "reliability": 4,
+      "description": "떨어지던 중에 작은 빨간 캔들 뒤에 큰 초록 캔들이 덮어버려요! 사려는 사람이 확 많아졌다는 뜻이에요.",
+      "howToRead": "① 작은 빨간(하락) 캔들 다음에 큰 초록(상승) 캔들 찾기 ② 초록이 빨간을 완전히 감싸는지 확인 ③ 떨어지던 중이면 매수 신호!",
+      "tradingTip": "초록 캔들이 클수록 더 강한 신호예요!",
+      "keyPoints": [
+        "큰 초록 캔들이 이전 캔들을 감싸",
+        "떨어지던 중에 나오면 반등 신호",
+        "캔들이 클수록 더 강함"
+      ],
+      "example": {
+        "situation": "떨어지던 중 작은 빨간 → 다음 날 큰 초록 캔들",
+        "action": "큰 초록 캔들 확인 후 사기",
+        "result": "반등 시작 → +10% 상승"
+      },
+      "chartData": {
+        "points": [[0,20],[10,35],[20,48],[30,58],[40,68],[50,74],[55,78],[58,72],[62,55],[72,45],[82,35],[92,28],[100,20]],
+        "necklineY": null,
+        "highlights": [
+          {"x": 55, "y": 78, "label": "작은 음봉", "type": "info", "position": "below"},
+          {"x": 58, "y": 72, "label": "🟢 장악!", "type": "buy", "position": "below"},
+          {"x": 72, "y": 45, "label": "반등 진행", "type": "buy", "position": "above"}
+        ]
+      },
+      "steps": [
+        {
+          "phase": "before",
+          "emoji": "📉",
+          "title": "하락 추세 진행 중",
+          "description": "주가가 며칠째 떨어지고 있어요. 투자자들이 팔고 있는 상태예요.",
+          "priceNote": "예) 며칠간 하락 중"
+        },
+        {
+          "phase": "forming",
+          "emoji": "🔴",
+          "title": "작은 빨간 캔들",
+          "description": "전날 작은 하락 캔들이 나와요. 아직은 하락 추세처럼 보여요.",
+          "priceNote": "작은 음봉(하락 캔들) 등장"
+        },
+        {
+          "phase": "signal",
+          "emoji": "🟢",
+          "title": "큰 초록 캔들이 덮어버림! → 매수",
+          "description": "오늘 주가가 전날 캔들을 완전히 덮을 만큼 크게 올라요! 강한 매수 신호예요.",
+          "priceNote": "큰 양봉이 전날 음봉을 완전히 감싸면 매수!"
+        },
+        {
+          "phase": "after",
+          "emoji": "📈",
+          "title": "반등 진행",
+          "description": "장악형 확인 후 강한 반등이 시작돼요.",
+          "priceNote": "반등 시작 → +10% 상승 기대"
+        }
+      ],
+      "profitScenario": {
+        "stock": "삼성전자",
+        "entryPrice": 68000,
+        "shares": 100,
+        "targetPrice": 74800,
+        "stopLoss": 64600,
+        "entryNote": "상승 장악형 확인 즉시 매수",
+        "signalType": "buy"
+      }
+    },
+    {
+      "id": "bearish-engulfing",
+      "name": "하락 장악형",
+      "nameEn": "Bearish Engulfing",
+      "emoji": "🔴",
+      "category": "캔들스틱",
+      "type": "반전",
+      "signal": "매도",
+      "difficulty": 2,
+      "reliability": 4,
+      "description": "올라가던 중에 작은 초록 캔들 뒤에 큰 빨간 캔들이 덮어버려요! 팔려는 사람이 확 많아졌다는 뜻이에요.",
+      "howToRead": "① 작은 초록(상승) 캔들 다음에 큰 빨간(하락) 캔들 찾기 ② 빨간이 초록을 완전히 감싸는지 확인 ③ 올라가던 중이면 매도 신호!",
+      "tradingTip": "빨간 캔들이 클수록 더 강한 신호예요!",
+      "keyPoints": [
+        "큰 빨간 캔들이 이전 캔들을 감싸",
+        "올라가던 중에 나오면 하락 신호",
+        "캔들이 클수록 더 강함"
+      ],
+      "example": {
+        "situation": "올라가던 중 작은 초록 → 다음 날 큰 빨간 캔들",
+        "action": "큰 빨간 캔들 확인 후 팔기",
+        "result": "하락 시작 → -9% 하락"
+      },
+      "chartData": {
+        "points": [[0,80],[10,65],[20,52],[30,42],[40,32],[50,26],[55,22],[58,28],[62,45],[72,55],[82,65],[92,72],[100,80]],
+        "necklineY": null,
+        "highlights": [
+          {"x": 55, "y": 22, "label": "작은 양봉", "type": "info", "position": "above"},
+          {"x": 58, "y": 28, "label": "🔴 장악!", "type": "sell", "position": "above"},
+          {"x": 72, "y": 55, "label": "하락 진행", "type": "sell", "position": "below"}
+        ]
+      },
+      "steps": [
+        {
+          "phase": "before",
+          "emoji": "📈",
+          "title": "상승 추세 진행 중",
+          "description": "주가가 며칠째 올라가고 있어요. 투자자들이 기대감에 사고 있는 상태예요.",
+          "priceNote": "예) 며칠간 상승 중"
+        },
+        {
+          "phase": "forming",
+          "emoji": "🟢",
+          "title": "작은 초록 캔들",
+          "description": "전날 작은 상승 캔들이 나와요. 아직은 상승 추세처럼 보여요.",
+          "priceNote": "작은 양봉(상승 캔들) 등장"
+        },
+        {
+          "phase": "signal",
+          "emoji": "🔴",
+          "title": "큰 빨간 캔들이 덮어버림! → 매도",
+          "description": "오늘 주가가 전날 캔들을 완전히 덮을 만큼 크게 떨어져요! 강한 매도 신호예요.",
+          "priceNote": "큰 음봉이 전날 양봉을 완전히 감싸면 매도!"
+        },
+        {
+          "phase": "after",
+          "emoji": "📉",
+          "title": "하락 진행",
+          "description": "장악형 확인 후 강한 하락이 시작돼요.",
+          "priceNote": "하락 시작 → -9% 하락 예상"
+        }
+      ],
+      "profitScenario": {
+        "stock": "카카오",
+        "entryPrice": 55000,
+        "shares": 100,
+        "targetPrice": 50050,
+        "stopLoss": 57750,
+        "entryNote": "하락 장악형 확인 즉시 매도",
+        "signalType": "sell"
+      }
+    },
+    {
+      "id": "morning-star",
+      "name": "모닝스타",
+      "nameEn": "Morning Star",
+      "emoji": "🌟",
+      "category": "캔들스틱",
+      "type": "반전",
+      "signal": "매수",
+      "difficulty": 3,
+      "reliability": 5,
+      "description": "떨어지던 바닥에서 캔들 3개가 만드는 강한 반등 신호! 큰 빨간 → 작은 캔들 → 큰 초록 순서로 나타나요.",
+      "howToRead": "① 큰 빨간(하락) 캔들 확인 ② 다음 날 작은 캔들(멈춤 신호) 확인 ③ 그다음 큰 초록(상승) 캔들이 나오면 매수!",
+      "tradingTip": "3개 캔들이 순서대로 나와야 해요. 가장 믿을 만한 캔들 패턴!",
+      "keyPoints": [
+        "캔들 3개 조합 (큰 하락→작은→큰 상승)",
+        "바닥에서 가장 강한 반등 신호",
+        "가장 믿을 만한 캔들 패턴!"
+      ],
+      "example": {
+        "situation": "급락 후 큰 빨간 → 작은 캔들 → 큰 초록",
+        "action": "3번째 큰 초록 캔들 확인 후 사기",
+        "result": "바닥 확인 → +15% 반등"
+      },
+      "chartData": {
+        "points": [[0,20],[10,32],[20,45],[30,58],[40,70],[48,80],[53,88],[56,90],[59,88],[62,75],[68,60],[75,48],[82,38],[90,30],[100,22]],
+        "necklineY": null,
+        "highlights": [
+          {"x": 48, "y": 80, "label": "큰 음봉", "type": "info", "position": "below"},
+          {"x": 56, "y": 90, "label": "작은 캔들", "type": "info", "position": "below"},
+          {"x": 62, "y": 75, "label": "🌟 큰 양봉!", "type": "buy", "position": "below"},
+          {"x": 82, "y": 38, "label": "반등 진행", "type": "buy", "position": "above"}
+        ]
+      },
+      "steps": [
+        {
+          "phase": "before",
+          "emoji": "📉",
+          "title": "급락 후 큰 음봉",
+          "description": "주가가 급격히 떨어지면서 큰 빨간 캔들이 나와요. 공황 상태예요!",
+          "priceNote": "예) 하루에 -5% 이상 큰 하락"
+        },
+        {
+          "phase": "forming",
+          "emoji": "⚖️",
+          "title": "작은 캔들 (균형)",
+          "description": "다음 날 주가가 많이 움직이지 않아요. 사고 파는 힘이 균형을 이루는 중이에요.",
+          "priceNote": "거의 보합권의 작은 캔들"
+        },
+        {
+          "phase": "signal",
+          "emoji": "🌟",
+          "title": "큰 초록 캔들! → 매수 타이밍",
+          "description": "큰 상승 캔들이 나와서 3개 조합이 완성! 가장 강한 매수 신호 중 하나예요.",
+          "priceNote": "3번째 큰 양봉 확인 즉시 매수!"
+        },
+        {
+          "phase": "after",
+          "emoji": "🚀",
+          "title": "강한 반등 진행",
+          "description": "모닝스타는 매우 신뢰도 높은 신호예요. 강한 반등을 기대할 수 있어요.",
+          "priceNote": "반등 시작 → +15% 상승 기대"
+        }
+      ],
+      "profitScenario": {
+        "stock": "LG화학",
+        "entryPrice": 350000,
+        "shares": 10,
+        "targetPrice": 402500,
+        "stopLoss": 332500,
+        "entryNote": "모닝스타 3번째 양봉 확인 시 매수",
+        "signalType": "buy"
+      }
+    }
+  ],
+  "patternCategories": {
+    "추세 반전": {
+      "emoji": "🔄",
+      "color": "text-orange-400",
+      "bgColor": "bg-orange-500/10",
+      "borderColor": "border-orange-500/20",
+      "description": "방향이 반대로 바뀌는 신호"
+    },
+    "추세 지속": {
+      "emoji": "➡️",
+      "color": "text-blue-400",
+      "bgColor": "bg-blue-500/10",
+      "borderColor": "border-blue-500/20",
+      "description": "원래 가던 방향으로 계속 가는 신호"
+    },
+    "캔들스틱": {
+      "emoji": "🕯️",
+      "color": "text-purple-400",
+      "bgColor": "bg-purple-500/10",
+      "borderColor": "border-purple-500/20",
+      "description": "캔들 1~3개로 빠르게 판단하는 신호"
+    }
+  },
+  "signalColors": {
+    "매수": {
+      "color": "text-green-400",
+      "bg": "bg-green-500/10",
+      "border": "border-green-500/20"
+    },
+    "매도": {
+      "color": "text-red-400",
+      "bg": "bg-red-500/10",
+      "border": "border-red-500/20"
+    },
+    "양방향": {
+      "color": "text-yellow-400",
+      "bg": "bg-yellow-500/10",
+      "border": "border-yellow-500/20"
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "characters": {
+    "conservative": {
+      "name": "차트 지킴이 수호",
+      "emoji": "🛡️",
+      "color": "#3B82F6",
+      "type": "보수적 안정형",
+      "story": "주식 세계에 처음 온 당신은 위험을 피하며 안전하게 투자하는 전략가입니다. 수호는 방어력이 뛰어나 손실을 최소화하며 꾸준히 성장합니다.",
+      "stats": {
+        "defense": 90,
+        "speed": 40,
+        "power": 50,
+        "wisdom": 85
+      },
+      "skill": "방어막 : 손실 10% 감소",
+      "background": "평범한 직장인이었던 당신은 '파도를 타라' 게임에서 투자의 세계로 소환되었습니다. 처음엔 무서웠지만, 신중한 분석과 안정적인 전략으로 조금씩 자산을 늘려가고 있습니다."
+    },
+    "balanced": {
+      "name": "파도 라이더 민지",
+      "emoji": "📊",
+      "color": "#10B981",
+      "type": "신중한 기술적 분석가",
+      "story": "당신은 차트를 읽는 능력이 뛰어난 균형잡힌 투자자입니다. 민지는 파도의 흐름을 정확히 읽고 최적의 타이밍에 매매합니다.",
+      "stats": {
+        "defense": 70,
+        "speed": 70,
+        "power": 70,
+        "wisdom": 90
+      },
+      "skill": "파도 예측 : 차트 분석력 20% 상승",
+      "background": "평소 주식에 관심이 많았던 대학생. 어느 날 '파도를 타라' 앱을 깔고 나서 진짜 투자의 세계로 빨려 들어왔습니다. 책으로 배운 엘리엇 파동 이론을 실전에서 활용하며 성장 중입니다."
+    },
+    "aggressive": {
+      "name": "번개 트레이더 준호",
+      "emoji": "⚡",
+      "color": "#EF4444",
+      "type": "공격적 도전형",
+      "story": "위험을 두려워하지 않는 공격형 투자자입니다. 준호는 빠른 판단력으로 높은 수익을 추구하며 대담하게 파도를 탑니다.",
+      "stats": {
+        "defense": 50,
+        "speed": 95,
+        "power": 90,
+        "wisdom": 65
+      },
+      "skill": "번개 매수 : 수익률 15% 추가",
+      "background": "게임 속 세계에서 가장 대담한 투자자. 준호는 높은 파도를 타며 큰 수익을 노리지만, 때로는 크게 넘어지기도 합니다. 하지만 포기하지 않고 다시 일어섭니다."
+    }
+  },
+  "levels": [
+    { "level": 1, "title": "투자 입문자", "minExp": 0, "emoji": "🌱" },
+    { "level": 2, "title": "초보 트레이더", "minExp": 1000, "emoji": "🏄‍♂️" },
+    { "level": 3, "title": "파도 탐험가", "minExp": 2500, "emoji": "🌊" },
+    { "level": 4, "title": "숙련된 서퍼", "minExp": 5000, "emoji": "🏄" },
+    { "level": 5, "title": "파도 마스터", "minExp": 10000, "emoji": "⭐" },
+    { "level": 6, "title": "전설의 투자자", "minExp": 20000, "emoji": "👑" }
+  ],
+  "achievements": [
+    { "id": "first_win", "name": "첫 승리", "desc": "첫 수익 달성", "reward": "+100 EXP", "emoji": "🎉" },
+    { "id": "wave_master", "name": "파도 정복", "desc": "5파 완벽 매도", "reward": "+200 EXP", "emoji": "🌊" },
+    { "id": "loss_control", "name": "손실 컨트롤", "desc": "손절 3회 성공", "reward": "+150 EXP", "emoji": "🛡️" },
+    { "id": "ten_wins", "name": "10연승", "desc": "10번 연속 수익", "reward": "+500 EXP", "emoji": "🔥" }
+  ]
+}

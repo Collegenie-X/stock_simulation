@@ -1,0 +1,95 @@
+{
+  "types": {
+    "challenger": {
+      "emoji": "⚡",
+      "label": "도전가형",
+      "title": "위기를 기회로 바꾸는 투자자",
+      "description": "남들이 두려워할 때 과감히 매수하는 타입! 리스크를 감수하고 큰 수익을 노리는 공격적 투자 스타일이에요.",
+      "strengths": ["기회 포착 본능", "빠른 의사결정", "과감한 포지션 진입"],
+      "weaknesses": ["과도한 매매 위험", "손절 타이밍 놓칠 수 있음"],
+      "tip": "자신감은 좋지만, 투자금의 30% 이상은 현금으로 보유하는 습관을 들여보세요!",
+      "gradient": "from-orange-500 to-red-500",
+      "accent": "text-orange-400",
+      "bg": "bg-orange-500/10",
+      "border": "border-orange-500/20",
+      "glow": "shadow-[0_0_24px_rgba(249,115,22,0.3)]"
+    },
+    "analyst": {
+      "emoji": "📊",
+      "label": "분석가형",
+      "title": "데이터로 승부하는 투자자",
+      "description": "감정보다 데이터! 이벤트를 분석하고 적절한 타이밍에 진입하는 냉철한 투자 스타일이에요.",
+      "strengths": ["합리적 판단력", "적절한 포지션 관리", "뉴스 분석력"],
+      "weaknesses": ["과도한 분석으로 타이밍 놓칠 수 있음"],
+      "tip": "분석은 최고! 하지만 때로는 직감도 믿어보세요. 완벽한 타이밍은 없어요.",
+      "gradient": "from-blue-500 to-cyan-500",
+      "accent": "text-blue-400",
+      "bg": "bg-blue-500/10",
+      "border": "border-blue-500/20",
+      "glow": "shadow-[0_0_24px_rgba(59,130,246,0.3)]"
+    },
+    "conservative": {
+      "emoji": "🛡️",
+      "label": "안정추구형",
+      "title": "원금 보전이 최우선인 투자자",
+      "description": "작은 금액부터 조심스럽게! 리스크를 최소화하고 안전한 투자를 추구하는 신중한 스타일이에요.",
+      "strengths": ["원금 보전 능력", "신중한 의사결정", "리스크 관리"],
+      "weaknesses": ["기회를 놓칠 수 있음", "수익률이 낮을 수 있음"],
+      "tip": "안전이 최고! 하지만 조금씩 투자 범위를 넓혀보세요. 작은 도전이 큰 성장으로 이어져요.",
+      "gradient": "from-green-500 to-emerald-500",
+      "accent": "text-green-400",
+      "bg": "bg-green-500/10",
+      "border": "border-green-500/20",
+      "glow": "shadow-[0_0_24px_rgba(34,197,94,0.3)]"
+    },
+    "emotional": {
+      "emoji": "🎭",
+      "label": "감성투자형",
+      "title": "직감과 감정으로 투자하는 타입",
+      "description": "뉴스에 빠르게 반응하고 감각적으로 판단! 때로는 그 직감이 놀라운 수익을 가져다주기도 해요.",
+      "strengths": ["시장 분위기 감지", "빠른 반응 속도", "트렌드 파악"],
+      "weaknesses": ["감정적 매매 위험", "FOMO에 취약"],
+      "tip": "직감을 믿되, 매매 전 3초만 멈추고 생각하는 습관을 들여보세요!",
+      "gradient": "from-purple-500 to-violet-500",
+      "accent": "text-purple-400",
+      "bg": "bg-purple-500/10",
+      "border": "border-purple-500/20",
+      "glow": "shadow-[0_0_24px_rgba(168,85,247,0.3)]"
+    },
+    "systematic": {
+      "emoji": "🧘",
+      "label": "침착형",
+      "title": "일관된 원칙으로 투자하는 타입",
+      "description": "흔들림 없이 꾸준히! 감정에 휘둘리지 않고 자신만의 기준으로 투자하는 멘탈 강자예요.",
+      "strengths": ["감정 통제력", "일관된 전략", "인내심"],
+      "weaknesses": ["유연성 부족할 수 있음", "기회 놓칠 가능성"],
+      "tip": "꾸준함이 최고의 무기! 가끔은 새로운 전략도 시도해보면 더 성장할 수 있어요.",
+      "gradient": "from-cyan-500 to-teal-500",
+      "accent": "text-cyan-400",
+      "bg": "bg-cyan-500/10",
+      "border": "border-cyan-500/20",
+      "glow": "shadow-[0_0_24px_rgba(6,182,212,0.3)]"
+    }
+  },
+  "traits": [
+    { "key": "riskTaking", "label": "리스크 감수", "emoji": "🎲", "bar": "from-red-500 to-orange-500" },
+    { "key": "timing", "label": "타이밍 감각", "emoji": "⏱️", "bar": "from-yellow-500 to-amber-500" },
+    { "key": "patience", "label": "인내심", "emoji": "🧘", "bar": "from-green-500 to-emerald-500" },
+    { "key": "rationality", "label": "합리성", "emoji": "🧠", "bar": "from-blue-500 to-cyan-500" },
+    { "key": "emotionControl", "label": "감정 통제", "emoji": "❄️", "bar": "from-purple-500 to-violet-500" }
+  ],
+  "profitMessages": [
+    { "minRate": 5, "emoji": "🏆", "title": "전설의 투자자!", "message": "이 위기를 완벽하게 활용했어요!" },
+    { "minRate": 2, "emoji": "⭐", "title": "훌륭한 결과!", "message": "시장을 읽는 눈이 있네요!" },
+    { "minRate": 0, "emoji": "👍", "title": "안전한 마무리!", "message": "손해 없이 위기를 넘겼어요!" },
+    { "minRate": -5, "emoji": "📚", "title": "좋은 경험!", "message": "이 경험이 다음에 큰 도움이 될 거예요" },
+    { "minRate": -999, "emoji": "💪", "title": "포기하지 마!", "message": "실패에서 배우는 게 진짜 투자 실력이에요" }
+  ],
+  "patternDescriptions": {
+    "buyOnDip": { "emoji": "📉🛒", "label": "하락 시 매수", "desc": "떨어질 때 과감하게 매수" },
+    "buyOnRally": { "emoji": "📈🛒", "label": "상승 시 매수", "desc": "오를 때 따라 매수" },
+    "sellOnPeak": { "emoji": "📈💸", "label": "상승 시 매도", "desc": "오를 때 이익 실현" },
+    "panicSell": { "emoji": "📉💸", "label": "하락 시 매도", "desc": "떨어질 때 손절" },
+    "holdSteady": { "emoji": "⏸️", "label": "관망", "desc": "기다리며 판단" }
+  }
+}
