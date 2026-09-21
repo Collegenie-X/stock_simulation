@@ -226,7 +226,7 @@ export default function SceneLaunch({ visible }: SceneLaunchProps) {
               <Text style={styles.modeIcon}>⚡</Text>
               <View>
                 <Text style={styles.modeTitle}>간략 측정</Text>
-                <Text style={styles.modeDesc}>핵심 7문항 · 약 2분</Text>
+                <Text style={styles.modeDesc}>핵심 10문항 · 약 3분</Text>
               </View>
             </View>
             <View style={styles.modeRight}>
@@ -245,7 +245,7 @@ export default function SceneLaunch({ visible }: SceneLaunchProps) {
               <Text style={styles.modeIcon}>🔬</Text>
               <View style={{ flexShrink: 1 }}>
                 <Text style={styles.modeTitle}>세부 측정</Text>
-                <Text style={styles.modeDesc}>전체 21문항 · 약 7분 · 시나리오 포함</Text>
+                <Text style={styles.modeDesc}>전체 30문항 · 약 10분 · 돈 시나리오 포함</Text>
               </View>
             </View>
             <Text style={styles.arrow}>→</Text>

@@ -1,4 +1,5 @@
 import type { StockListItem } from "../types"
+import { getPreGameHistory } from "./stockHistory"
 
 // ── 5가지 호가 패턴 ────────────────────────────────────────────
 // deltas: 4틱 사이클마다 devMax 대비 이동 비율
@@ -18,23 +19,25 @@ export function pickPattern(id: string): number {
   return Math.abs(h) % BREATH_PATTERNS.length
 }
 
-/** 미니차트용 히스토리 데이터 생성 */
-export function buildChartData(stock: StockListItem, currentTurn: number) {
-  const HISTORY = 30
-  const SAMPLE  = 2
-  const rawData: { price: number; index: number }[] = []
+/**
+ * 미니차트용 데이터: 게임 시작 전 3개월(JSON) + 지금까지의 게임 가격 + 실시간 꼬리.
+ * trail(최근 틱 가격들)을 주면 차트 끝이 실전처럼 오르락내리락 흔들린다.
+ */
+export function buildChartData(stock: StockListItem, currentTurn: number, trail: number[] = []) {
+  const WINDOW = 60
+  const SAMPLE = 2
 
-  if (currentTurn < HISTORY) {
-    for (let i = HISTORY - currentTurn; i > 0; i--) {
-      rawData.push({ price: stock.initialPrice, index: rawData.length })
-    }
+  const prices = getPreGameHistory(stock).map((h) => h.price)
+  for (let i = 0; i <= currentTurn; i++) {
+    prices.push(stock.turns?.[i]?.price || stock.initialPrice)
   }
 
-  const startIdx = Math.max(0, currentTurn - HISTORY + 1)
-  for (let i = startIdx; i <= currentTurn; i++) {
-    const p = stock.turns?.[i]?.price || stock.initialPrice
-    rawData.push({ price: p, index: rawData.length })
-  }
+  const recent = prices.slice(-WINDOW)
+  // 과거 JSON 이 없는 종목은 예전처럼 시작가로 앞을 채움
+  while (recent.length < WINDOW) recent.unshift(stock.initialPrice)
 
-  return rawData.filter((_, idx) => idx % SAMPLE === 0)
+  // 과거는 SAMPLE 간격으로 솎고(끝 점은 남김), 실시간 꼬리는 솎지 않고 그대로 붙임
+  const lastIdx = recent.length - 1
+  return [...recent.filter((_, idx) => (lastIdx - idx) % SAMPLE === 0), ...trail]
+    .map((price, index) => ({ price, index }))
 }

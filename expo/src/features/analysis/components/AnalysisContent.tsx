@@ -14,6 +14,8 @@ import type {
   AbilityScores,
   PersonalityScores,
   PersonalityType,
+  MoneyScores,
+  HabitCounts,
 } from "../types";
 import {
   FEEDBACK_AUTO_ADVANCE_MS,
@@ -33,10 +35,10 @@ import ResultScreen from "./ResultScreen";
 import { ParticleBurst, ScorePop, ScreenFlash, FeedbackTimer, ComboBurst, LevelUpRing } from "./GameEffects";
 
 const INTRO_ITEMS = [
-  { emoji: "🎭", text: "다양한 상황에서 네 감정을 솔직하게 골라봐!", delay: 0 },
-  { emoji: "📈", text: "실전 차트를 보면서 네 반응을 체크해!", delay: 100 },
-  { emoji: "🎯", text: "정답은 없어! 네 성향을 발견하는 게 목표야", delay: 200 },
-  { emoji: "🏆", text: "선택할 때마다 점수와 특수효과가 빵빵!", delay: 300 },
+  { emoji: "🎭", text: "실제로 겪을 법한 장면에서 솔직하게 골라봐!", delay: 0 },
+  { emoji: "💰", text: "꽁돈이 생길 때, 급한 돈이 필요할 때도 점검해!", delay: 100 },
+  { emoji: "📈", text: "실전 차트를 보면서 네 반응을 체크해!", delay: 200 },
+  { emoji: "🎯", text: "정답은 없어! 나를 아는 게 목표야", delay: 300 },
 ];
 
 function isChartQuestion(q: AnyQuestion): q is ChartQuestion {
@@ -54,6 +56,20 @@ const INITIAL_ABILITIES: AbilityScores = {
   emotionControl: 0,
   coping: 0,
   infoJudgment: 0,
+  moneyManagement: 0,
+};
+
+const INITIAL_MONEY: MoneyScores = { separated: 0, wallet: 0, allin: 0, leverage: 0 };
+
+const INITIAL_HABITS: HabitCounts = {
+  chase: 0,
+  panicSell: 0,
+  earlyProfit: 0,
+  averagingDown: 0,
+  tailFollow: 0,
+  blindWait: 0,
+  breakeven: 0,
+  overtrade: 0,
 };
 
 const INITIAL_PERSONALITY: PersonalityScores = {
@@ -93,6 +109,8 @@ export default function AnalysisContent() {
   const [feedbackInsight, setFeedbackInsight] = useState("");
   const [abilities, setAbilities] = useState<AbilityScores>(INITIAL_ABILITIES);
   const [personalityScores, setPersonalityScores] = useState<PersonalityScores>(INITIAL_PERSONALITY);
+  const [moneyScores, setMoneyScores] = useState<MoneyScores>(INITIAL_MONEY);
+  const [habitCounts, setHabitCounts] = useState<HabitCounts>(INITIAL_HABITS);
   const [showResult, setShowResult] = useState(false);
   const [chartTrigger, setChartTrigger] = useState(0);
 
@@ -120,7 +138,9 @@ export default function AnalysisContent() {
       if (!raw) return;
       const saved = JSON.parse(raw);
       if (saved?.personalityScores) setPersonalityScores(saved.personalityScores);
-      if (saved?.abilities) setAbilities(saved.abilities);
+      if (saved?.abilities) setAbilities({ ...INITIAL_ABILITIES, ...saved.abilities });
+      if (saved?.moneyScores) setMoneyScores({ ...INITIAL_MONEY, ...saved.moneyScores });
+      if (saved?.habitCounts) setHabitCounts({ ...INITIAL_HABITS, ...saved.habitCounts });
       setPhase("result");
       setShowResult(true);
     } catch {}
@@ -173,6 +193,10 @@ export default function AnalysisContent() {
         }
         return next;
       });
+
+      const { moneyTag, habitTag } = option;
+      if (moneyTag) setMoneyScores((prev) => ({ ...prev, [moneyTag]: prev[moneyTag] + 1 }));
+      if (habitTag) setHabitCounts((prev) => ({ ...prev, [habitTag]: prev[habitTag] + 1 }));
 
       setCombo((prev) => {
         const nextCombo = lastType === option.personalityType ? prev + 1 : 1;
@@ -268,6 +292,8 @@ export default function AnalysisContent() {
             <ResultScreen
               personalityScores={personalityScores}
               abilities={abilities}
+              moneyScores={moneyScores}
+              habitCounts={habitCounts}
               totalQuestions={total}
               mode={mode}
             />
@@ -324,7 +350,7 @@ export default function AnalysisContent() {
           </FadeUp>
         )}
 
-        {!isChart && !!(currentQ as TheoryQuestion).scenarioGroup && (
+        {mode === "detailed" && !isChart && !!(currentQ as TheoryQuestion).scenarioGroup && (
           <FadeUp key={`scenario-${currentQ.id}`} style={styles.scenarioWrap}>
             <Gradient
               dir="r"

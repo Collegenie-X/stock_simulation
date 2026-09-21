@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react"
 import { StyleSheet, Text, View } from "react-native"
 import { useRouter } from "expo-router"
-import { Float, GlowOrb, ProgressBar, Pulse } from "@/components/ui"
+import { Float, GlowOrb, ProgressBar, Pulse, WaveLogo } from "@/components/ui"
 import { storage } from "@/lib/storage"
+import { ALWAYS_SHOW_ONBOARDING } from "@/features/onboarding/config"
 import { palette } from "@/theme"
 import { AnimatedChart } from "./AnimatedChart"
 
@@ -22,7 +23,7 @@ export default function SplashScreen() {
     }, 70)
 
     const timer = setTimeout(() => {
-      const done = storage.getOnboardingStatus()
+      const done = !ALWAYS_SHOW_ONBOARDING && storage.getOnboardingStatus()
       router.replace(done ? "/home" : "/onboarding")
     }, 2500)
 
@@ -47,11 +48,11 @@ export default function SplashScreen() {
       {/* 메인 콘텐츠 */}
       <View style={styles.content}>
         <Float>
-          <Text style={styles.emoji}>📈</Text>
+          <WaveLogo size={150} />
         </Float>
         <Text style={styles.title}>파도를 타라</Text>
-        <Text style={styles.subtitle}>차트로 배우는 실전 투자</Text>
-        <Text style={styles.desc}>AI와 대결하며 성장하는 투자 교육</Text>
+        <Text style={styles.subtitle}>내 투자 버릇, 게임으로 고친다</Text>
+        <Text style={styles.desc}>8턴 전략 게임 · 실전 시뮬레이션</Text>
       </View>
 
       {/* 프로그레스 바 */}
@@ -69,8 +70,7 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: "#000000", alignItems: "center", justifyContent: "center", overflow: "hidden" },
   glowWrap: { position: "absolute", top: "8%", alignSelf: "center" },
   content: { alignItems: "center", paddingHorizontal: 24 },
-  emoji: { fontSize: 90, lineHeight: 110, marginBottom: 24, color: "#ffffff" },
-  title: { fontSize: 36, fontWeight: "900", color: "#ffffff", letterSpacing: -0.9, marginBottom: 8 },
+  title: { marginTop: 12, fontSize: 36, fontWeight: "900", color: "#ffffff", letterSpacing: -0.9, marginBottom: 8 },
   subtitle: { fontSize: 18, fontWeight: "700", color: palette.green[400], marginBottom: 4 },
   desc: { fontSize: 14, color: palette.gray[500] },
   progress: { marginTop: 48, width: 176 },

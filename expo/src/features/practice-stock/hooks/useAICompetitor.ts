@@ -1,5 +1,5 @@
 
-import { useState, useCallback, useMemo } from "react"
+import { useState, useCallback, useEffect, useMemo } from "react"
 import aiCompetitorsData from "@/data/ai-competitors.json"
 
 // ── 투자 성향 분류 ─────────────────────────────────────────
@@ -657,6 +657,11 @@ export function useAICompetitor(initialCash: number) {
     setBestAITrades(0)
     setGapHistory([])
   }, [initialCash])
+
+  // 저장된 설정이 늦게 읽혀 시작 금액이 바뀌면 AI 도 같은 돈으로 다시 출발한다 (안 그러면 −90% 로 보인다)
+  useEffect(() => {
+    resetAI()
+  }, [resetAI])
 
   return {
     aiCompetitor,

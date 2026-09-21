@@ -2,7 +2,7 @@ import { useMemo } from "react"
 import { storage } from "@/lib/storage"
 import scenariosData from "@/data/game-scenarios.json"
 import scenarios100DaysData from "@/data/stock-100days-data.json"
-import { generateAIStocks, generateRobotAutoStocks } from "../../utils/stockDataUtils"
+import { generateStocksFromHistory } from "../../utils/stockDataUtils"
 
 /**
  * 시나리오 및 주식 정보 확인 (100일 데이터 포함 + AI/로봇 주식 동적 생성)
@@ -51,9 +51,10 @@ export function useTradeScenario(scenarioId: string): any | null {
       return { ...stock, turns: newTurns }
     })
 
-    const aiStocks = generateAIStocks(10, 50000, extended.totalTurns)
-    const robotAutoStocks = generateRobotAutoStocks(10, 30000, extended.totalTurns)
-    extended.stocks = [...extendedStocks, ...aiStocks, ...robotAutoStocks]
+    // 종목별 JSON(stock-history) 에만 있는 종목 — 게임 화면(useScenario)과 같은 가격을 쓴다
+    const firstDate = rawScenario.stocks[0]?.turns?.[0]?.date || "2010.01.04"
+    const existingIds = new Set<string>(extendedStocks.map((st: any) => st.id))
+    extended.stocks = [...extendedStocks, ...generateStocksFromHistory(existingIds, firstDate, extended.totalTurns)]
 
     return extended
   }, [rawScenario])

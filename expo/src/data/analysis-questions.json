@@ -5,18 +5,18 @@
       "chartVariant": 0,
       "chartAccent": "green",
       "category": "first_emotion",
-      "question": "처음으로 주식 매수 버튼 눌렀어! 🔥\n지금 네 심장은?",
+      "question": "처음으로 주식 매수 버튼 눌렀어! 🔥\n10분 뒤, 넌 뭐 하고 있어?",
       "options": [
         {
           "emoji": "🤩",
-          "text": "와 심장 터질 것 같아!! 빨리 올라라!",
+          "text": "앱 또 열었어!! 빨리 올라라!",
           "personalityType": "challenger",
           "insight": "오 역시 뜨거운 피가 흐르는 도전가! 🔥 기회를 잡는 본능이 살아있어",
           "abilities": { "riskTolerance": 30, "coping": 20 }
         },
         {
           "emoji": "😰",
-          "text": "아 벌써 불안해... 마이너스 뜨면 어쩌지",
+          "text": "벌써 불안해... 마이너스 뜨면 어쩌지",
           "personalityType": "conservative",
           "insight": "안전이 최우선이구나 🛡️ 리스크를 본능적으로 느끼는 신중파야",
           "abilities": { "emotionControl": 15, "riskTolerance": 10 }
@@ -42,7 +42,7 @@
       "chartVariant": 1,
       "chartAccent": "red",
       "category": "loss_emotion",
-      "question": "내 주식이 3일 연속 빠지고 있어 📉\n-8%... 지금 솔직히 어때?",
+      "question": "내 주식이 3일 연속 빠지고 있어 📉\n-8%... 출근길에 앱을 열었어. 솔직히 어때?",
       "options": [
         {
           "emoji": "😱",
@@ -70,7 +70,8 @@
           "text": "너무 겁나... 그냥 다 팔고 싶어",
           "personalityType": "conservative",
           "insight": "안전이 최우선이야 🛡️ 그 신중함이 큰 손실을 막아줄 거야",
-          "abilities": { "riskTolerance": 10, "emotionControl": 15 }
+          "abilities": { "riskTolerance": 10, "emotionControl": 15 },
+          "habitTag": "panicSell"
         }
       ]
     },
@@ -86,7 +87,8 @@
           "text": "야 그 종목 뭔데?! 나도 당장 알아볼래!",
           "personalityType": "challenger",
           "insight": "기회를 못 지나치는 타입이야 ⚡ 그 추진력이 대박의 열쇠!",
-          "abilities": { "riskTolerance": 30, "coping": 20 }
+          "abilities": { "riskTolerance": 30, "coping": 20 },
+          "habitTag": "chase"
         },
         {
           "emoji": "🧐",
@@ -186,48 +188,11 @@
       ]
     },
     {
-      "id": 6,
-      "chartVariant": 2,
-      "chartAccent": "green",
-      "category": "stock_analysis",
-      "question": "관심 종목을 발견했어! 🔍\n투자 전에 제일 먼저 뭘 확인해?",
-      "options": [
-        {
-          "emoji": "📈",
-          "text": "차트부터! 추세선, 이평선, 거래량 패턴 체크",
-          "personalityType": "analyst",
-          "insight": "기술적 분석의 달인! 📊 차트에서 진실을 읽어내는 눈이 있어",
-          "abilities": { "analysis": 35, "infoJudgment": 20 }
-        },
-        {
-          "emoji": "🏢",
-          "text": "기업 실적이랑 재무제표! PER, PBR 숫자가 진실이야",
-          "personalityType": "systematic",
-          "insight": "펀더멘탈 분석파! 🧘 기업의 본질을 꿰뚫어보는 눈이 있어",
-          "abilities": { "analysis": 25, "infoJudgment": 30 }
-        },
-        {
-          "emoji": "💬",
-          "text": "커뮤니티 반응이랑 뉴스! 분위기 파악이 먼저지",
-          "personalityType": "emotional",
-          "insight": "시장 분위기를 읽는 감각파! 🎭 그 촉이 때로는 숫자보다 정확해",
-          "abilities": { "infoJudgment": 20, "coping": 15 }
-        },
-        {
-          "emoji": "🚀",
-          "text": "테마 확인! 지금 핫한 섹터에 속하는지가 중요해",
-          "personalityType": "challenger",
-          "insight": "트렌드를 타는 도전가! ⚡ 시장의 흐름을 읽는 눈이 있어",
-          "abilities": { "riskTolerance": 25, "infoJudgment": 20 }
-        }
-      ]
-    },
-    {
       "id": 7,
       "chartVariant": 4,
       "chartAccent": "green",
       "category": "profit_reaction",
-      "question": "목표 수익률 달성!! 🎯✨\n이 돈 어떻게 할 거야?",
+      "question": "처음 정한 목표 수익률 달성!! 🎯✨\n이제 어떻게 할 거야?",
       "options": [
         {
           "emoji": "💰",
@@ -255,7 +220,8 @@
           "text": "기분 좋아서 같은 종목 더 살까봐 ㅋㅋ",
           "personalityType": "emotional",
           "insight": "감정이 투자를 이끄는 타입! 🎭 기분 좋을 때가 위험할 수 있어",
-          "abilities": { "riskTolerance": 25, "emotionControl": 5 }
+          "abilities": { "riskTolerance": 25, "emotionControl": 5 },
+          "habitTag": "chase"
         }
       ]
     },
@@ -271,7 +237,8 @@
           "text": "앱 켜서 바로 매수!! 늦으면 끝이야",
           "personalityType": "challenger",
           "insight": "스피드가 생명인 도전가! ⚡ 그 실행력은 진짜 대단해",
-          "abilities": { "riskTolerance": 30, "coping": 25 }
+          "abilities": { "riskTolerance": 30, "coping": 25 },
+          "habitTag": "chase"
         },
         {
           "emoji": "🔍",
@@ -297,6 +264,46 @@
       ]
     },
     {
+      "id": 26,
+      "chartVariant": 1,
+      "chartAccent": "red",
+      "category": "amount_weight",
+      "question": "100만원 넣었을 땐 -5%도 멀쩡했어.\n이번엔 1,000만원. 같은 -5%인데 -50만원이야 😨\n지금 넌?",
+      "options": [
+        {
+          "emoji": "📋",
+          "text": "똑같아. 금액 말고 %로 보니까. 규칙도 그대로",
+          "personalityType": "systematic",
+          "insight": "금액이 커져도 같은 사람! 🧘 그게 제일 어려운 능력이야",
+          "abilities": { "emotionControl": 35, "moneyManagement": 20 }
+        },
+        {
+          "emoji": "😰",
+          "text": "금액을 보니 손이 떨려... 일단 절반은 팔아야겠어",
+          "personalityType": "conservative",
+          "insight": "큰돈 앞에서 솔직한 신중파! 🛡️ 떨리는 건 돈이 네 그릇보다 크다는 신호야",
+          "abilities": { "emotionControl": 10, "riskTolerance": 5 },
+          "habitTag": "panicSell"
+        },
+        {
+          "emoji": "😵",
+          "text": "한 달 생활비가 날아갔다고 생각하니 일이 손에 안 잡혀",
+          "personalityType": "emotional",
+          "insight": "숫자를 삶으로 느끼는 감성파! 🎭 그 무게를 작은 돈에서 미리 겪어보자",
+          "abilities": { "emotionControl": 5, "coping": 10 }
+        },
+        {
+          "emoji": "🔥",
+          "text": "큰돈일수록 기회지! 더 넣어서 평단 낮춘다",
+          "personalityType": "challenger",
+          "insight": "큰 판에서 더 세지는 도전가! ⚡ 다만 -5%가 -15%가 돼도 버틸 수 있는지 먼저 봐",
+          "abilities": { "riskTolerance": 35, "moneyManagement": 0 },
+          "moneyTag": "allin",
+          "habitTag": "averagingDown"
+        }
+      ]
+    },
+    {
       "id": 9,
       "chartVariant": 1,
       "chartAccent": "red",
@@ -312,7 +319,8 @@
           "text": "바로 시간외 매도! 더 빠지기 전에 팔아야 해!",
           "personalityType": "emotional",
           "insight": "위기에서 빠르게 반응하는 타입! 🎭 그 민첩함이 때로는 살려줘",
-          "abilities": { "coping": 15, "emotionControl": 5 }
+          "abilities": { "coping": 15, "emotionControl": 5 },
+          "habitTag": "panicSell"
         },
         {
           "emoji": "🔍",
@@ -353,7 +361,8 @@
           "text": "건강 문제면 과매도잖아! 물 타서 평단 낮추자!",
           "personalityType": "challenger",
           "insight": "분석 후 과감하게 베팅하는 도전가! ⚡ 그 판단이 반등의 열쇠야",
-          "abilities": { "riskTolerance": 30, "coping": 25 }
+          "abilities": { "riskTolerance": 30, "coping": 25 },
+          "habitTag": "averagingDown"
         },
         {
           "emoji": "⏳",
@@ -367,7 +376,8 @@
           "text": "-12%면 너무 무서워... 반 정도는 팔아야겠어",
           "personalityType": "conservative",
           "insight": "리스크를 줄이는 신중한 판단! 🛡️ 남은 반으로 기회를 엿볼 수 있잖아",
-          "abilities": { "emotionControl": 15, "riskTolerance": 10 }
+          "abilities": { "emotionControl": 15, "riskTolerance": 10 },
+          "habitTag": "panicSell"
         },
         {
           "emoji": "📋",
@@ -394,14 +404,16 @@
           "text": "봤지?! 더 회복할 거야. 추가 매수까지 간다!",
           "personalityType": "challenger",
           "insight": "끝까지 믿고 밀어붙이는 도전가! ⚡ 그 확신이 대박의 기반이야",
-          "abilities": { "riskTolerance": 30, "coping": 20 }
+          "abilities": { "riskTolerance": 30, "coping": 20 },
+          "habitTag": "averagingDown"
         },
         {
           "emoji": "💰",
           "text": "-3%면 다행이다... 본전만 찾으면 바로 매도할래",
           "personalityType": "conservative",
           "insight": "안전하게 빠지려는 신중파! 🛡️ 손실 최소화가 최고의 전략이야",
-          "abilities": { "emotionControl": 20, "riskTolerance": 10 }
+          "abilities": { "emotionControl": 20, "riskTolerance": 10 },
+          "habitTag": "breakeven"
         },
         {
           "emoji": "📊",
@@ -431,7 +443,8 @@
           "text": "당장 AI 테마주로 갈아타야지! 돈이 거기로 가잖아",
           "personalityType": "challenger",
           "insight": "트렌드를 빠르게 캐치하는 도전가! ⚡ 시장의 흐름을 타는 본능이 있어",
-          "abilities": { "riskTolerance": 30, "coping": 20 }
+          "abilities": { "riskTolerance": 30, "coping": 20 },
+          "habitTag": "chase"
         },
         {
           "emoji": "📊",
@@ -452,44 +465,348 @@
           "text": "왜 나만 안 올라... 불안해서 반은 AI주로 옮길까",
           "personalityType": "emotional",
           "insight": "FOMO에 솔직한 감성파! 🎭 그 감정을 인식하는 것 자체가 대단해",
-          "abilities": { "emotionControl": 5, "riskTolerance": 15 }
+          "abilities": { "emotionControl": 5, "riskTolerance": 15 },
+          "habitTag": "chase"
         }
       ]
     },
     {
-      "id": 13,
-      "chartVariant": 2,
-      "chartAccent": "yellow",
-      "category": "night_habit",
-      "question": "밤 11시... 주식 때문에\n머릿속이 복잡해 🌙 넌 어때?",
+      "id": 22,
+      "chartVariant": 4,
+      "chartAccent": "green",
+      "category": "asset_windfall",
+      "question": "생각도 못 한 보너스 300만원이 들어왔어! 💸\n이 꽁돈, 어디로 보낼 거야?",
       "options": [
         {
-          "emoji": "😫",
-          "text": "주가 계속 신경 쓰여서 잠이 안 와ㅠㅠ",
-          "personalityType": "emotional",
-          "insight": "투자에 온 마음을 쏟는 감성파! 🎭 그만큼 진심이라는 뜻이야",
-          "abilities": { "emotionControl": 5, "coping": 10 }
+          "emoji": "🚀",
+          "text": "전부 지금 제일 핫한 종목에! 어차피 없던 돈이잖아",
+          "personalityType": "challenger",
+          "insight": "꽁돈일수록 과감해지는 도전가! ⚡ 근데 없던 돈도 잃으면 똑같이 아파",
+          "abilities": { "riskTolerance": 30, "coping": 10 },
+          "moneyTag": "allin",
+          "habitTag": "chase"
         },
         {
-          "emoji": "😌",
-          "text": "ㅋㅋ 규칙대로 했으니까 편히 잘 수 있지~",
+          "emoji": "🏦",
+          "text": "비상금 통장부터 채우고, 남는 건 나눠서 투자",
           "personalityType": "systematic",
-          "insight": "원칙 지킨 자만 누리는 꿀잠! 🧘 그 멘탈 존경해",
+          "insight": "돈마다 자리를 정해주는 침착파! 🧘 꽁돈도 규칙대로 가는구나",
+          "abilities": { "moneyManagement": 35, "emotionControl": 25 },
+          "moneyTag": "separated"
+        },
+        {
+          "emoji": "👛",
+          "text": "일단 주식 계좌에 넣어둘래. 필요하면 팔아 쓰면 되지",
+          "personalityType": "emotional",
+          "insight": "주식 계좌가 곧 내 통장인 타입! 🎭 편하긴 한데, 파는 날을 네가 못 고를 수도 있어",
+          "abilities": { "coping": 15, "moneyManagement": 5 },
+          "moneyTag": "wallet"
+        },
+        {
+          "emoji": "🔒",
+          "text": "예금이나 파킹통장에. 공돈이라도 잃긴 싫어",
+          "personalityType": "conservative",
+          "insight": "꽁돈도 소중히 지키는 신중파! 🛡️ 지키는 것도 실력이야",
+          "abilities": { "moneyManagement": 25, "riskTolerance": 5 },
+          "moneyTag": "separated"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "chartVariant": 1,
+      "chartAccent": "red",
+      "category": "asset_sudden_need",
+      "scenarioGroup": "sudden_money",
+      "scenarioTotal": 3,
+      "scenarioTitle": "갑자기 목돈이 필요해",
+      "scenarioStep": 1,
+      "question": "🚨 집주인이 다음 달까지 보증금 500만원 올려달래!\n통장엔 돈이 모자라고, 내 주식은 지금 -12%...\n어떻게 마련할 거야?",
+      "options": [
+        {
+          "emoji": "🧮",
+          "text": "어느 종목을 팔아야 덜 아픈지 계산해서, 전망 나쁜 것부터 판다",
+          "personalityType": "analyst",
+          "insight": "급할 때도 계산부터 하는 분석가! 📊 다만 -12%에서 파는 건 계산해도 아프지",
+          "abilities": { "analysis": 25, "coping": 20, "moneyManagement": 10 },
+          "moneyTag": "wallet"
+        },
+        {
+          "emoji": "💳",
+          "text": "마이너스통장으로 막자. 주식은 본전 올 때까지 절대 안 팔아",
+          "personalityType": "challenger",
+          "insight": "버티기에 진심인 도전가! ⚡ 근데 이자는 본전을 기다려 주지 않아",
+          "abilities": { "riskTolerance": 30, "moneyManagement": 5 },
+          "moneyTag": "leverage",
+          "habitTag": "breakeven"
+        },
+        {
+          "emoji": "🏦",
+          "text": "비상금 통장이 따로 있어. 주식은 안 건드려도 돼",
+          "personalityType": "systematic",
+          "insight": "급한 돈과 굴리는 돈을 나눠 둔 침착파! 🧘 시장이 나쁜 날에도 안 팔아도 되는 힘이야",
+          "abilities": { "moneyManagement": 35, "emotionControl": 30 },
+          "moneyTag": "separated"
+        },
+        {
+          "emoji": "✂️",
+          "text": "수익 난 종목만 골라 팔래. 물린 건 아까워서 못 팔아",
+          "personalityType": "emotional",
+          "insight": "이익은 빨리, 손실은 오래 드는 마음! 🎭 그러다 계좌에 물린 것만 남을 수 있어",
+          "abilities": { "emotionControl": 5, "moneyManagement": 5 },
+          "moneyTag": "wallet",
+          "habitTag": "earlyProfit"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "chartVariant": 0,
+      "chartAccent": "green",
+      "category": "asset_sudden_need",
+      "scenarioGroup": "sudden_money",
+      "scenarioTotal": 3,
+      "scenarioTitle": "갑자기 목돈이 필요해",
+      "scenarioStep": 2,
+      "question": "보증금은 어떻게든 해결했어.\n그런데 한 달 뒤... 시장이 +15% 반등했대 📈\n지금 드는 생각은?",
+      "options": [
+        {
+          "emoji": "🏦",
+          "text": "다시는 급한 돈을 주식에 안 둬. 비상금부터 만든다",
+          "personalityType": "systematic",
+          "insight": "한 번의 경험을 규칙으로 바꾸는 침착파! 🧘 그게 진짜 성장이야",
+          "abilities": { "moneyManagement": 30, "coping": 25 },
+          "moneyTag": "separated"
+        },
+        {
+          "emoji": "😤",
+          "text": "억울해!! 월급 들어오자마자 바로 다시 산다",
+          "personalityType": "emotional",
+          "insight": "놓친 게 제일 아픈 감성파! 🎭 억울함으로 사면 보통 늦게 사게 돼",
+          "abilities": { "emotionControl": 5, "riskTolerance": 20 },
+          "moneyTag": "wallet",
+          "habitTag": "chase"
+        },
+        {
+          "emoji": "🤷",
+          "text": "어쩔 수 없었지. 필요한 돈은 필요한 돈이야",
+          "personalityType": "conservative",
+          "insight": "결과에 끌려다니지 않는 신중파! 🛡️ 뒤돌아보지 않는 것도 멘탈이야",
+          "abilities": { "emotionControl": 25, "moneyManagement": 15 }
+        },
+        {
+          "emoji": "💳",
+          "text": "대출을 받아서라도 판 만큼 다시 채운다",
+          "personalityType": "challenger",
+          "insight": "물량 복구에 진심인 도전가! ⚡ 빚으로 산 주식은 흔들릴 때 두 배로 무거워",
+          "abilities": { "riskTolerance": 35, "moneyManagement": 0 },
+          "moneyTag": "leverage",
+          "habitTag": "chase"
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "chartVariant": 4,
+      "chartAccent": "cyan",
+      "category": "asset_rule",
+      "scenarioGroup": "sudden_money",
+      "scenarioTotal": 3,
+      "scenarioTitle": "갑자기 목돈이 필요해",
+      "scenarioStep": 3,
+      "question": "이번 일로 돈 규칙을 새로 짜기로 했어 📝\n월급이 들어오면 어떻게 나눌 거야?",
+      "options": [
+        {
+          "emoji": "🎰",
+          "text": "남는 돈은 전부 주식! 현금은 놀리면 손해야",
+          "personalityType": "challenger",
+          "insight": "돈을 쉬게 두지 않는 도전가! ⚡ 근데 쉬는 돈이 급한 날 널 구해줘",
+          "abilities": { "riskTolerance": 30, "moneyManagement": 5 },
+          "moneyTag": "allin"
+        },
+        {
+          "emoji": "🧱",
+          "text": "생활비 3~6개월치 비상금 먼저. 그다음 매달 같은 금액만 투자",
+          "personalityType": "systematic",
+          "insight": "순서가 있는 침착파! 🧘 이러면 급락에도 팔 이유가 없어져",
+          "abilities": { "moneyManagement": 35, "emotionControl": 25 },
+          "moneyTag": "separated"
+        },
+        {
+          "emoji": "🌊",
+          "text": "그때그때 달라. 여유 있으면 넣고, 필요하면 빼고",
+          "personalityType": "emotional",
+          "insight": "흐름대로 가는 감성파! 🎭 넣고 빼는 타이밍은 보통 시장과 반대로 가",
+          "abilities": { "coping": 15, "moneyManagement": 5 },
+          "moneyTag": "wallet"
+        },
+        {
+          "emoji": "🗂️",
+          "text": "쓸 시기별로 나눠. 2년 안에 쓸 돈은 예금, 나머지만 주식",
+          "personalityType": "analyst",
+          "insight": "돈에 기한표를 붙이는 분석가! 📊 기한 있는 돈은 주식에 두면 안 되지",
+          "abilities": { "analysis": 25, "moneyManagement": 35 },
+          "moneyTag": "separated"
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "chartVariant": 0,
+      "chartAccent": "green",
+      "category": "asset_as_cash",
+      "question": "여행 경비 200만원이 필요해 ✈️\n통장은 빠듯한데, 주식 계좌엔 +6% 수익 중인 종목이 있어",
+      "options": [
+        {
+          "emoji": "👛",
+          "text": "수익 난 거 팔아서 가지 뭐! 주식 계좌가 내 통장이야",
+          "personalityType": "emotional",
+          "insight": "주식을 현금처럼 쓰는 타입! 🎭 쓰려고 파는 순간, 매도 이유는 시장이 아니라 내 지갑이 돼",
+          "abilities": { "coping": 15, "moneyManagement": 5 },
+          "moneyTag": "wallet",
+          "habitTag": "earlyProfit"
+        },
+        {
+          "emoji": "🧘",
+          "text": "여행은 월급 모아서 가. 투자금은 투자금이야",
+          "personalityType": "systematic",
+          "insight": "돈에 꼬리표를 붙여 둔 침착파! 🧘 그래야 주식이 자랄 시간을 가져",
+          "abilities": { "moneyManagement": 35, "emotionControl": 25 },
+          "moneyTag": "separated"
+        },
+        {
+          "emoji": "💳",
+          "text": "카드 할부로 가고 주식은 그대로! 더 오를 텐데 왜 팔아",
+          "personalityType": "challenger",
+          "insight": "수익을 끝까지 끌고 가는 도전가! ⚡ 근데 할부 이자보다 더 번다는 보장은 없어",
+          "abilities": { "riskTolerance": 30, "moneyManagement": 5 },
+          "moneyTag": "leverage"
+        },
+        {
+          "emoji": "📉",
+          "text": "여행을 줄이거나 미뤄. 중간에 빼면 불어나는 속도가 끊겨",
+          "personalityType": "analyst",
+          "insight": "복리를 계산하는 분석가! 📊 꺼내 쓰는 돈의 진짜 값을 아는구나",
+          "abilities": { "analysis": 25, "moneyManagement": 30 },
+          "moneyTag": "separated"
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "chartVariant": 4,
+      "chartAccent": "yellow",
+      "category": "leverage",
+      "question": "확신이 드는 종목을 찾았어!\n그때 앱에 뜬 알림: '신용으로 2배까지 살 수 있어요' 💳",
+      "options": [
+        {
+          "emoji": "🚀",
+          "text": "확신 있으면 크게 가야지! 풀로 당긴다",
+          "personalityType": "challenger",
+          "insight": "확신에 베팅하는 도전가! ⚡ 빚은 수익도 2배, 버틸 시간은 절반이야",
+          "abilities": { "riskTolerance": 35, "moneyManagement": 0 },
+          "moneyTag": "leverage"
+        },
+        {
+          "emoji": "🧮",
+          "text": "이자랑 강제로 팔리는 조건부터 계산. 웬만하면 안 써",
+          "personalityType": "analyst",
+          "insight": "빚의 가격표부터 보는 분석가! 📊 조건을 아는 사람만 빚을 쓸 자격이 있지",
+          "abilities": { "analysis": 30, "infoJudgment": 20, "moneyManagement": 20 }
+        },
+        {
+          "emoji": "🚫",
+          "text": "빚으로는 절대 안 사. 내 돈만큼만 해",
+          "personalityType": "conservative",
+          "insight": "선을 지키는 신중파! 🛡️ 내 돈이면 기다릴 수 있고, 빚이면 못 기다려",
+          "abilities": { "moneyManagement": 35, "emotionControl": 20 },
+          "moneyTag": "separated"
+        },
+        {
+          "emoji": "👀",
+          "text": "요즘 다들 쓴다던데... 조금만 써볼까?",
+          "personalityType": "emotional",
+          "insight": "분위기에 솔직한 감성파! 🎭 '다들 한다'는 이유가 제일 위험한 이유야",
+          "abilities": { "emotionControl": 5, "moneyManagement": 5 },
+          "moneyTag": "leverage"
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "chartVariant": 3,
+      "chartAccent": "cyan",
+      "category": "slot_swap",
+      "question": "보유 종목 5칸이 꽉 찼어 ●●●●●\n새 종목을 사려면 하나를 내보내야 해. 뭘 팔래?",
+      "options": [
+        {
+          "emoji": "💰",
+          "text": "제일 많이 오른 걸 팔래. 수익은 챙겨야지",
+          "personalityType": "conservative",
+          "insight": "수익 확정이 편한 신중파! 🛡️ 근데 잘 크는 나무를 먼저 베는 걸 수도 있어",
+          "abilities": { "emotionControl": 15, "riskTolerance": 10 },
+          "habitTag": "earlyProfit"
+        },
+        {
+          "emoji": "🌱",
+          "text": "제일 많이 물린 걸 판다. 틀린 건 인정하고 밭을 비워",
+          "personalityType": "systematic",
+          "insight": "잡초 뽑기를 아는 침착파! 🧘 손절은 실패가 아니라 밭 관리야",
+          "abilities": { "emotionControl": 35, "coping": 30 }
+        },
+        {
+          "emoji": "📊",
+          "text": "다섯 개 전망을 다시 점수 매겨서 꼴찌를 판다",
+          "personalityType": "analyst",
+          "insight": "수익률이 아니라 앞날을 보는 분석가! 📊 산 가격은 시장이 모르는 숫자거든",
+          "abilities": { "analysis": 35, "infoJudgment": 25 }
+        },
+        {
+          "emoji": "😵",
+          "text": "못 고르겠어... 그냥 돈을 더 넣어서 살래",
+          "personalityType": "emotional",
+          "insight": "고르는 게 제일 힘든 감성파! 🎭 돈은 한정돼 있어. 무엇을 놓을지가 진짜 선택이야",
+          "abilities": { "emotionControl": 5, "moneyManagement": 5 },
+          "moneyTag": "allin"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "chartVariant": 3,
+      "chartAccent": "yellow",
+      "category": "waiting",
+      "question": "내 종목이 3주째 제자리야 😑\n지루해 죽겠는데... 넌 지금 뭘 하고 있어?",
+      "options": [
+        {
+          "emoji": "🔄",
+          "text": "뭐라도 하자! 움직이는 종목으로 갈아탄다",
+          "personalityType": "challenger",
+          "insight": "가만히 못 있는 도전가! ⚡ 가만히 있는 것보다 못한 매매도 많아",
+          "abilities": { "riskTolerance": 25, "coping": 15 },
+          "habitTag": "overtrade"
+        },
+        {
+          "emoji": "⏳",
+          "text": "기다리는 중이야. 내가 정한 가격이 오면 움직여",
+          "personalityType": "systematic",
+          "insight": "조건을 기다리는 침착파! 🧘 그건 '아무것도 안 함'이 아니라 선택이야",
           "abilities": { "emotionControl": 35, "coping": 25 }
         },
         {
-          "emoji": "🤓",
-          "text": "내일 시장 어떻게 될지 시나리오 짜는 중",
-          "personalityType": "analyst",
-          "insight": "잠자기 전에도 분석하는 진짜 분석가! 📊 준비의 달인이네",
-          "abilities": { "analysis": 30, "infoJudgment": 20 }
+          "emoji": "🤷",
+          "text": "왜 안 움직이는지 모르겠고... 그냥 두는 중",
+          "personalityType": "emotional",
+          "insight": "결정을 미루는 중인 감성파! 🎭 기다림엔 두 종류가 있어. 기다리는 것과 미루는 것",
+          "abilities": { "emotionControl": 10, "coping": 5 },
+          "habitTag": "blindWait"
         },
         {
-          "emoji": "😰",
-          "text": "내일 더 빠지면 어쩌지... 너무 불안해",
-          "personalityType": "conservative",
-          "insight": "손실이 제일 무서운 안전파! 🛡️ 그 걱정이 큰 실수를 막아줘",
-          "abilities": { "emotionControl": 10, "riskTolerance": 10 }
+          "emoji": "🔔",
+          "text": "실적 발표일 확인하고 알림 걸어뒀어",
+          "personalityType": "analyst",
+          "insight": "기다림에도 계획이 있는 분석가! 📊 무엇을 기다리는지 아는 게 핵심이야",
+          "abilities": { "analysis": 30, "infoJudgment": 25 }
         }
       ]
     }
@@ -515,7 +832,8 @@
           "emotion": "🔥 탐욕 폭발",
           "personalityType": "challenger",
           "insight": "급등장에서 빛나는 도전가! ⚡ 그 스피드 대단해",
-          "abilities": { "riskTolerance": 30, "coping": 15 }
+          "abilities": { "riskTolerance": 30, "coping": 15 },
+          "habitTag": "chase"
         },
         {
           "emoji": "🧠",
@@ -561,7 +879,8 @@
           "emotion": "💀 공포 MAX",
           "personalityType": "emotional",
           "insight": "위기에서 감정이 폭발하는 솔직한 타입! 🎭 그 본능이 때론 도움이 돼",
-          "abilities": { "emotionControl": 5, "coping": 5 }
+          "abilities": { "emotionControl": 5, "coping": 5 },
+          "habitTag": "panicSell"
         },
         {
           "emoji": "😤",
@@ -569,7 +888,8 @@
           "emotion": "💢 오기 발동",
           "personalityType": "challenger",
           "insight": "끝까지 안 포기하는 투사! ⚡ 그 의지력이 반등을 만들 수도!",
-          "abilities": { "riskTolerance": 30, "coping": 10 }
+          "abilities": { "riskTolerance": 30, "coping": 10 },
+          "habitTag": "averagingDown"
         },
         {
           "emoji": "🧐",
@@ -609,7 +929,8 @@
           "emotion": "🔥 탐욕 ON",
           "personalityType": "challenger",
           "insight": "AI 경고도 무시하는 도전가! ⚡ 그 배짱이 대단해",
-          "abilities": { "riskTolerance": 30, "coping": 20 }
+          "abilities": { "riskTolerance": 30, "coping": 20 },
+          "habitTag": "chase"
         },
         {
           "emoji": "🤔",
@@ -633,7 +954,8 @@
           "emotion": "😣 미련 가득",
           "personalityType": "emotional",
           "insight": "아쉬움에 솔직한 감성파! 🎭 그 감정이 때론 기회를 만들기도 해",
-          "abilities": { "emotionControl": 10, "riskTolerance": 15 }
+          "abilities": { "emotionControl": 10, "riskTolerance": 15 },
+          "habitTag": "chase"
         }
       ]
     },
@@ -657,7 +979,8 @@
           "emotion": "💀 패닉 모드",
           "personalityType": "emotional",
           "insight": "위기에서 본능으로 반응하는 감성파! 🎭 그 빠른 반응이 때론 정답이야",
-          "abilities": { "emotionControl": 5, "coping": 5 }
+          "abilities": { "emotionControl": 5, "coping": 5 },
+          "habitTag": "panicSell"
         },
         {
           "emoji": "🧠",
@@ -801,7 +1124,8 @@
           "emotion": "💀 생존 모드",
           "personalityType": "conservative",
           "insight": "최악의 상황에서 자산 보전을 최우선으로 하는 신중파! 🛡️ 그 생존력이 대단해",
-          "abilities": { "emotionControl": 15, "riskTolerance": 10 }
+          "abilities": { "emotionControl": 15, "riskTolerance": 10 },
+          "habitTag": "panicSell"
         },
         {
           "emoji": "📊",
@@ -849,7 +1173,8 @@
           "emotion": "🔥 올라타기",
           "personalityType": "challenger",
           "insight": "기회를 잡는 본능이 살아있는 도전가! ⚡ 근데 작전주 조심해야 해!",
-          "abilities": { "riskTolerance": 30, "coping": 10 }
+          "abilities": { "riskTolerance": 30, "coping": 10 },
+          "habitTag": "chase"
         },
         {
           "emoji": "🔍",
@@ -873,7 +1198,98 @@
           "emotion": "😣 FOMO",
           "personalityType": "emotional",
           "insight": "놓칠까 불안한 감성파! 🎭 그 FOMO를 인식하는 것만으로도 성장이야",
-          "abilities": { "emotionControl": 5, "riskTolerance": 15 }
+          "abilities": { "emotionControl": 5, "riskTolerance": 15 },
+          "habitTag": "chase"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "chartVariant": 3,
+      "chartAccent": "cyan",
+      "title": "〰️ 차트 끝이 파르르!",
+      "stock": "LG에너지솔루션",
+      "sector": "2차전지",
+      "situation": "며칠째 횡보, 지금 막 현재가가 위로 툭 치는 중",
+      "currentPrice": 412000,
+      "change": "+0.8%",
+      "volume": "+15%",
+      "question": "차트 끝이 위로 막 치고 있어! 👆\n지금 아니면 늦을 것 같은데...?",
+      "options": [
+        {
+          "emoji": "⚡",
+          "text": "지금이야! 바로 매수!",
+          "personalityType": "emotional",
+          "insight": "끝의 떨림에 손이 먼저 나가는 감성파! 🎭 그 떨림은 방향이 아니라 그냥 떨림일 때가 많아",
+          "abilities": { "emotionControl": 5, "coping": 10 },
+          "habitTag": "tailFollow"
+        },
+        {
+          "emoji": "🧘",
+          "text": "1분짜리 움직임은 소음이야. 종가 보고 정해",
+          "personalityType": "systematic",
+          "insight": "손가락 말고 달을 보는 침착파! 🧘 떨림에 안 흔들리는 게 실력이야",
+          "abilities": { "emotionControl": 35, "infoJudgment": 25 }
+        },
+        {
+          "emoji": "🔍",
+          "text": "거래량이 같이 터졌나? 아니면 패스",
+          "personalityType": "analyst",
+          "insight": "떨림에도 근거를 묻는 분석가! 📊 +15% 거래량이면 아직 아무 일도 아니지",
+          "abilities": { "analysis": 30, "infoJudgment": 30 }
+        },
+        {
+          "emoji": "🔥",
+          "text": "일단 조금 태워보고, 오르면 더 산다!",
+          "personalityType": "challenger",
+          "insight": "일단 올라타는 도전가! ⚡ 끝만 보고 산 건 끝만 보고 팔게 돼",
+          "abilities": { "riskTolerance": 30, "coping": 15 },
+          "habitTag": "tailFollow"
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "chartVariant": 3,
+      "chartAccent": "yellow",
+      "title": "😤 내가 팔자마자 반등?!",
+      "stock": "POSCO홀딩스",
+      "sector": "철강/소재",
+      "situation": "-7% 급락에 전량 매도 → 이틀 뒤 +9% 반등",
+      "currentPrice": 318000,
+      "change": "+9%",
+      "volume": "+140%",
+      "news": "낙폭 과대 인식에 기관 순매수",
+      "question": "무서워서 다 팔았는데 이틀 만에 반등했어 😤\n'내가 팔면 오른다'... 지금 넌?",
+      "options": [
+        {
+          "emoji": "🏃",
+          "text": "억울해!! 지금이라도 다시 산다",
+          "personalityType": "emotional",
+          "insight": "놓친 게 제일 아픈 감성파! 🎭 무서워서 팔고 억울해서 사면, 비싸게 사고 싸게 파는 거야",
+          "abilities": { "emotionControl": 5, "riskTolerance": 20 },
+          "habitTag": "chase"
+        },
+        {
+          "emoji": "📝",
+          "text": "왜 팔았는지 복기부터. 기준이 가격이었나, 기분이었나",
+          "personalityType": "analyst",
+          "insight": "후회를 정보로 바꾸는 분석가! 📊 운이 아니라 습관이었는지 보는 거지",
+          "abilities": { "analysis": 35, "coping": 25 }
+        },
+        {
+          "emoji": "🛡️",
+          "text": "더 빠졌을 수도 있잖아. 뒤돌아보지 않아",
+          "personalityType": "conservative",
+          "insight": "결과에 안 끌려가는 신중파! 🛡️ 다만 같은 장면이 또 오면 또 팔 건지는 생각해 봐",
+          "abilities": { "emotionControl": 20, "riskTolerance": 10 }
+        },
+        {
+          "emoji": "✂️",
+          "text": "다음 급락엔 절반만 팔기로 규칙을 하나 추가해",
+          "personalityType": "systematic",
+          "insight": "경험을 규칙으로 바꾸는 침착파! 🧘 전부 아니면 전무가 아니야",
+          "abilities": { "emotionControl": 30, "coping": 30 }
         }
       ]
     }

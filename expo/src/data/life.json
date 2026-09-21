@@ -1,0 +1,580 @@
+{
+  "characters": [
+    {
+      "id": "hangyeol",
+      "emoji": "🎒",
+      "name": "한결",
+      "age": 26,
+      "scene": "첫 직장 2년차 · 월세 원룸",
+      "startCash": 5000000,
+      "goal": "종잣돈 만들기",
+      "recover": "아주 길다",
+      "minus10": "두 달 저축",
+      "lesson": "실수는 일찍, 작게",
+      "startStage": 4,
+      "unit": {
+        "label": "월세",
+        "counter": "달치",
+        "amount": 500000
+      }
+    },
+    {
+      "id": "doyun",
+      "emoji": "💍",
+      "name": "도윤·서아",
+      "age": 34,
+      "scene": "신혼 · 전세 만기 2년 남음",
+      "startCash": 10000000,
+      "goal": "전세 보증금 올려주기",
+      "recover": "길다",
+      "minus10": "전세 연장이 꼬임",
+      "lesson": "기한이 있는 돈의 무게",
+      "startStage": 5,
+      "unit": {
+        "label": "전세 이자",
+        "counter": "달치",
+        "amount": 400000
+      }
+    },
+    {
+      "id": "jeongwoo",
+      "emoji": "🏫",
+      "name": "정우",
+      "age": 43,
+      "scene": "초등생 둘 · 대출 있는 아파트",
+      "startCash": 30000000,
+      "goal": "아이 교육비",
+      "recover": "보통",
+      "minus10": "학원 하나",
+      "lesson": "지키는 것도 실력",
+      "startStage": 6,
+      "unit": {
+        "label": "아이 학원비",
+        "counter": "달치",
+        "amount": 300000
+      }
+    },
+    {
+      "id": "migyeong",
+      "emoji": "🧳",
+      "name": "미경",
+      "age": 55,
+      "scene": "은퇴 10년 전 · 부모님 부양",
+      "startCash": 50000000,
+      "goal": "노후 자금",
+      "recover": "짧다",
+      "minus10": "은퇴 1년 미룸",
+      "lesson": "위험을 줄여 가는 법",
+      "startStage": 7,
+      "unit": {
+        "label": "노후 생활비",
+        "counter": "달치",
+        "amount": 2000000
+      }
+    },
+    {
+      "id": "yeongsu",
+      "emoji": "🌿",
+      "name": "영수",
+      "age": 67,
+      "scene": "은퇴 · 연금 생활",
+      "startCash": 100000000,
+      "goal": "남은 삶의 생활비",
+      "recover": "거의 없다",
+      "minus10": "생활비 열 달",
+      "lesson": "꺼내 쓰면서 버티는 법",
+      "startStage": 7,
+      "unit": {
+        "label": "생활비",
+        "counter": "달치",
+        "amount": 1000000
+      }
+    }
+  ],
+  "moneyTypes": [
+    {
+      "id": "spare",
+      "emoji": "☕",
+      "name": "여윳돈",
+      "desc": "없어도 생활은 되는 돈",
+      "cashMult": 1,
+      "goal": null,
+      "ifLost": "아프지만 생활은 그대로",
+      "lesson": null,
+      "unit": null
+    },
+    {
+      "id": "living",
+      "emoji": "🍚",
+      "name": "생계형",
+      "desc": "생활비를 쪼개서 넣은 돈",
+      "cashMult": 0.5,
+      "goal": "생활비에 보태기",
+      "ifLost": "당장 이번 달이 빠듯해져요",
+      "lesson": "잃으면 안 되는 돈은 작게, 천천히",
+      "unit": {
+        "label": "식비",
+        "counter": "달치",
+        "amount": 400000
+      }
+    },
+    {
+      "id": "lump",
+      "emoji": "📅",
+      "name": "쓸 곳 정해진 돈",
+      "desc": "전세금·등록금처럼 곧 써야 할 돈",
+      "cashMult": 2,
+      "goal": "쓸 날까지 지키기",
+      "ifLost": "계획한 날에 돈이 모자라요",
+      "lesson": "기한이 있는 돈은 기다릴 수 없다",
+      "unit": null
+    },
+    {
+      "id": "loan",
+      "emoji": "💳",
+      "name": "빌린 돈",
+      "desc": "대출·마이너스 통장으로 넣은 돈",
+      "cashMult": 1,
+      "goal": "이자보다 더 벌기",
+      "ifLost": "돈은 사라져도 빚은 남아요",
+      "lesson": "빌린 돈은 두 배로 무겁다",
+      "unit": null,
+      "unitRate": {
+        "label": "대출 이자",
+        "counter": "달치",
+        "rate": 0.005
+      }
+    },
+    {
+      "id": "fulltime",
+      "emoji": "💼",
+      "name": "전업 투자",
+      "desc": "월급 없이 이 돈으로 먹고사는 중",
+      "cashMult": 3,
+      "goal": "매달 생활비 벌기",
+      "ifLost": "월급이 없어 메울 곳이 없어요",
+      "lesson": "버는 것보다 안 잃는 게 먼저",
+      "unit": {
+        "label": "생활비",
+        "counter": "달치",
+        "amount": 2500000
+      }
+    }
+  ],
+  "houses": [
+    {
+      "stage": 1,
+      "name": "쪽방",
+      "emoji": "🕯️",
+      "sign": "창 없는 방, 이불 한 채",
+      "minRatio": 0
+    },
+    {
+      "stage": 2,
+      "name": "고시원",
+      "emoji": "🚪",
+      "sign": "컵라면, 접이식 책상",
+      "minRatio": 0.3
+    },
+    {
+      "stage": 3,
+      "name": "반지하 원룸",
+      "emoji": "🪟",
+      "sign": "작은 창, 빨래 건조대",
+      "minRatio": 0.5
+    },
+    {
+      "stage": 4,
+      "name": "원룸",
+      "emoji": "🪴",
+      "sign": "화분 하나",
+      "minRatio": 0.8
+    },
+    {
+      "stage": 5,
+      "name": "투룸 빌라",
+      "emoji": "🏠",
+      "sign": "식탁, 책장",
+      "minRatio": 1.2
+    },
+    {
+      "stage": 6,
+      "name": "전세 아파트",
+      "emoji": "🏢",
+      "sign": "소파, 가족사진",
+      "minRatio": 1.6
+    },
+    {
+      "stage": 7,
+      "name": "내 집",
+      "emoji": "🏡",
+      "sign": "베란다 정원",
+      "minRatio": 2.2
+    },
+    {
+      "stage": 8,
+      "name": "마당 있는 집",
+      "emoji": "🌳",
+      "sign": "나무 한 그루",
+      "minRatio": 3.0
+    }
+  ],
+  "wisdomTitles": [
+    {
+      "min": 0,
+      "title": "새내기"
+    },
+    {
+      "min": 3,
+      "title": "일꾼"
+    },
+    {
+      "min": 8,
+      "title": "농부"
+    },
+    {
+      "min": 15,
+      "title": "어른 농부"
+    }
+  ],
+  "lines": {
+    "start": [
+      "자, 이번 계절도 천천히 가 보자."
+    ],
+    "calm": [
+      "밭은 가만히 있어도 자란다고 했지.",
+      "오늘은 별일 없네. 그게 좋은 거지."
+    ],
+    "up": [
+      "괜찮네. 근데 이게 실력일까, 운일까.",
+      "좋다. 들뜨지만 말자."
+    ],
+    "bigUp": [
+      "이러다 이사 가겠는데? …진정하자.",
+      "많이 올랐다. 욕심이 제일 무섭지."
+    ],
+    "down": [
+      "…오늘은 앱 그만 볼까.",
+      "조금 빠졌네. 계획대로만 하자."
+    ],
+    "bigDown": [
+      "숨 한 번 쉬고. 지금 누르면 기분이 누르는 거야.",
+      "무섭다. 그래도 무서워서 파는 건 아니길."
+    ],
+    "moveUp": [
+      "여기 창이 크다. 근데 이게 실력이었나, 운이었나."
+    ],
+    "moveDown": [
+      "짐이 줄어드니 생각도 줄어드네. 다시 하면 되지."
+    ],
+    "stay": [
+      "같은 집, 같은 창. 그래도 나는 조금 달라졌다."
+    ]
+  },
+  "seasonMessages": {
+    "goodUp": "이 집은 당신이 지은 집입니다.",
+    "badUp": "집은 커졌지만, 같은 방식이면 다음 계절에 돌려줘야 할 수 있어요.",
+    "goodDown": "옳은 선택이 늘 보답받지는 않아요. 책장에 책이 한 권 늘었습니다.",
+    "badDown": "가장 비쌌던 결정을 같이 봅시다. 집은 다시 넓힐 수 있어요."
+  },
+  "events": [
+    {
+      "id": "hospital",
+      "emoji": "🚑",
+      "kind": "need",
+      "title": "가족이 병원에 입원했어요",
+      "desc": "병원비를 바로 내야 해요",
+      "rate": 0.15,
+      "onlyTypes": null,
+      "ages": null
+    },
+    {
+      "id": "car",
+      "emoji": "🔧",
+      "kind": "need",
+      "title": "차가 고장 났어요",
+      "desc": "수리비가 나왔어요",
+      "rate": 0.08,
+      "onlyTypes": null,
+      "ages": null
+    },
+    {
+      "id": "rent",
+      "emoji": "🏠",
+      "kind": "need",
+      "title": "집주인이 보증금을 올려 달래요",
+      "desc": "이번 주 안에 보내야 해요",
+      "rate": 0.2,
+      "onlyTypes": null,
+      "ages": [
+        20,
+        45
+      ]
+    },
+    {
+      "id": "wedding",
+      "emoji": "💌",
+      "kind": "need",
+      "title": "결혼식·경조사가 몰렸어요",
+      "desc": "축의금이 한꺼번에 나가요",
+      "rate": 0.05,
+      "onlyTypes": null,
+      "ages": null
+    },
+    {
+      "id": "tuition",
+      "emoji": "🎓",
+      "kind": "need",
+      "title": "아이 학원비·등록금 낼 날이에요",
+      "desc": "미룰 수 없는 돈이에요",
+      "rate": 0.12,
+      "onlyTypes": null,
+      "ages": [
+        35,
+        60
+      ]
+    },
+    {
+      "id": "phone",
+      "emoji": "📱",
+      "kind": "need",
+      "title": "휴대폰이 망가졌어요",
+      "desc": "새로 사야 해요",
+      "rate": 0.04,
+      "onlyTypes": null,
+      "ages": null
+    },
+    {
+      "id": "interest",
+      "emoji": "💳",
+      "kind": "need",
+      "title": "대출 이자 내는 날이에요",
+      "desc": "수익이 나든 말든 이자는 나가요",
+      "rate": 0.02,
+      "onlyTypes": [
+        "loan"
+      ],
+      "ages": null
+    },
+    {
+      "id": "livingcost",
+      "emoji": "🛒",
+      "kind": "need",
+      "title": "이번 달 생활비를 꺼내야 해요",
+      "desc": "월급이 없으니 계좌에서 꺼내요",
+      "rate": 0.06,
+      "onlyTypes": [
+        "fulltime",
+        "living"
+      ],
+      "ages": null
+    },
+    {
+      "id": "deadline",
+      "emoji": "📅",
+      "kind": "need",
+      "title": "돈 쓸 날이 앞당겨졌어요",
+      "desc": "일부를 먼저 보내야 해요",
+      "rate": 0.25,
+      "onlyTypes": [
+        "lump"
+      ],
+      "ages": null
+    },
+    {
+      "id": "health",
+      "emoji": "💊",
+      "kind": "need",
+      "title": "건강 검진에서 재검이 나왔어요",
+      "desc": "검사비와 약값이 들어요",
+      "rate": 0.07,
+      "onlyTypes": null,
+      "ages": [
+        50,
+        99
+      ]
+    },
+    {
+      "id": "bonus",
+      "emoji": "🎁",
+      "kind": "gain",
+      "title": "회사에서 보너스가 나왔어요",
+      "desc": "생각 못 한 돈이 들어왔어요",
+      "rate": 0.1,
+      "onlyTypes": [
+        "spare",
+        "lump",
+        "loan"
+      ],
+      "ages": [
+        20,
+        60
+      ]
+    },
+    {
+      "id": "taxrefund",
+      "emoji": "🧾",
+      "kind": "gain",
+      "title": "세금 환급금이 들어왔어요",
+      "desc": "13월의 월급이에요",
+      "rate": 0.05,
+      "onlyTypes": null,
+      "ages": null
+    },
+    {
+      "id": "savings",
+      "emoji": "🏦",
+      "kind": "gain",
+      "title": "적금이 만기 됐어요",
+      "desc": "목돈이 계좌로 들어왔어요",
+      "rate": 0.15,
+      "onlyTypes": null,
+      "ages": null
+    },
+    {
+      "id": "dividend",
+      "emoji": "💰",
+      "kind": "gain",
+      "title": "배당금이 들어왔어요",
+      "desc": "들고만 있었는데 돈이 생겼어요",
+      "rate": 0.03,
+      "onlyTypes": null,
+      "ages": null
+    },
+    {
+      "id": "gift",
+      "emoji": "🧧",
+      "kind": "gain",
+      "title": "가족이 용돈을 보내 줬어요",
+      "desc": "고마운 돈이에요",
+      "rate": 0.04,
+      "onlyTypes": null,
+      "ages": null
+    }
+  ],
+  "eventLines": {
+    "paidCash": "현금을 남겨 둔 덕분에 주식은 안 팔아도 돼요.",
+    "forcedSell": "현금이 모자라 주식을 지금 값에 팔아야 해요. 급한 돈은 값을 기다려 주지 않아요.",
+    "forcedSellLoss": "떨어져 있는데도 팔아야 해요. 그래서 현금을 조금은 남겨 두는 거예요.",
+    "gain": "공돈이 생겼어요. 바로 다 살까요, 조금 남겨 둘까요?"
+  },
+  "decor": [
+    {
+      "id": "plant",
+      "emoji": "🪴",
+      "name": "화분",
+      "group": "room",
+      "rate": 0.01,
+      "minStage": 1,
+      "line": "방에 초록이 생겼어요"
+    },
+    {
+      "id": "lamp",
+      "emoji": "💡",
+      "name": "예쁜 조명",
+      "group": "room",
+      "rate": 0.015,
+      "minStage": 2,
+      "line": "밤이 따뜻해졌어요"
+    },
+    {
+      "id": "desk",
+      "emoji": "🖥️",
+      "name": "책상과 컴퓨터",
+      "group": "room",
+      "rate": 0.04,
+      "minStage": 3,
+      "line": "내 자리가 생겼어요"
+    },
+    {
+      "id": "bed",
+      "emoji": "🛏️",
+      "name": "푹신한 침대",
+      "group": "room",
+      "rate": 0.05,
+      "minStage": 4,
+      "line": "잠이 달라졌어요"
+    },
+    {
+      "id": "sofa",
+      "emoji": "🛋️",
+      "name": "소파",
+      "group": "room",
+      "rate": 0.06,
+      "minStage": 5,
+      "line": "친구를 부를 수 있어요"
+    },
+    {
+      "id": "tv",
+      "emoji": "📺",
+      "name": "큰 TV",
+      "group": "room",
+      "rate": 0.05,
+      "minStage": 5,
+      "line": "주말이 기다려져요"
+    },
+    {
+      "id": "cat",
+      "emoji": "🐈",
+      "name": "고양이",
+      "group": "joy",
+      "rate": 0.03,
+      "minStage": 4,
+      "line": "집에 가면 누가 기다려요"
+    },
+    {
+      "id": "dog",
+      "emoji": "🐕",
+      "name": "강아지",
+      "group": "joy",
+      "rate": 0.04,
+      "minStage": 5,
+      "line": "매일 산책을 나가요"
+    },
+    {
+      "id": "bike",
+      "emoji": "🚲",
+      "name": "자전거",
+      "group": "joy",
+      "rate": 0.02,
+      "minStage": 2,
+      "line": "바람 쐬러 나가요"
+    },
+    {
+      "id": "guitar",
+      "emoji": "🎸",
+      "name": "기타",
+      "group": "joy",
+      "rate": 0.025,
+      "minStage": 3,
+      "line": "서툴지만 한 곡 쳐요"
+    },
+    {
+      "id": "trip",
+      "emoji": "✈️",
+      "name": "여행 한 번",
+      "group": "joy",
+      "rate": 0.08,
+      "minStage": 4,
+      "line": "사진이 한 장 늘었어요"
+    },
+    {
+      "id": "car",
+      "emoji": "🚗",
+      "name": "자동차",
+      "group": "joy",
+      "rate": 0.25,
+      "minStage": 6,
+      "line": "어디든 갈 수 있어요"
+    },
+    {
+      "id": "garden",
+      "emoji": "🌷",
+      "name": "작은 정원",
+      "group": "room",
+      "rate": 0.1,
+      "minStage": 7,
+      "line": "봄마다 꽃이 피어요"
+    }
+  ]
+}

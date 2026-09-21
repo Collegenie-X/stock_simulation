@@ -1,17 +1,19 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type ReactNode } from "react"
 import { Platform, StyleSheet, Text, View } from "react-native"
 import { useLocalSearchParams, useRouter } from "expo-router"
 import { BounceIn, FadeUp, Float, Gradient, PressableScale, Pulse, GlowOrb } from "@/components/ui"
 import { localStore } from "@/lib/storage"
 import { playClickSound } from "@/lib/sound"
 import { alpha, palette } from "@/theme"
-import type { AbilityScores, AssessmentMode, PersonalityScores, PersonalityType } from "../types"
-import { ABILITY_META, ABILITY_BAR_COLORS, PERSONALITY_META, PERSONALITY_COLORS, LABELS } from "../config"
+import type { AbilityScores, AssessmentMode, HabitCounts, HabitTag, MoneyScores, PersonalityScores, PersonalityType } from "../types"
+import { ABILITY_META, ABILITY_BAR_COLORS, HABIT_META, MONEY_META, MONEY_ORDER, PERSONALITY_META, PERSONALITY_COLORS, LABELS } from "../config"
 import PersonalityCharacter from "./PersonalityCharacter"
 
 interface ResultScreenProps {
   personalityScores: PersonalityScores
   abilities: AbilityScores
+  moneyScores: MoneyScores
+  habitCounts: HabitCounts
   totalQuestions: number
   mode?: AssessmentMode
 }
@@ -80,7 +82,57 @@ function toRank(score: number): { label: string; text: string; bg: string; borde
 
 const MONO = Platform.select({ ios: "Menlo", android: "monospace", default: "monospace" })
 
-export default function ResultScreen({ personalityScores, abilities, totalQuestions, mode = "detailed" }: ResultScreenProps) {
+// 보고서 핵심 요약의 한 줄
+function SummaryRow({ no, tag, emoji, title, body, color }: { no: string; tag: string; emoji: string; title: string; body: string; color: string }) {
+  return (
+    <View style={styles.reportItem}>
+      <Text style={[styles.reportNo, { color }]}>{no}</Text>
+      <View style={[styles.reportBar, { backgroundColor: color }]} />
+      <View style={{ flex: 1 }}>
+        <Text style={styles.summaryTag}>{tag}</Text>
+        <Text style={[styles.summaryTitle, { color }]}>
+          {emoji} {title}
+        </Text>
+        <Text style={styles.summaryBody}>{body}</Text>
+      </View>
+    </View>
+  )
+}
+
+function CommentBox({ label, text, color, border, bg }: { label: string; text: string; color: string; border: string; bg: string }) {
+  return (
+    <View style={[styles.comment, { borderColor: border, backgroundColor: bg }]}>
+      <Text style={[styles.commentLabel, { color }]}>💬 {label}</Text>
+      <Text style={styles.commentText}>{text}</Text>
+    </View>
+  )
+}
+
+function Accordion({ emoji, title, hint, open, onToggle, children }: { emoji: string; title: string; hint: string; open: boolean; onToggle: () => void; children: ReactNode }) {
+  return (
+    <View style={[styles.card, styles.accordion]}>
+      <PressableScale
+        scaleTo={0.99}
+        pressedOpacity={1}
+        onPress={() => {
+          playClickSound()
+          onToggle()
+        }}
+        style={styles.accordionHead}
+      >
+        <Text style={styles.cardEmoji}>{emoji}</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.cardTitle}>{title}</Text>
+          <Text numberOfLines={1} style={styles.accordionHint}>{hint}</Text>
+        </View>
+        <Text style={styles.accordionArrow}>{open ? "▲" : "▼"}</Text>
+      </PressableScale>
+      {open && <FadeUp distance={8} duration={250} style={styles.accordionBody}>{children}</FadeUp>}
+    </View>
+  )
+}
+
+export default function ResultScreen({ personalityScores, abilities, moneyScores, habitCounts, totalQuestions, mode = "detailed" }: ResultScreenProps) {
   const router = useRouter()
   const params = useLocalSearchParams<{ returnTo?: string }>()
   const returnTo = typeof params.returnTo === "string" ? params.returnTo : null
@@ -96,6 +148,8 @@ export default function ResultScreen({ personalityScores, abilities, totalQuesti
       secondaryPersonality: secondary,
       personalityScores,
       abilities,
+      moneyScores,
+      habitCounts,
       investmentStyle: toInvestmentStyle(primary),
       wavePatternType: toWavePattern(primary),
       challengerScore: toChallengerScore(personalityScores),
@@ -103,7 +157,7 @@ export default function ResultScreen({ personalityScores, abilities, totalQuesti
       updatedAt: new Date().toISOString(),
     }
     localStore.setItem("compete_dna_result", JSON.stringify(dnaResult))
-  }, [primary, secondary, personalityScores, abilities])
+  }, [primary, secondary, personalityScores, abilities, moneyScores, habitCounts])
 
   const maxAbility = Math.max(...Object.values(abilities), 1)
   const sortedAbilities = (Object.keys(abilities) as (keyof AbilityScores)[]).sort((a, b) => abilities[b] - abilities[a])
@@ -111,6 +165,43 @@ export default function ResultScreen({ personalityScores, abilities, totalQuesti
   const personalityTypes = (Object.keys(personalityScores) as PersonalityType[]).sort((a, b) => personalityScores[b] - personalityScores[a])
   const totalScore = Object.values(personalityScores).reduce((a, b) => a + b, 0)
   const rank = toRank(totalScore)
+
+  // 자산 점검 · 습관 (동점이면 MONEY_ORDER 순서대로 더 위험한 쪽)
+  const moneyTotal = Object.values(moneyScores).reduce((a, b) => a + b, 0)
+  const topMoney = moneyTotal > 0 ? MONEY_ORDER.slice().sort((a, b) => moneyScores[b] - moneyScores[a])[0] : null
+  const topHabits = (Object.keys(habitCounts) as HabitTag[])
+    .filter((h) => habitCounts[h] > 0)
+    .sort((a, b) => habitCounts[b] - habitCounts[a])
+    .slice(0, 3)
+  const topHabit = topHabits[0] ?? null
+  const weakestAbility = sortedAbilities[sortedAbilities.length - 1]
+
+  const overallComment =
+    topMoney && !MONEY_META[topMoney].safe
+      ? `먼저 볼 것은 매매 기술이 아니라 돈의 자리입니다. ${MONEY_META[topMoney].label} 습관은 급한 돈이 필요한 날, 가장 나쁜 가격에 팔게 만들 수 있습니다.${topHabit ? ` 그다음이 '${HABIT_META[topHabit].label}'입니다.` : ""}`
+      : topHabit
+        ? `${topMoney ? "돈의 자리는 잘 잡혀 있습니다. " : ""}다음 과제는 '${HABIT_META[topHabit].label}'입니다. 뿌리는 ${HABIT_META[topHabit].fear}입니다.`
+        : "성향과 돈 관리가 같은 방향을 봅니다. 남은 것은 실제 장면에서도 그대로 하는지 확인하는 일입니다."
+
+  const scoreGap = secondary ? personalityScores[primary] - personalityScores[secondary] : Infinity
+  const distComment = !secondaryMeta
+    ? `${primaryMeta.label} 하나로 뚜렷합니다. 어떤 장면에서도 같은 방식으로 반응한다는 뜻이며, 그 방식이 안 맞는 장에서는 약점도 뚜렷해집니다.`
+    : scoreGap <= 10
+      ? `${primaryMeta.label}과 ${secondaryMeta.label}이 거의 같은 크기입니다. 상황에 따라 다른 사람이 됩니다. 특히 금액이 커질 때 어느 쪽이 나오는지 지켜보세요.`
+      : `${primaryMeta.label}이 중심이고, ${secondaryMeta.label}이 보조로 나옵니다. 흔들리는 장면에서는 보조 성향이 먼저 튀어나오기도 합니다.`
+
+  const abilityComment =
+    `가장 강한 능력은 ${ABILITY_META[sortedAbilities[0]].label}, 가장 약한 능력은 ${ABILITY_META[weakestAbility].label}입니다. ` +
+    (weakestAbility === "moneyManagement"
+      ? "매매보다 먼저 비상금과 투자금을 나누는 것부터 시작하세요."
+      : weakestAbility === "emotionControl"
+        ? "사고파는 기준을 미리 적어 두면 감정이 끼어들 자리가 줄어듭니다."
+        : "약한 능력은 시뮬레이션에서 작은 돈으로 먼저 연습하세요.")
+
+  const missions = [...primaryMeta.tips, ...(topMoney ? [MONEY_META[topMoney].missions[0]] : [])]
+
+  const [openSection, setOpenSection] = useState<string | null>(null)
+  const toggleSection = (id: string) => setOpenSection((cur) => (cur === id ? null : id))
 
   const [activeBubble, setActiveBubble] = useState<string | null>(null)
   const bubbleTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -187,12 +278,146 @@ export default function ResultScreen({ personalityScores, abilities, totalQuesti
         </View>
       </BounceIn>
 
-      {/* ── 성향 분포 ── */}
-      <FadeUp delay={200} distance={20} style={styles.card}>
-        <View style={styles.cardHead}>
-          <Text style={styles.cardEmoji}>📊</Text>
-          <Text style={styles.cardTitle}>성향 분포</Text>
+      {/* ── 핵심 요약 (보고서 첫 장) ── */}
+      <FadeUp delay={200} distance={20}>
+        <Gradient
+          dir="b"
+          colors={[alpha("#ffffff", 0.06), alpha("#ffffff", 0.02)]}
+          style={[styles.reportHead, { borderColor: primaryColors.border }]}
+        >
+          <View style={styles.reportHeadRow}>
+            <View style={{ flexShrink: 1 }}>
+              <Text style={styles.reportKicker}>Investment Profile Report</Text>
+              <Text style={[styles.reportTitle, { color: primaryColors.text }]}>핵심 요약</Text>
+            </View>
+            <View style={styles.reportIdCol}>
+              <View style={[styles.reportIdBox, { borderColor: primaryColors.border, backgroundColor: primaryColors.bg }]}>
+                <Text style={[styles.reportId, { color: primaryColors.text }]}>{reportId}</Text>
+              </View>
+              <Text style={styles.reportDate}>{dateStr}</Text>
+            </View>
+          </View>
+          <Gradient dir="r" colors={primaryColors.accent} style={styles.reportDivider} />
+        </Gradient>
+
+        <View style={[styles.reportBody, { borderColor: primaryColors.border }]}>
+          <SummaryRow no="01" tag="투자 성향" emoji={primaryMeta.emoji} title={primaryMeta.label} body={primaryMeta.summary} color={primaryColors.text} />
+          {!!topMoney && (
+            <SummaryRow
+              no="02"
+              tag="돈 다루는 습관"
+              emoji={MONEY_META[topMoney].emoji}
+              title={MONEY_META[topMoney].label}
+              body={MONEY_META[topMoney].short}
+              color={MONEY_META[topMoney].color}
+            />
+          )}
+          <SummaryRow
+            no={topMoney ? "03" : "02"}
+            tag="조심할 습관"
+            emoji={topHabit ? HABIT_META[topHabit].emoji : "✅"}
+            title={topHabit ? `${HABIT_META[topHabit].label} ×${habitCounts[topHabit]}` : "눈에 띄는 습관 없음"}
+            body={topHabit ? `뿌리: ${HABIT_META[topHabit].fear}` : "감정에 끌려간 선택이 거의 없었습니다."}
+            color={topHabit ? palette.red[300] : palette.emerald[300]}
+          />
+          <CommentBox label="총평" text={overallComment} color={primaryColors.text} border={primaryColors.border} bg={primaryColors.bg} />
         </View>
+
+        <View style={[styles.reportFoot, { borderColor: primaryColors.border }]}>
+          <Text style={styles.reportConfidential}>교육용 결과 · 투자 자문 아님</Text>
+          <Text style={[styles.reportSign, { color: primaryColors.text }]}>✦ {primaryMeta.label}</Text>
+        </View>
+      </FadeUp>
+
+      {/* ── 상세 (열고 닫기) ── */}
+      <FadeUp delay={400} distance={20} style={{ gap: 10 }}>
+        <Text style={styles.detailKicker}>상세 보기 · 눌러서 열기</Text>
+
+        {!!topMoney && (
+          <Accordion
+            emoji="💰"
+            title="자산 점검"
+            hint={`${MONEY_META[topMoney].label} · 주식은 제2의 자산`}
+            open={openSection === "money"}
+            onToggle={() => toggleSection("money")}
+          >
+            <View style={{ gap: 10 }}>
+              {MONEY_ORDER.slice().reverse().map((tag) => {
+                const m = MONEY_META[tag]
+                const pct = Math.round((moneyScores[tag] / moneyTotal) * 100)
+                return (
+                  <View key={tag}>
+                    <View style={styles.moneyRow}>
+                      <Text style={styles.moneyEmoji}>{m.emoji}</Text>
+                      <Text style={[styles.moneyLabel, { color: tag === topMoney ? m.color : alpha("#ffffff", 0.45) }]}>{m.label}</Text>
+                      <Text style={styles.moneyCount}>{moneyScores[tag]}회</Text>
+                    </View>
+                    <View style={styles.moneyTrack}>
+                      <View style={{ height: "100%", borderRadius: 9999, width: `${pct}%`, backgroundColor: m.color }} />
+                    </View>
+                  </View>
+                )
+              })}
+            </View>
+            <Text style={styles.detailText}>
+              <Highlighted text={MONEY_META[topMoney].desc} highlightColor={MONEY_META[topMoney].color} />
+            </Text>
+            <CommentBox
+              label="코멘트"
+              text={MONEY_META[topMoney].check.replace(/==/g, "")}
+              color={MONEY_META[topMoney].color}
+              border={alpha("#ffffff", 0.12)}
+              bg={alpha("#ffffff", 0.03)}
+            />
+            <Text style={styles.detailNote}>
+              꽁돈이 생길 때, 급한 돈이 필요할 때, 여행비가 필요할 때의 선택을 모았습니다. 문제는 종목이 아니라 돈의 자리일 때가 많습니다.
+            </Text>
+          </Accordion>
+        )}
+
+        <Accordion
+          emoji="🔁"
+          title="내 습관"
+          hint={topHabits.length ? topHabits.map((h) => HABIT_META[h].label).join(" · ") : "눈에 띄는 습관 없음"}
+          open={openSection === "habit"}
+          onToggle={() => toggleSection("habit")}
+        >
+          {topHabits.length === 0 ? (
+            <Text style={styles.detailText}>추격매수·급락 손절 같은 감정적 선택이 거의 없었습니다.</Text>
+          ) : (
+            topHabits.map((h) => (
+              <View key={h} style={styles.habitItem}>
+                <Text style={styles.habitEmoji}>{HABIT_META[h].emoji}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.habitTitle}>
+                    {HABIT_META[h].label} <Text style={styles.habitCount}>×{habitCounts[h]}</Text>
+                  </Text>
+                  <Text style={styles.habitFear}>뿌리: {HABIT_META[h].fear}</Text>
+                  <Text style={styles.habitTip}>→ {HABIT_META[h].tip}</Text>
+                </View>
+              </View>
+            ))
+          )}
+          <CommentBox
+            label="코멘트"
+            text={
+              topHabits.length
+                ? "습관의 이름은 달라도 뿌리는 대부분 두려움입니다. 이름이 붙으면 고칠 수 있습니다. 시뮬레이션에서 이 습관이 실제로 얼마였는지 가격표로 확인해 보세요."
+                : "아는 것과 지키는 것은 다른 능력입니다. 시뮬레이션에서 실제 선택도 같은지 확인해 보세요."
+            }
+            color={primaryColors.text}
+            border={alpha("#ffffff", 0.12)}
+            bg={alpha("#ffffff", 0.03)}
+          />
+        </Accordion>
+
+        <Accordion
+          emoji="📊"
+          title="성향 분포"
+          hint={secondaryMeta ? `${primaryMeta.label} + ${secondaryMeta.label}` : primaryMeta.label}
+          open={openSection === "dist"}
+          onToggle={() => toggleSection("dist")}
+        >
         <View style={{ gap: 16 }}>
           {personalityTypes.map((type) => {
             const m = PERSONALITY_META[type]
@@ -255,14 +480,16 @@ export default function ResultScreen({ personalityScores, abilities, totalQuesti
             )
           })}
         </View>
-      </FadeUp>
+          <CommentBox label="코멘트" text={distComment} color={primaryColors.text} border={alpha("#ffffff", 0.12)} bg={alpha("#ffffff", 0.03)} />
+        </Accordion>
 
-      {/* ── 능력치 ── */}
-      <FadeUp delay={400} distance={20} style={styles.card}>
-        <View style={styles.cardHead}>
-          <Text style={styles.cardEmoji}>⚔️</Text>
-          <Text style={styles.cardTitle}>능력치</Text>
-        </View>
+        <Accordion
+          emoji="⚔️"
+          title="능력치"
+          hint={`강점 ${ABILITY_META[sortedAbilities[0]].label} · 약점 ${ABILITY_META[weakestAbility].label}`}
+          open={openSection === "ability"}
+          onToggle={() => toggleSection("ability")}
+        >
         <View style={styles.grid}>
           {sortedAbilities.map((key, idx) => {
             const meta = ABILITY_META[key]
@@ -318,34 +545,17 @@ export default function ResultScreen({ personalityScores, abilities, totalQuesti
             )
           })}
         </View>
-      </FadeUp>
+          <CommentBox label="코멘트" text={abilityComment} color={primaryColors.text} border={alpha("#ffffff", 0.12)} bg={alpha("#ffffff", 0.03)} />
+        </Accordion>
 
-      {/* ── 분석 리포트 ── */}
-      <FadeUp delay={550} distance={20}>
-        {/* report shell */}
-        <Gradient
-          dir="b"
-          colors={[alpha("#ffffff", 0.06), alpha("#ffffff", 0.02)]}
-          style={[styles.reportHead, { borderColor: primaryColors.border }]}
+        <Accordion
+          emoji="📑"
+          title={`${primaryMeta.label} 상세 분석`}
+          hint={`${primaryMeta.analysis.length}가지 관찰`}
+          open={openSection === "report"}
+          onToggle={() => toggleSection("report")}
         >
-          {/* report header */}
-          <View style={styles.reportHeadRow}>
-            <View style={{ flexShrink: 1 }}>
-              <Text style={styles.reportKicker}>Investment Profile Report</Text>
-              <Text style={[styles.reportTitle, { color: primaryColors.text }]}>{primaryMeta.label} 투자자 분석</Text>
-            </View>
-            <View style={styles.reportIdCol}>
-              <View style={[styles.reportIdBox, { borderColor: primaryColors.border, backgroundColor: primaryColors.bg }]}>
-                <Text style={[styles.reportId, { color: primaryColors.text }]}>{reportId}</Text>
-              </View>
-              <Text style={styles.reportDate}>{dateStr}</Text>
-            </View>
-          </View>
-          <Gradient dir="r" colors={primaryColors.accent} style={styles.reportDivider} />
-        </Gradient>
-
-        {/* report body */}
-        <View style={[styles.reportBody, { borderColor: primaryColors.border }]}>
+        <View style={{ gap: 16 }}>
           {primaryMeta.analysis.map((item, i) => (
             <View key={i} style={styles.reportItem}>
               <Text style={[styles.reportNo, { color: primaryColors.text }]}>{String(i + 1).padStart(2, "0")}</Text>
@@ -356,12 +566,7 @@ export default function ResultScreen({ personalityScores, abilities, totalQuesti
             </View>
           ))}
         </View>
-
-        {/* report footer */}
-        <View style={[styles.reportFoot, { borderColor: primaryColors.border }]}>
-          <Text style={styles.reportConfidential}>CONFIDENTIAL · FOR INTERNAL USE ONLY</Text>
-          <Text style={[styles.reportSign, { color: primaryColors.text }]}>✦ {primaryMeta.label}</Text>
-        </View>
+        </Accordion>
       </FadeUp>
 
       {/* ── 다음 미션 ── */}
@@ -371,7 +576,7 @@ export default function ResultScreen({ personalityScores, abilities, totalQuesti
           <Text style={styles.cardTitle}>{LABELS.tipsTitle}</Text>
         </View>
         <View style={{ gap: 8 }}>
-          {primaryMeta.tips.map((tip, i) => (
+          {missions.map((tip, i) => (
             <View key={i} style={[styles.tip, { borderColor: primaryColors.border }]}>
               <Text style={[styles.tipNo, { color: primaryColors.text }]}>{i + 1}</Text>
               <Text style={styles.tipText}>{tip}</Text>
@@ -610,6 +815,35 @@ const styles = StyleSheet.create({
   },
   reportConfidential: { fontSize: 9, color: alpha("#ffffff", 0.25), fontFamily: MONO, letterSpacing: 0.45 },
   reportSign: { fontSize: 9, fontWeight: "900", opacity: 0.5 },
+
+  summaryTag: { fontSize: 10, fontWeight: "700", color: alpha("#ffffff", 0.4), letterSpacing: 0.5 },
+  summaryTitle: { fontSize: 17, fontWeight: "900", marginTop: 2 },
+  summaryBody: { fontSize: 13, color: alpha("#ffffff", 0.65), lineHeight: 20, marginTop: 2 },
+  comment: { borderRadius: 12, borderWidth: 1, paddingHorizontal: 12, paddingVertical: 10, gap: 4 },
+  commentLabel: { fontSize: 11, fontWeight: "900" },
+  commentText: { fontSize: 13, color: alpha("#ffffff", 0.75), lineHeight: 21 },
+
+  detailKicker: { fontSize: 11, fontWeight: "700", color: alpha("#ffffff", 0.35), marginLeft: 4 },
+  accordion: { padding: 0 },
+  accordionHead: { flexDirection: "row", alignItems: "center", gap: 12, padding: 16 },
+  accordionHint: { fontSize: 11, color: alpha("#ffffff", 0.45), marginTop: 2 },
+  accordionArrow: { fontSize: 11, color: alpha("#ffffff", 0.4) },
+  accordionBody: { paddingHorizontal: 16, paddingBottom: 16, gap: 14 },
+  detailText: { fontSize: 14, color: alpha("#ffffff", 0.7), lineHeight: 23 },
+  detailNote: { fontSize: 11, color: alpha("#ffffff", 0.35), lineHeight: 17 },
+
+  moneyRow: { flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 6 },
+  moneyEmoji: { fontSize: 18, color: "#ffffff" },
+  moneyLabel: { fontSize: 13, fontWeight: "900" },
+  moneyCount: { marginLeft: "auto", fontSize: 12, fontWeight: "700", color: alpha("#ffffff", 0.5) },
+  moneyTrack: { height: 8, borderRadius: 9999, backgroundColor: alpha("#ffffff", 0.05), overflow: "hidden" },
+
+  habitItem: { flexDirection: "row", gap: 12, alignItems: "flex-start" },
+  habitEmoji: { fontSize: 24, color: "#ffffff" },
+  habitTitle: { fontSize: 14, fontWeight: "900", color: "#ffffff" },
+  habitCount: { color: palette.red[300] },
+  habitFear: { fontSize: 12, color: alpha("#ffffff", 0.5), marginTop: 2 },
+  habitTip: { fontSize: 13, color: alpha("#ffffff", 0.75), lineHeight: 20, marginTop: 4 },
 
   mission: { borderRadius: 16, borderWidth: 2, padding: 16 },
   tip: {

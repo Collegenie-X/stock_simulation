@@ -79,6 +79,7 @@ export default function GuideScreen() {
     storage.setGameSettings({
       duration,
       initialCash,
+      lifeSeason: false,
     })
 
     let characterType: "conservative" | "aggressive" | "balanced" = "balanced"

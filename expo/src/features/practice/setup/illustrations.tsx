@@ -3,7 +3,7 @@
  * - 인라인 <svg> → react-native-svg
  * - SMIL <animate> 는 RN 에서 지원되지 않아 RN Animated 로 동일한 값/주기를 재현
  */
-import { useEffect, useRef, useState } from "react"
+import { forwardRef, useEffect, useRef, useState } from "react"
 import { Animated, Easing } from "react-native"
 import Svg, {
   Circle,
@@ -19,8 +19,14 @@ import Svg, {
   Text as SvgText,
 } from "react-native-svg"
 
-const AnimatedCircle = Animated.createAnimatedComponent(Circle)
-const AnimatedLine = Animated.createAnimatedComponent(Line)
+// Animated 가 붙이는 collapsable={false} 가 웹에서 DOM 으로 새어 경고 창이 뜨므로 걸러낸다
+const PlainCircle = forwardRef<any, any>(({ collapsable: _c, ...props }, ref) => <Circle ref={ref} {...props} />)
+const PlainLine = forwardRef<any, any>(({ collapsable: _c, ...props }, ref) => <Line ref={ref} {...props} />)
+PlainCircle.displayName = "PlainCircle"
+PlainLine.displayName = "PlainLine"
+
+const AnimatedCircle = Animated.createAnimatedComponent(PlainCircle)
+const AnimatedLine = Animated.createAnimatedComponent(PlainLine)
 
 /**
  * SMIL `values="a;b;a" dur="Ns" repeatCount="indefinite"` 대체

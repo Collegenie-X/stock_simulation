@@ -11,6 +11,7 @@ import { WeeklyReportModal } from "./WeeklyReportModal"
 import { DatePopup } from "./DatePopup"
 import { FloatingExitButton } from "./FloatingExitButton"
 import { DailyNewsCard } from "./detail-view/DailyNewsCard"
+import { PastNewsCard } from "./detail-view/PastNewsCard"
 import { MyStockInfoCard } from "./detail-view/MyStockInfoCard"
 import { PendingOrdersList, type PendingOrder } from "./detail-view/PendingOrdersList"
 import { TradeButtons } from "./detail-view/TradeButtons"
@@ -27,6 +28,9 @@ export interface DetailViewProps {
   // 주식 기본 정보
   stockName: string
   currentPrice: number
+  /** 뉴스용 등락(턴 기준). 실시간 틱에 뉴스가 깜빡이지 않게 따로 받는다 */
+  newsChange?: string
+  newsIsUp?: boolean
   prevPrice: number
   change: string
   isUp: boolean
@@ -98,6 +102,8 @@ const FEEDBACK_STYLE = {
 export const DetailView = ({
   stockName,
   currentPrice,
+  newsChange,
+  newsIsUp,
   prevPrice,
   change,
   isUp,
@@ -145,8 +151,8 @@ export const DetailView = ({
 
   const dailyEvents = useMemo(() => {
     return generateDailyEvents({
-      currentIsUp: isUp,
-      currentChange: Number(change),
+      currentIsUp: newsIsUp ?? isUp,
+      currentChange: Number(newsChange ?? change),
       stockNews,
       stockCategory,
       stockName,
@@ -154,7 +160,7 @@ export const DetailView = ({
       prevDayIsUp,
       prevDayNews,
     })
-  }, [isUp, change, stockNews, stockCategory, stockName, prevDayChange, prevDayIsUp, prevDayNews])
+  }, [newsIsUp ?? isUp, newsChange ?? change, stockNews, stockCategory, stockName, prevDayChange, prevDayIsUp, prevDayNews])
 
   // 가격 변동 시 플래시 (웹: flash-up / flash-down 배경 + animate-ticker-pulse)
   const prevPriceRef = useRef(currentPrice)
@@ -315,8 +321,11 @@ export const DetailView = ({
 
         {/* 오늘의 이벤트/뉴스 */}
         {dailyEvents.length > 0 && (
-          <DailyNewsCard events={dailyEvents} isUp={isUp} showDelayNotice={prevDayChange !== undefined} />
+          <DailyNewsCard events={dailyEvents} isUp={newsIsUp ?? isUp} showDelayNotice={prevDayChange !== undefined} />
         )}
+
+        {/* 게임 시작 전 3개월 흐름·뉴스 (접힘) */}
+        <PastNewsCard stockId={selectedStockId} />
 
         {/* 내 주식 정보 카드 */}
         {currentHoldings > 0 && (

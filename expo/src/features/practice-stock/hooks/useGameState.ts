@@ -2,11 +2,11 @@ import { useMemo, useState } from "react"
 import { useIsFocused } from "expo-router"
 import { DAYS_PER_WEEK, DAY_NAMES, DAY_PHASES, DECISIONS_PER_DAY } from "../config"
 import type { ChartPeriod, StockViewTab, ViewMode } from "../types"
-import { generateHistory } from "../utils/stockDataUtils"
+import { getPreGameClose, getPreGameHistory } from "../utils/stockHistory"
 import { useAIBattle } from "./useAIBattle"
 import { useDayProgression } from "./useDayProgression"
 import { useGameSession } from "./useGameSession"
-import { useLivePrices } from "./useLivePrices"
+import { getLiveTrail, useLivePrices } from "./useLivePrices"
 import { useScenario } from "./useScenario"
 import { useTrading } from "./useTrading"
 
@@ -24,7 +24,7 @@ export function useGameState(scenarioId: string, refreshParam?: string) {
 
   // ── 화면(UI) 상태 ─────────────────────────────────────────
   const [viewMode, setViewMode] = useState<ViewMode>("list")
-  const [chartPeriod, setChartPeriod] = useState<ChartPeriod>("1D")
+  const [chartPeriod, setChartPeriod] = useState<ChartPeriod>("1M") // 기본 "3달" — 지난 흐름을 먼저 보고 판단
   const [favorites, setFavorites] = useState<string[]>([])
   const [showDatePopup] = useState(false)
   const [stockViewTab, setStockViewTab] = useState<StockViewTab>("현재가")
@@ -70,7 +70,7 @@ export function useGameState(scenarioId: string, refreshParam?: string) {
   const currentAvgPrice = averagePrices[selectedStockId] || 0
 
   const prevPrice =
-    currentTurn > 0 && currentStock ? currentStock.turns[currentTurn - 1].price : currentStock?.initialPrice || 0
+    currentTurn > 0 && currentStock ? currentStock.turns[currentTurn - 1].price : currentStock ? getPreGameClose(currentStock) : 0
   const change = currentPrice && prevPrice ? (((currentPrice - prevPrice) / prevPrice) * 100).toFixed(1) : "0.0"
   const isUp = Number.parseFloat(change) >= 0
 
@@ -104,7 +104,7 @@ export function useGameState(scenarioId: string, refreshParam?: string) {
     return scenario.stocks.map((stock) => {
       const turnData = stock.turns?.[currentTurn]
       const currentPrice = turnData?.price || stock.initialPrice || 0
-      const prevPrice = currentTurn > 0 ? stock.turns?.[currentTurn - 1]?.price || stock.initialPrice || 0 : stock.initialPrice || 0
+      const prevPrice = currentTurn > 0 ? stock.turns?.[currentTurn - 1]?.price || stock.initialPrice || 0 : getPreGameClose(stock)
       const change = prevPrice > 0 ? (((currentPrice - prevPrice) / prevPrice) * 100).toFixed(1) : "0.0"
       return {
         ...stock,
@@ -122,6 +122,11 @@ export function useGameState(scenarioId: string, refreshParam?: string) {
 
   // 라이브 가격 (StockListSection + GameHeader 공유)
   const { livePrices, tickUps } = useLivePrices(allStocksData as any)
+
+  // 지금 보고 있는 종목의 실시간 가격 (상세 화면 숫자·차트 끝이 틱마다 움직인다)
+  const liveSelectedPrice = livePrices[selectedStockId] ?? currentPrice
+  const liveChange = liveSelectedPrice && prevPrice ? (((liveSelectedPrice - prevPrice) / prevPrice) * 100).toFixed(1) : "0.0"
+  const liveIsUp = Number.parseFloat(liveChange) >= 0
 
   // 라이브 가격 기반 총자산 (GameHeader 표시용)
   const liveTotalStockValue = allStocksData.reduce((acc, stock) => {
@@ -142,7 +147,9 @@ export function useGameState(scenarioId: string, refreshParam?: string) {
     liveProfitRate,
     showDaySummary: progression.showDaySummary,
     showMiniReport: progression.showMiniReport,
+    dayEndTick: progression.dayEndTick,
     dailyUserDecisions: progression.dailyUserDecisions,
+    setDailyUserDecisions: progression.setDailyUserDecisions,
     setStockCompareResults: progression.setStockCompareResults,
   })
 
@@ -155,25 +162,34 @@ export function useGameState(scenarioId: string, refreshParam?: string) {
   const chartData = useMemo(() => {
     if (!currentStock) return []
 
-    const history = generateHistory(currentStock.initialPrice, 365) // Generate 1 year history
+    // 게임 시작 전 3개월 (종목별 JSON — 매번 같은 값)
+    const history = getPreGameHistory(currentStock).map((h, idx) => ({ ...h, index: idx }))
     const gameData = currentStock.turns.slice(0, currentTurn + 1).map((t, idx) => ({
       index: history.length + idx,
       price: t.price,
-      date: t.date,
+      date: t.date.replace(/\./g, "-"), // 과거 JSON 과 같은 날짜 모양으로
     }))
 
-    const fullData = [...history, ...gameData]
+    // 실시간 꼬리: 차트 끝이 틱마다 오르락내리락 흔들린다
+    const lastDate = gameData[gameData.length - 1]?.date ?? ""
+    const liveTail = getLiveTrail(currentStock.id).map((price, idx) => ({
+      index: history.length + gameData.length + idx,
+      price,
+      date: lastDate,
+    }))
+
+    const fullData = [...history, ...gameData, ...liveTail]
 
     let filteredData
     switch (chartPeriod) {
       case "1D":
-        filteredData = fullData.slice(-20) // Approx 1 day in game minutes
+        filteredData = fullData.slice(-8)
         break
       case "1W":
-        filteredData = fullData.slice(-100) // Approx 1 week
+        filteredData = fullData.slice(-20)
         break
       case "1M":
-        filteredData = fullData.slice(-400) // Approx 1 month
+        filteredData = fullData.slice(-200) // 3달: 게임 전 3개월이 처음부터 다 보임
         break
       case "1Y":
         filteredData = fullData // Full history
@@ -184,7 +200,7 @@ export function useGameState(scenarioId: string, refreshParam?: string) {
 
     // 인덱스 재정렬
     return filteredData.map((d, idx) => ({ ...d, index: idx }))
-  }, [currentStock, currentTurn, chartPeriod])
+  }, [currentStock, currentTurn, chartPeriod, liveSelectedPrice])
 
   const maxBuyQuantity = Math.floor(cash / currentPrice)
 
@@ -243,6 +259,9 @@ export function useGameState(scenarioId: string, refreshParam?: string) {
     allStocksData,
     livePrices,
     tickUps,
+    liveSelectedPrice,
+    liveChange,
+    liveIsUp,
     liveTotalValue,
     liveProfitRate,
     weeklyReturn,

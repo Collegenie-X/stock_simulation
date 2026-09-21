@@ -3,7 +3,7 @@
  */
 import { useEffect, useState } from "react"
 import { Pressable, StyleSheet, Text, View } from "react-native"
-import { useRouter, type Href } from "expo-router"
+import { useLocalSearchParams, useRouter, type Href } from "expo-router"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ArrowLeft, Sparkles } from "lucide-react-native"
 import { Screen } from "@/components/layout"
@@ -23,23 +23,48 @@ import { SpeedModeSection } from "../components/SpeedModeSection"
 import { DailyOpportunitySection } from "../components/DailyOpportunitySection"
 import { SeedMoneySection } from "../components/SeedMoneySection"
 import { StartButton } from "../components/StartButton"
+import { getLifeCharacter, type LifeState } from "@/features/life/config"
+import { LifeSeedSection } from "@/features/life/components/LifeSeedSection"
+
+/** 이보다 적게 남으면 한 주도 사기 어려워 캐릭터의 돈으로는 시작할 수 없다 */
+const MIN_LIFE_SEED = 100000
 
 export default function PracticeSetupScreen() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
+  // 홈 카드에서 금액을 정해 들어온 경우 (예: "5억에도 평정심") — 캐릭터의 돈 대신 그 금액으로 시작
+  const params = useLocalSearchParams<{ seed?: string }>()
+  const presetSeed = Number(params.seed) || 0
   const [mode, setMode] = useState<SpeedMode>(DEFAULT_MODE)
   const [seedMoney, setSeedMoney] = useState(DEFAULT_SEED_MONEY)
   const [dailyOpp, setDailyOpp] = useState(DEFAULT_DAILY_OPP)
+  // 캐릭터가 있으면 기본은 "캐릭터의 돈" — 결과가 집에 반영된다
+  const [life, setLife] = useState<LifeState | null>(null)
+  const [useLifeMoney, setUseLifeMoney] = useState(false)
+  const [showCustomSeed, setShowCustomSeed] = useState(false)
+  const lifeCharacter = getLifeCharacter(life?.characterId)
 
   useEffect(() => {
+    const savedLife = storage.getLife()
+    if (savedLife && getLifeCharacter(savedLife.characterId) && savedLife.assets >= MIN_LIFE_SEED) {
+      setLife(savedLife)
+      setUseLifeMoney(!presetSeed)
+    }
     const settings = storage.getGameSettings()
     if (settings?.speedMode) setMode(settings.speedMode as SpeedMode)
-    if (settings?.initialCash) setSeedMoney(settings.initialCash)
+    if (presetSeed) setSeedMoney(presetSeed)
+    else if (settings?.initialCash) setSeedMoney(settings.initialCash)
     if (settings?.dailyOpportunities) setDailyOpp(settings.dailyOpportunities)
   }, [])
 
   const currentMode = SPEED_MODES[mode]
-  const isSprintDisabled = seedMoney > SPRINT_MAX_CAPITAL
+  const startCash = useLifeMoney && life ? life.assets : seedMoney
+  const isSprintDisabled = startCash > SPRINT_MAX_CAPITAL
+
+  // 큰돈은 스프린트로 굴릴 수 없다 (금액 선택 화면과 같은 규칙)
+  useEffect(() => {
+    if (isSprintDisabled && mode === "sprint") setMode("standard")
+  }, [isSprintDisabled, mode])
 
   const handleModeSelect = (key: SpeedMode) => {
     setMode(key)
@@ -51,8 +76,14 @@ export default function PracticeSetupScreen() {
       timerSeconds: currentMode.timer,
       simulationMonths: currentMode.simulationMonths,
       dailyOpportunities: dailyOpp as 1 | 2,
-      initialCash: seedMoney,
+      initialCash: startCash,
+      lifeSeason: useLifeMoney && !!life,
     })
+    // 새 계절은 지난 생활 사건 기록 없이 시작한다
+    if (useLifeMoney && life) storage.setLife({ ...life, seasonEvents: [] })
+    // 새 판은 빈 계좌에서 시작한다 (지난 판의 세션·거래 기록이 섞이지 않게)
+    storage.clearGameSession(currentMode.scenarioId)
+    storage.clearTradeHistory(currentMode.scenarioId)
     router.push(`/practice/stock/${currentMode.scenarioId}` as Href)
   }
 
@@ -99,11 +130,34 @@ export default function PracticeSetupScreen() {
       </View>
 
       <View style={styles.body}>
+        {life && lifeCharacter ? (
+          <LifeSeedSection
+            life={life}
+            character={lifeCharacter}
+            useLifeMoney={useLifeMoney}
+            onUseLifeMoney={() => setUseLifeMoney(true)}
+            showCustom={showCustomSeed}
+            onToggleCustom={() => setShowCustomSeed((v) => !v)}
+          >
+            <SeedMoneySection
+              seedMoney={useLifeMoney ? -1 : seedMoney}
+              mode={mode}
+              onSelect={(v) => {
+                setSeedMoney(v)
+                setUseLifeMoney(false)
+              }}
+              onModeChange={setMode}
+            />
+          </LifeSeedSection>
+        ) : null}
+
         <SpeedModeSection mode={mode} onSelect={handleModeSelect} isSprintDisabled={isSprintDisabled} dailyOpp={dailyOpp} />
 
         <DailyOpportunitySection dailyOpp={dailyOpp} onSelect={setDailyOpp} />
 
-        <SeedMoneySection seedMoney={seedMoney} mode={mode} onSelect={setSeedMoney} onModeChange={setMode} />
+        {!(life && lifeCharacter) && (
+          <SeedMoneySection seedMoney={seedMoney} mode={mode} onSelect={setSeedMoney} onModeChange={setMode} />
+        )}
       </View>
     </Screen>
   )

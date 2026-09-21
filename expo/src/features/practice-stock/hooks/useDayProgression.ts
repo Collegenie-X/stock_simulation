@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 import {
   AI_REPORT_INTERVAL,
-  DAYS_PER_WEEK,
+  WEEKS_PER_MONTH,
   DECISIONS_PER_DAY,
   DECISION_TIMER_SECONDS,
   TURNS_PER_DECISION,
@@ -37,6 +37,9 @@ export function useDayProgression({ scenario, session, isFocused }: UseDayProgre
   const [cardFeedbackData, setCardFeedbackData] = useState<CardFeedbackData | null>(null)
   const [showDaySummary, setShowDaySummary] = useState(false)
   const [showMiniReport, setShowMiniReport] = useState(false)
+  const [reportKind, setReportKind] = useState<"week" | "month">("week")
+  /** 하루가 끝날 때마다 1씩 오른다 — AI 가 매일 장을 마감하게 하는 신호 */
+  const [dayEndTick, setDayEndTick] = useState(0)
   const [showFinalReport, setShowFinalReport] = useState(false)
   const [pendingNextDay, setPendingNextDay] = useState<number | null>(null)
   const [totalDecisions, setTotalDecisions] = useState(0)
@@ -103,23 +106,18 @@ export function useDayProgression({ scenario, session, isFocused }: UseDayProgre
       setCurrentTurn((prev) => Math.min(prev + TURNS_PER_DECISION, maxTurns - 1))
       const nextDay = currentDay + 1
 
-      // 주간 리포트 체크 (7일마다)
-      if (currentDay % DAYS_PER_WEEK === 0) {
-        setIsPlaying(false)
-        setShowWeeklyReport(true)
-        setCurrentDay(nextDay)
-        return
-      }
-
-      // 게임 종료 체크
+      // 게임 종료 체크 — 마지막 날은 주간 리포트 없이 바로 최종 리포트
       if (currentTurn + TURNS_PER_DECISION >= maxTurns - 1) {
         setIsPlaying(false)
         setTimeout(() => setShowFinalReport(true), 500)
         return
       }
 
-      // 3일 간격으로 미니 게임 리포트 표시 (수동 닫기)
+      setDayEndTick((t) => t + 1)
+
+      // 일주일마다 주간 리포트, 4주마다 월간 리포트 (수동 닫기)
       if (currentDay % AI_REPORT_INTERVAL === 0) {
+        setReportKind((currentDay / AI_REPORT_INTERVAL) % WEEKS_PER_MONTH === 0 ? "month" : "week")
         setShowMiniReport(true)
         setPendingNextDay(nextDay)
       } else {
@@ -218,11 +216,15 @@ export function useDayProgression({ scenario, session, isFocused }: UseDayProgre
     startNextDay()
   }, [startNextDay])
 
-  // 미니 게임 리포트 닫기 → 다음 날 시작
-  const handleMiniReportContinue = useCallback(() => {
-    setShowMiniReport(false)
-    startNextDay()
-  }, [startNextDay])
+  // 주간·월간 리포트 닫기 → 이번 주 시작 값을 기록하고 다음 날 시작
+  const handleMiniReportContinue = useCallback(
+    (currentWeekValue?: number) => {
+      if (currentWeekValue !== undefined) setLastWeekValue(currentWeekValue)
+      setShowMiniReport(false)
+      startNextDay()
+    },
+    [startNextDay, setLastWeekValue],
+  )
 
   // 주간 리포트 닫기
   const handleCloseReport = useCallback(
@@ -251,6 +253,8 @@ export function useDayProgression({ scenario, session, isFocused }: UseDayProgre
     setCardFeedbackData,
     showDaySummary,
     showMiniReport,
+    reportKind,
+    dayEndTick,
     showFinalReport,
     totalDecisions,
     setTotalDecisions,

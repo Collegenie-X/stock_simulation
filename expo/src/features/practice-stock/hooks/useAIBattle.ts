@@ -13,7 +13,10 @@ interface UseAIBattleArgs {
   liveProfitRate: number
   showDaySummary: boolean
   showMiniReport: boolean
+  /** 하루가 끝날 때마다 1씩 오르는 신호 */
+  dayEndTick: number
   dailyUserDecisions: UserDayDecision[]
+  setDailyUserDecisions: (decisions: UserDayDecision[]) => void
   setStockCompareResults: (results: StockCompareResult[]) => void
 }
 
@@ -31,7 +34,9 @@ export function useAIBattle({
   liveProfitRate,
   showDaySummary,
   showMiniReport,
+  dayEndTick,
   dailyUserDecisions,
+  setDailyUserDecisions,
   setStockCompareResults,
 }: UseAIBattleArgs) {
   // AI 갭 피드백 상태
@@ -43,11 +48,13 @@ export function useAIBattle({
   const competitor = useAICompetitor(initialValue)
   const { simulateDayTrades, calcTotalValue: calcAITotalValue, calcBestAITotalValue } = competitor
 
-  // 하루 요약 또는 미니 리포트 표시 시 AI 시뮬레이션 자동 실행
+  // 하루가 끝날 때마다 AI 도 장을 마감한다 (리포트가 주 1회로 줄어도 AI 는 매일 움직인다)
   useEffect(() => {
-    if ((showDaySummary || showMiniReport) && scenario) {
-      const result = simulateDayTrades(scenario.stocks as any, currentTurn, holdings, cash, currentDay, liveProfitRate, dailyUserDecisions)
-      if (result?.waveAnalysis) {
+    if (dayEndTick > 0 && scenario) {
+      // 리포트가 없는 날은 이미 다음 날로 넘어간 뒤라 하루를 되돌려 센다
+      const endedDay = showDaySummary || showMiniReport ? currentDay : Math.max(1, currentDay - 1)
+      const result = simulateDayTrades(scenario.stocks as any, currentTurn, holdings, cash, endedDay, liveProfitRate, dailyUserDecisions)
+      if (result?.waveAnalysis && (showDaySummary || showMiniReport)) {
         setLastWaveAnalysis(result.waveAnalysis)
         setShowAIGapFeedback(true)
       }
@@ -56,14 +63,15 @@ export function useAIBattle({
         // 누적 타임라인에 day/turn 포함하여 추가
         const stamped = result.stockCompareResults.map((r) => ({
           ...r,
-          day: r.day ?? currentDay,
+          day: r.day ?? endedDay,
           turn: r.turn ?? currentTurn,
         }))
         setDecisionTimeline((prev) => [...prev, ...stamped])
       }
+      setDailyUserDecisions([])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showDaySummary, showMiniReport])
+  }, [dayEndTick])
 
   const aiTotalValue = scenario ? calcAITotalValue(scenario.stocks as any, currentTurn) : initialValue
   const bestAITotalValue = scenario ? calcBestAITotalValue(scenario.stocks as any, currentTurn) : initialValue

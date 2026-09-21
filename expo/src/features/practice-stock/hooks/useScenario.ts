@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import scenariosData from "@/data/game-scenarios.json"
 import scenarios100DaysData from "@/data/stock-100days-data.json"
-import { generateAIStocks, generateRobotAutoStocks } from "../utils/stockDataUtils"
+import { generateStocksFromHistory } from "../utils/stockDataUtils"
 
 export interface ScenarioTurn {
   turn: number
@@ -30,7 +30,7 @@ export interface GameScenario {
 /**
  * 시나리오 데이터 선택 + 자동 확장 (웹 page.tsx 의 requiredTurns / scenario useMemo 와 동일)
  * - 스피드 모드에 필요한 턴 수만큼 기존 주식의 턴을 생성
- * - AI 주식 10개 + 로봇/자동차 주식 10개 추가
+ * - 종목별 JSON(stock-history) 에만 있는 종목(AI·로봇·추가 종목) 추가
  */
 export function useScenario(scenarioId: string, speedMode?: string): GameScenario | null {
   // 시나리오 데이터 선택 및 확장
@@ -107,13 +107,10 @@ export function useScenario(scenarioId: string, speedMode?: string): GameScenari
       }
     })
 
-    // AI 주식 10개 추가
-    const aiStocks = generateAIStocks(10, 50000, extendedScenario.totalTurns)
-    extendedStocks = [...extendedStocks, ...aiStocks]
-
-    // 로봇/자동차 주식 10개 추가
-    const robotAutoStocks = generateRobotAutoStocks(10, 30000, extendedScenario.totalTurns)
-    extendedStocks = [...extendedStocks, ...robotAutoStocks]
+    // 종목별 JSON(src/data/stock-history) 에만 있는 종목 추가 — AI·로봇·추가 종목
+    const firstDate = rawScenario.stocks[0]?.turns?.[0]?.date || "2010.01.04"
+    const existingIds = new Set(extendedStocks.map((st: any) => st.id))
+    extendedStocks = [...extendedStocks, ...generateStocksFromHistory(existingIds, firstDate, extendedScenario.totalTurns)]
 
     extendedScenario.stocks = extendedStocks as ScenarioStock[]
 

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react"
 import { Modal, ScrollView, StyleSheet, Text, View } from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { ChevronRight, Home } from "lucide-react-native"
-import { Gradient, PressableScale, Pulse } from "@/components/ui"
+import { BounceIn, Gradient, PressableScale, Pulse } from "@/components/ui"
 import { alpha, palette } from "@/theme"
 import { formatNumber } from "@/lib/format"
 import { LABELS } from "@/features/practice-stock/config"
@@ -12,19 +12,20 @@ import type {
 } from "@/features/practice-stock/types"
 import { AssetFlowChart } from "./final-report/AssetFlowChart"
 import { OverviewTab } from "./final-report/OverviewTab"
-import { RateCompareRow } from "./final-report/RateCompareRow"
-import { ReportTabs } from "./final-report/ReportTabs"
 import { Reveal } from "./final-report/Reveal"
 import { StockCard } from "./final-report/StockCard"
 import { buildAchievements } from "./final-report/achievements"
 import { rateColor } from "./final-report/colors"
 import { FINAL_GRADE_CONFIG, calcFinalGrade } from "./final-report/grade"
-
-type ReportTab = "overview" | "stocks"
+import { CountUp } from "./report/CountUp"
+import { Fold } from "./report/Fold"
+import { RankRace } from "./report/RankRace"
 
 // ── 메인 컴포넌트 ─────────────────────────────────────────
 export const FinalGameReport = ({
   isVisible,
+  lifeSlot,
+  growSlot,
   totalDays,
   userProfitRate,
   userTotalValue,
@@ -48,11 +49,10 @@ export const FinalGameReport = ({
 }: FinalGameReportProps) => {
   const insets = useSafeAreaInsets()
   const [animStep, setAnimStep] = useState(0)
-  const [activeTab, setActiveTab] = useState<ReportTab>("overview")
   const [selectedStock, setSelectedStock] = useState<StockDetailData | null>(null)
 
   useEffect(() => {
-    if (!isVisible) { setAnimStep(0); setSelectedStock(null); setActiveTab("overview"); return }
+    if (!isVisible) { setAnimStep(0); setSelectedStock(null); return }
     const timers = [
       setTimeout(() => setAnimStep(1), 300),
       setTimeout(() => setAnimStep(2), 800),
@@ -119,11 +119,18 @@ export const FinalGameReport = ({
           {/* ── 등급 ── */}
           <Reveal show={animStep >= 1} duration={1000} distance={32} style={styles.gradeSection}>
             <Text style={styles.gameComplete}>{LABELS.finalReport.gameComplete}</Text>
-            {stats.grade === "S+" ? <Pulse>{badge}</Pulse> : badge}
+            {animStep >= 1 && <BounceIn>{stats.grade === "S+" ? <Pulse>{badge}</Pulse> : badge}</BounceIn>}
             <Text style={[styles.gradeText, { color: gc.color }]}>{stats.grade} {LABELS.finalReport.gradeLabel}</Text>
             <Text style={styles.gradeTitle}>{gc.title}</Text>
             <Text style={styles.gradeSubtitle}>{gc.subtitle}</Text>
           </Reveal>
+
+          {/* ── 계절 결과: 집이 바뀌는 순간 ── */}
+          {!!lifeSlot && (
+            <Reveal show={animStep >= 2} style={{ marginBottom: 16 }}>
+              {lifeSlot}
+            </Reveal>
+          )}
 
           {/* ── 최종 수익률 ── */}
           <Reveal show={animStep >= 2} style={{ marginBottom: 16 }}>
@@ -131,9 +138,13 @@ export const FinalGameReport = ({
               <View style={styles.returnHeader}>
                 <View>
                   <Text style={styles.returnLabel}>{LABELS.finalReport.finalReturn}</Text>
-                  <Text style={[styles.returnRate, { color: rateColor(userProfitRate) }]}>
-                    {userProfitRate >= 0 ? "+" : ""}{userProfitRate}%
-                  </Text>
+                  <CountUp
+                    value={userProfitRate}
+                    start={animStep >= 2}
+                    duration={1200}
+                    format={(v) => `${v >= 0 ? "+" : ""}${v.toFixed(1)}%`}
+                    style={[styles.returnRate, { color: rateColor(userProfitRate) }]}
+                  />
                   <Text style={[styles.returnAmount, { color: alpha(rateColor(stats.profitAmount), 0.7) }]}>
                     {stats.profitAmount >= 0 ? "+" : ""}{formatNumber(stats.profitAmount)}원
                   </Text>
@@ -156,18 +167,18 @@ export const FinalGameReport = ({
                 />
               )}
 
-              {/* 3자 수익률 비교 — 거래가 있을 때만 의미 있음 */}
+              {/* 순위 달리기 — 거래가 있을 때만 의미 있음 */}
               {tradeHistory.length > 0 ? (
-                <RateCompareRow
-                  style={{ marginTop: 12 }}
-                  userProfitRate={userProfitRate}
-                  aiSimilarName={aiSimilarName}
-                  aiSimilarEmoji={aiSimilarEmoji}
-                  aiSimilarProfitRate={aiSimilarProfitRate}
-                  aiBestName={aiBestName}
-                  aiBestEmoji={aiBestEmoji}
-                  aiBestProfitRate={aiBestProfitRate}
-                />
+                <View style={{ marginTop: 12 }}>
+                  <RankRace
+                    start={animStep >= 2}
+                    racers={[
+                      { emoji: "🙋", name: "나", rate: userProfitRate, mine: true },
+                      { emoji: aiSimilarEmoji, name: aiSimilarName, rate: aiSimilarProfitRate },
+                      { emoji: aiBestEmoji, name: aiBestName, rate: aiBestProfitRate },
+                    ]}
+                  />
+                </View>
               ) : (
                 <View style={styles.noTrade}>
                   <Text style={styles.noTradeText}>거래 기록이 없어 AI 비교를 생략했어요</Text>
@@ -176,22 +187,20 @@ export const FinalGameReport = ({
             </Gradient>
           </Reveal>
 
-          {/* ── 탭 ── */}
-          <Reveal show={animStep >= 3} distance={0} style={{ marginBottom: 16 }}>
-            <ReportTabs<ReportTab>
-              tabs={[
-                { key: "overview", label: LABELS.finalReport.tabOverview },
-                { key: "stocks", label: LABELS.finalReport.tabStocks },
-              ]}
-              active={activeTab}
-              onChange={setActiveTab}
-            />
-          </Reveal>
+          {/* ── 삶 키우기: 번 돈으로 이사하고 꾸민다 ── */}
+          {!!growSlot && (
+            <Reveal show={animStep >= 3} style={{ marginBottom: 16 }}>
+              {growSlot}
+            </Reveal>
+          )}
 
-          {/* ── 탭 콘텐츠 ── */}
-          <Reveal show={animStep >= 3} style={{ marginBottom: 24 }}>
-            {/* 종합 탭 */}
-            {activeTab === "overview" && (
+          {/* ── 상세: 전부 접어 둔다 ── */}
+          <Reveal show={animStep >= 3} style={{ gap: 8, marginBottom: 24 }}>
+            <Fold
+              emoji="📊"
+              title={LABELS.finalReport.foldOverview}
+              badge={`${tradeHistory.length}번${stats.sellCount > 0 ? ` · ${LABELS.finalReport.winRate} ${stats.winRate}%` : ""}`}
+            >
               <OverviewTab
                 stats={stats}
                 totalDays={totalDays}
@@ -209,10 +218,9 @@ export const FinalGameReport = ({
                 aiBestProfitRate={aiBestProfitRate}
                 aiBestTotalValue={aiBestTotalValue}
               />
-            )}
+            </Fold>
 
-            {/* 주식 상세 탭 */}
-            {activeTab === "stocks" && (
+            <Fold emoji="📈" title={LABELS.finalReport.foldStocks} badge={`${stockDetails?.length ?? 0}개`}>
               <View style={{ gap: 8 }}>
                 {(!stockDetails || stockDetails.length === 0) ? (
                   <View style={styles.emptyCard}>
@@ -233,7 +241,7 @@ export const FinalGameReport = ({
                   ))
                 )}
               </View>
-            )}
+            </Fold>
           </Reveal>
 
           {/* ── 액션 버튼 ── */}

@@ -1,11 +1,13 @@
-import { ChartTrainingPreview } from "./ChartTrainingPreview"
-import { EventScenarioPreview } from "./EventScenarioPreview"
-import { RealDataPreview } from "./RealDataPreview"
-import { AIBattlePreview } from "./AIBattlePreview"
+import { PatternPreview } from "./PatternPreview"
+import { ComparePreview } from "./ComparePreview"
+import { KnowMePreview } from "./KnowMePreview"
+import { StrategyGamePreview } from "./StrategyGamePreview"
+import { SimulationPreview } from "./SimulationPreview"
 
-export function SlidePreview({ idx, trigger }: { idx: number; trigger: number }) {
-  if (idx === 0) return <ChartTrainingPreview trigger={trigger} />
-  if (idx === 1) return <EventScenarioPreview trigger={trigger} />
-  if (idx === 2) return <RealDataPreview trigger={trigger} />
-  return <AIBattlePreview />
+// data.json slides 순서와 1:1 — 버릇 찾기 → 비교 → 나 알기 → 전략 8턴 게임 → 실전 시뮬레이션
+const PREVIEWS = [PatternPreview, ComparePreview, KnowMePreview, StrategyGamePreview, SimulationPreview]
+
+export function SlidePreview({ idx }: { idx: number; trigger: number }) {
+  const Preview = PREVIEWS[idx] ?? SimulationPreview
+  return <Preview />
 }

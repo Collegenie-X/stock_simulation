@@ -4,6 +4,7 @@
  */
 import { localStore } from "./localStore"
 import type { TradeRecord } from "@/features/practice-stock/types"
+import type { LifeState } from "@/features/life/config"
 
 export { localStore }
 
@@ -15,6 +16,7 @@ const STORAGE_KEYS = {
   PROGRESS: "user_progress",
   PORTFOLIO: "user_portfolio",
   CHARACTER: "character_data",
+  LIFE: "life_state",
   GAME_SETTINGS: "game_settings",
   GAME_SESSION_PREFIX: "game_session_",
   TRADE_HISTORY_PREFIX: "trade_history_",
@@ -75,6 +77,8 @@ export interface GameSettings {
   timerSeconds?: number
   simulationMonths?: number
   initialCash?: number
+  /** true 면 캐릭터의 돈으로 하는 판 — 끝나면 결과가 집에 반영된다 */
+  lifeSeason?: boolean
   soundEnabled?: boolean
   notificationsEnabled?: boolean
   [key: string]: any
@@ -280,6 +284,20 @@ export const storage = {
     removeStorageItem(STORAGE_KEYS.CHARACTER)
   },
 
+  // ===== 삶(캐릭터·집) 관련 =====
+
+  getLife(): LifeState | null {
+    return getStorageItem<LifeState>(STORAGE_KEYS.LIFE)
+  },
+
+  setLife(life: LifeState): void {
+    setStorageItem(STORAGE_KEYS.LIFE, life)
+  },
+
+  clearLife(): void {
+    removeStorageItem(STORAGE_KEYS.LIFE)
+  },
+
   // ===== 게임 설정 관련 =====
 
   /**
@@ -384,6 +402,7 @@ export const storage = {
     this.clearProgress()
     this.clearPortfolio()
     this.clearCharacter()
+    this.clearLife()
     this.clearGameSettings()
     this.clearAllGameSessions()
   },

@@ -213,6 +213,7 @@ export default function PracticeScreen() {
                           simulationMonths: stage.id === 1 ? 1 : stage.id === 2 ? 2 : stage.id <= 4 ? 3 : stage.id === 5 ? 6 : 12,
                           dailyOpportunities: stage.id <= 2 ? 1 : 2,
                           initialCash: parseInt(stage.money.replace(/[^0-9]/g, "")) * 10000,
+                          lifeSeason: false,
                         })
                         router.push(`/practice/stock/scenario-${stage.id <= 2 ? "1" : "100days"}` as Href)
                       }

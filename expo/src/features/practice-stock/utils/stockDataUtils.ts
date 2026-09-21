@@ -1,3 +1,5 @@
+import { STOCK_HISTORY_LIST } from "@/data/stock-history"
+
 // ============================================================
 // AI 분석 이유 데이터
 // ============================================================
@@ -46,99 +48,50 @@ export function generateHistory(initialPrice: number, days: number) {
 }
 
 // ============================================================
-// AI 주식 생성
+// 종목별 JSON(src/data/stock-history) 기반 종목 생성
+// - source 가 "generated" 인 종목은 게임 가격(turns)을 실행 때 만든다
+// - 시작가·변동성은 JSON 값 그대로 → 게임 전 3개월 차트와 끊김 없이 이어짐
 // ============================================================
-export function generateAIStocks(count: number, startingPrice: number, requiredTurns: number) {
-  const aiCompanies = [
-    "OpenAI", "Anthropic", "DeepMind", "Cohere", "Hugging Face",
-    "Stability AI", "Midjourney", "Character.AI", "Jasper", "Copy.ai",
-    "Synthesia", "Runway", "Descript", "Otter.ai", "Grammarly",
-    "Notion AI", "GitHub Copilot", "Tabnine", "Replit", "Cursor AI",
-  ]
-  const newsTemplates = [
-    "AI 모델 성능 개선", "새로운 AI 기능 출시", "대규모 투자 유치",
-    "주요 기업과 파트너십", "AI 기술 혁신 발표", "사용자 급증", "AI 시장 확대",
-  ]
+const GENERATED_NEWS = [
+  "거래량 증가 추세", "안정적인 흐름 유지", "투자 심리 회복", "변동성 확대",
+  "신규 사업 기대감", "기관 매수세 유입", "차익 실현 매물 출회", "관망세 지속",
+]
 
-  const stocks = []
-  for (let i = 0; i < count; i++) {
-    const companyName =
-      i < aiCompanies.length ? aiCompanies[i] : `AI-Tech-${String(i + 1).padStart(3, "0")}`
-    const basePrice = startingPrice * (0.5 + Math.random())
-    let currentPrice = basePrice
-    const startDate = new Date(2024, 0, 1)
-    const turns = []
+// 게임 화면과 매매 화면이 같은 가격을 보도록, 한 번 만든 결과를 같이 쓴다
+const generatedCache = new Map<string, ReturnType<typeof buildStocksFromHistory>>()
 
-    for (let turn = 0; turn < requiredTurns; turn++) {
-      const change = (Math.random() - 0.48) * 0.08
-      currentPrice = Math.max(1000, Math.round(currentPrice * (1 + change)))
-      const d = new Date(startDate)
-      d.setDate(d.getDate() + turn)
-      const dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`
-      turns.push({
-        turn: turn + 1,
-        date: dateStr,
-        price: currentPrice,
-        news: newsTemplates[Math.floor(Math.random() * newsTemplates.length)],
-      })
-    }
-
-    stocks.push({
-      id: `ai-stock-${i + 1}`,
-      name: companyName,
-      category: "AI/테크",
-      initialPrice: Math.round(basePrice),
-      turns,
-    })
+export function generateStocksFromHistory(existingIds: Set<string>, firstDate: string, requiredTurns: number) {
+  const key = `${firstDate}:${requiredTurns}`
+  let stocks = generatedCache.get(key)
+  if (!stocks) {
+    stocks = buildStocksFromHistory(firstDate, requiredTurns)
+    generatedCache.set(key, stocks)
   }
-  return stocks
+  return stocks.filter((st) => !existingIds.has(st.id))
 }
 
-// ============================================================
-// 로봇/자동차 주식 생성
-// ============================================================
-export function generateRobotAutoStocks(count: number, startingPrice: number, requiredTurns: number) {
-  const companies = [
-    "Tesla", "Rivian", "Lucid Motors", "NIO", "XPeng", "BYD",
-    "Boston Dynamics", "ABB Robotics", "FANUC", "KUKA", "Yaskawa",
-    "Universal Robots", "Teradyne", "iRobot", "Intuitive Surgical",
-    "Symbotic", "Sarcos", "Agility Robotics",
-  ]
-  const newsTemplates = [
-    "전기차 판매 증가", "로봇 기술 혁신", "자율주행 개선",
-    "생산 라인 확대", "신규 공장 건설", "배터리 기술 향상", "글로벌 시장 진출",
-  ]
+function buildStocksFromHistory(firstDate: string, requiredTurns: number) {
+  const sep = firstDate.includes("-") ? "-" : "."
+  const [y, m, d] = firstDate.split(" ")[0].split(/[.-]/).map(Number)
 
-  const stocks = []
-  for (let i = 0; i < count; i++) {
-    const companyName =
-      i < companies.length ? companies[i] : `RoboAuto-${String(i + 1).padStart(3, "0")}`
-    const basePrice = startingPrice * (0.7 + Math.random() * 0.6)
-    let currentPrice = basePrice
-    const startDate = new Date(2024, 0, 1)
+  return STOCK_HISTORY_LIST.filter((file) => file.source === "generated").map((file) => {
+    let currentPrice = file.basePrice
     const turns = []
-
     for (let turn = 0; turn < requiredTurns; turn++) {
-      const change = (Math.random() - 0.5) * 0.06
-      currentPrice = Math.max(1000, Math.round(currentPrice * (1 + change)))
-      const d = new Date(startDate)
-      d.setDate(d.getDate() + turn)
-      const dateStr = `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`
+      // 첫 턴은 시작가 그대로, 이후는 종목 변동성만큼 움직임
+      if (turn > 0) {
+        const change = (Math.random() - 0.48) * file.dailyVol * 4
+        currentPrice = Math.max(100, Math.round(currentPrice * (1 + change)))
+      }
+      const date = new Date(y, m - 1, d + turn)
+      const dateStr = [date.getFullYear(), String(date.getMonth() + 1).padStart(2, "0"), String(date.getDate()).padStart(2, "0")].join(sep)
       turns.push({
         turn: turn + 1,
         date: dateStr,
         price: currentPrice,
-        news: newsTemplates[Math.floor(Math.random() * newsTemplates.length)],
+        news: GENERATED_NEWS[Math.floor(Math.random() * GENERATED_NEWS.length)],
       })
     }
-
-    stocks.push({
-      id: `robot-auto-${i + 1}`,
-      name: companyName,
-      category: "로봇/자동차",
-      initialPrice: Math.round(basePrice),
-      turns,
-    })
-  }
-  return stocks
+    return { id: file.id, name: file.name, category: file.category, initialPrice: file.basePrice, turns }
+  })
 }

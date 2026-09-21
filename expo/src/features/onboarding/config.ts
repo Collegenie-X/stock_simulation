@@ -22,6 +22,10 @@ export const ACCENT_COLORS: Record<string, {
     textColor: palette.indigo[400],
     glowColor: alpha(palette.indigo[500], 0.08),
   },
+  rose: {
+    textColor: palette.rose[400],
+    glowColor: alpha(palette.rose[500], 0.08),
+  },
 }
 
 /** 슬라이드 accent 별 테마 (글로우 · 텍스트 · CTA 버튼 그라데이션) */
@@ -36,6 +40,7 @@ export const ACCENT_THEME: Record<string, {
   yellow: { text: palette.yellow[400], glow: palette.amber[500], glow2: palette.orange[500], button: [palette.yellow[300], palette.amber[400], palette.orange[500]], buttonText: "#1a1000" },
   cyan: { text: palette.cyan[400], glow: palette.cyan[500], glow2: palette.blue[500], button: [palette.cyan[300], palette.sky[400], palette.blue[500]], buttonText: "#00131a" },
   indigo: { text: palette.indigo[300], glow: palette.indigo[500], glow2: palette.purple[500], button: [palette.indigo[400], palette.violet[500], palette.fuchsia[500]], buttonText: "#ffffff" },
+  rose: { text: palette.rose[300], glow: palette.rose[500], glow2: palette.pink[500], button: [palette.rose[400], palette.pink[500], palette.fuchsia[500]], buttonText: "#ffffff" },
 }
 
 export const LABELS = {
@@ -44,6 +49,9 @@ export const LABELS = {
   start: "시작하기",
   free: "100% 무료 · 회원가입 없이 바로 시작",
 } as const
+
+/** 테스트용: true 면 앱을 켤 때마다 온보딩을 처음부터 보여줍니다 (출시 전 false 로) */
+export const ALWAYS_SHOW_ONBOARDING = true
 
 export const SWIPE_THRESHOLD = 75
 export const REDIRECT_PATH = "/analysis-intro"

@@ -23,8 +23,15 @@ import {
   MiniGameReport,
   FinalGameReport,
 } from "../components"
-import { AI_REPORT_INTERVAL, DAYS_PER_WEEK, DEBUG_BUTTONS, DECISIONS_PER_DAY } from "../config"
+import { AI_REPORT_INTERVAL, DAYS_PER_WEEK, DEBUG_BUTTONS, DECISIONS_PER_DAY, WEEKS_PER_MONTH } from "../config"
 import { useGameState } from "../hooks/useGameState"
+import { getLifeCharacter } from "@/features/life/config"
+import { LifeStrip } from "@/features/life/components/LifeStrip"
+import { LifeEventModal } from "@/features/life/components/LifeEventModal"
+import { LifeGrowSection } from "@/features/life/components/LifeGrowSection"
+import { SeasonMoveCard } from "@/features/life/components/SeasonMoveCard"
+import { useLifeEvents } from "@/features/life/hooks/useLifeEvents"
+import { useSeasonSettlement } from "@/features/life/hooks/useSeasonSettlement"
 
 /**
  * 주식 게임 메인 화면 (웹: app/practice/stock/[id]/page.tsx)
@@ -63,6 +70,39 @@ function StockGame({ onReload }: { onReload: () => void }) {
     liveProfitRate,
   } = game
 
+  // 캐릭터의 돈으로 하는 판이면, 끝나는 순간 결과를 삶(집·지혜)에 반영한다
+  const isLifeSeason = game.gameSettings?.lifeSeason === true
+  const seasonOutcome = useSeasonSettlement({
+    finished: progression.showFinalReport,
+    isLifeSeason,
+    scenarioId,
+    totalValue,
+    initialValue,
+    days: currentDay,
+  })
+
+  // 생활 사건 — 급하게 돈이 나가면 현금으로, 모자라면 주식을 지금 값에 판다
+  const lifeEvents = useLifeEvents({
+    isLifeSeason,
+    currentDay,
+    ready:
+      isWaitingForDecision &&
+      !showQuickTrade &&
+      !progression.showCardFeedback &&
+      !progression.showDaySummary &&
+      !progression.showMiniReport &&
+      !progression.showResult &&
+      !progression.showFinalReport,
+    cash,
+    holdings,
+    averagePrices,
+    prices: livePrices,
+    setCash: session.setCash,
+    setHoldings: session.setHoldings,
+    setAveragePrices: session.setAveragePrices,
+    setPaused: progression.setIsTimerPaused,
+  })
+
   // 로딩 화면 - 필수 데이터만 체크
   if (!scenario || !selectedStockId || !currentStock) {
     const loadingReason = !scenario
@@ -74,6 +114,8 @@ function StockGame({ onReload }: { onReload: () => void }) {
           : "알 수 없음"
     return <LoadingScreen reason={loadingReason} />
   }
+
+  const lifeCharacter = getLifeCharacter(storage.getLife()?.characterId)
 
   if (progression.showResult || progression.showFinalReport) {
     const tradeHist = storage.getTradeHistory(scenarioId) || []
@@ -116,6 +158,20 @@ function StockGame({ onReload }: { onReload: () => void }) {
       <View style={styles.root}>
         <FinalGameReport
           isVisible
+          lifeSlot={
+            seasonOutcome && lifeCharacter ? (
+              <SeasonMoveCard
+                outcome={seasonOutcome}
+                character={lifeCharacter}
+                initialValue={initialValue}
+                otherPaths={[
+                  { emoji: aiCompetitor.emoji, name: aiCompetitor.name, totalValue: ai.aiTotalValue },
+                  { emoji: "👑", name: bestAICompetitor.name, totalValue: ai.bestAITotalValue },
+                ]}
+              />
+            ) : undefined
+          }
+          growSlot={seasonOutcome && lifeCharacter ? <LifeGrowSection character={lifeCharacter} day={currentDay} /> : undefined}
           totalDays={currentDay}
           userProfitRate={profitRate}
           userTotalValue={totalValue}
@@ -136,6 +192,10 @@ function StockGame({ onReload }: { onReload: () => void }) {
           onGoHome={() => router.replace("/home" as Href)}
           onPlayAgain={() => {
             storage.clearGameSession(scenarioId)
+            storage.clearTradeHistory(scenarioId)
+            // 다음 계절은 방금 정산된 돈으로 이어서 시작한다
+            const nextLife = seasonOutcome ? storage.getLife() : null
+            if (nextLife) storage.setGameSettings({ lifeSeason: true, initialCash: nextLife.assets })
             onReload()
           }}
         />
@@ -144,6 +204,79 @@ function StockGame({ onReload }: { onReload: () => void }) {
   }
 
   // --- 자유 거래 VIEW (메인 게임 화면) ---
+  // 목록·상세 어느 화면에 있든 사건은 뜬다
+  const lifeEventModal = (
+    <LifeEventModal
+      pending={lifeEvents.pending}
+      cash={cash}
+      forcedSales={lifeEvents.forcedSales}
+      stockNames={Object.fromEntries(scenario.stocks.map((st) => [st.id, st.name]))}
+      onResolve={lifeEvents.resolve}
+    />
+  )
+
+  // 주간·월간 리포트 — 목록·상세 어느 화면에서 하루가 끝나도 뜬다
+  const isMonthReport = progression.reportKind === "month"
+  const monthStart = weeklyHistory[weeklyHistory.length - 1 - DAYS_PER_WEEK * WEEKS_PER_MONTH * DECISIONS_PER_DAY]?.value ?? initialValue
+  const monthlyReturn = monthStart > 0 ? Number((((totalValue - monthStart) / monthStart) * 100).toFixed(1)) : 0
+  const periodReport = (
+    <MiniGameReport
+      isVisible={progression.showMiniReport}
+      kind={progression.reportKind}
+      periodNumber={isMonthReport ? Math.round(currentDay / (DAYS_PER_WEEK * WEEKS_PER_MONTH)) : currentWeekNumber}
+      periodProfitRate={isMonthReport ? monthlyReturn : game.weeklyReturn}
+      lifeSlot={
+        isMonthReport && isLifeSeason && lifeCharacter ? (
+          <LifeGrowSection
+            character={lifeCharacter}
+            day={currentDay}
+            season={{
+              cash,
+              // 캐릭터의 돈 = 이번 판을 시작한 돈. 지금 전 재산이 곧 집을 가늠하는 돈이다
+              assets: totalValue,
+              onCashChange: (amount) => session.setCash((prev) => prev + amount),
+            }}
+          />
+        ) : undefined
+      }
+      reportDay={currentDay}
+      periodLabel={`${currentDay}일차`}
+      userProfitRate={profitRate}
+      userTotalValue={totalValue}
+      initialValue={initialValue}
+      cash={cash}
+      tradeCount={totalDecisions}
+      holdingsCount={Object.keys(holdings).filter((k) => holdings[k] > 0).length}
+      tradeHistory={storage.getTradeHistory(scenarioId) as any}
+      holdingItems={Object.keys(holdings)
+        .filter((k) => holdings[k] > 0)
+        .map((stockId) => {
+          const stock = scenario.stocks.find((s) => s.id === stockId)
+          const qty = holdings[stockId]
+          const avg = averagePrices[stockId] || 0
+          const cur = livePrices[stockId] ?? (stock?.turns?.[currentTurn]?.price || avg)
+          const profitRt = avg > 0 ? ((cur - avg) / avg) * 100 : 0
+          return {
+            stockId,
+            stockName: stock?.name || stockId,
+            quantity: qty,
+            avgPrice: avg,
+            currentPrice: cur,
+            profitAmount: Math.round((cur - avg) * qty),
+            profitRate: Math.round(profitRt * 10) / 10,
+          }
+        })}
+      assetHistory={weeklyHistory.slice(-(DAYS_PER_WEEK * (isMonthReport ? WEEKS_PER_MONTH : 1) * DECISIONS_PER_DAY))}
+      aiSimilarProfitRate={ai.aiProfitRate}
+      aiSimilarName={aiCompetitor.name}
+      aiSimilarEmoji={aiCompetitor.emoji}
+      aiBestProfitRate={ai.bestAIProfitRate}
+      aiBestName={bestAICompetitor.name}
+      aiBestEmoji={bestAICompetitor.emoji}
+      onContinue={() => progression.handleMiniReportContinue(totalValue)}
+    />
+  )
+
   if (game.viewMode === "list") {
     // 남은 결정 횟수 계산
     const remainingDecisions = Math.max(0, totalDays * DECISIONS_PER_DAY - totalDecisions)
@@ -185,6 +318,17 @@ function StockGame({ onReload }: { onReload: () => void }) {
             onTogglePause={() => progression.setIsTimerPaused((prev) => !prev)}
             onExitClick={() => game.setShowExitConfirm(true)}
             onProfitClick={() => game.setShowProfitAnalysis(true)}
+          />
+
+          {lifeEventModal}
+
+          {/* 삶의 띠 — 손익을 삶의 단위로, 이대로면 집이 어떻게 되는지 */}
+          <LifeStrip
+            isLifeSeason={isLifeSeason}
+            totalValue={liveTotalValue}
+            initialValue={initialValue}
+            profitRate={liveProfitRate}
+            currentDay={currentDay}
           />
 
           {/* 자유 거래 타임 - 주식 리스트 */}
@@ -295,55 +439,23 @@ function StockGame({ onReload }: { onReload: () => void }) {
             onContinue={progression.handleDaySummaryContinue}
           />
 
-          {/* 미니 게임 리포트 (3일 간격) */}
-          <MiniGameReport
-            isVisible={progression.showMiniReport}
-            reportDay={currentDay}
-            periodLabel={`${currentDay}일차`}
-            userProfitRate={profitRate}
-            userTotalValue={totalValue}
-            initialValue={initialValue}
-            cash={cash}
-            tradeCount={totalDecisions}
-            holdingsCount={holdingsCount}
-            tradeHistory={storage.getTradeHistory(scenarioId) as any}
-            holdingItems={
-              scenario
-                ? Object.keys(holdings)
-                    .filter((k) => holdings[k] > 0)
-                    .map((stockId) => {
-                      const stock = scenario.stocks.find((s) => s.id === stockId)
-                      const qty = holdings[stockId]
-                      const avg = averagePrices[stockId] || 0
-                      const cur = livePrices[stockId] ?? (stock?.turns?.[currentTurn]?.price || avg)
-                      const profitAmt = Math.round((cur - avg) * qty)
-                      const profitRt = avg > 0 ? ((cur - avg) / avg) * 100 : 0
-                      return {
-                        stockId,
-                        stockName: stock?.name || stockId,
-                        quantity: qty,
-                        avgPrice: avg,
-                        currentPrice: cur,
-                        profitAmount: profitAmt,
-                        profitRate: Math.round(profitRt * 10) / 10,
-                      }
-                    })
-                : []
-            }
-            assetHistory={weeklyHistory}
-            aiSimilarProfitRate={ai.aiProfitRate}
-            aiSimilarName={aiCompetitor.name}
-            aiSimilarEmoji={aiCompetitor.emoji}
-            aiBestProfitRate={ai.bestAIProfitRate}
-            aiBestName={bestAICompetitor.name}
-            aiBestEmoji={bestAICompetitor.emoji}
-            onContinue={progression.handleMiniReportContinue}
-          />
+          {periodReport}
 
           {/* ── 더미 데이터 미리보기: 3일차 리포트 ── */}
           {game.showPreviewMiniReport && (
             <MiniGameReport
               isVisible
+              kind="month"
+              periodNumber={1}
+              lifeSlot={
+                lifeCharacter ? (
+                  <LifeGrowSection
+                    character={lifeCharacter}
+                    day={currentDay}
+                    season={{ cash, assets: totalValue, onCashChange: (amount) => session.setCash((prev) => prev + amount) }}
+                  />
+                ) : undefined
+              }
               reportDay={dummyMini.reportDay}
               periodLabel={dummyMini.periodLabel}
               userProfitRate={dummyMini.userProfitRate}
@@ -369,6 +481,7 @@ function StockGame({ onReload }: { onReload: () => void }) {
           {game.showPreviewFinalReport && (
             <FinalGameReport
               isVisible
+              growSlot={lifeCharacter ? <LifeGrowSection character={lifeCharacter} day={currentDay} /> : undefined}
               totalDays={dummyFinal.totalDays}
               userProfitRate={dummyFinal.userProfitRate}
               userTotalValue={dummyFinal.userTotalValue}
@@ -448,12 +561,16 @@ function StockGame({ onReload }: { onReload: () => void }) {
     return (
       <View style={styles.root}>
         <View style={styles.container}>
+          {lifeEventModal}
+          {periodReport}
           <DetailView
             stockName={currentStock.name}
-            currentPrice={game.currentPrice}
+            currentPrice={game.liveSelectedPrice}
             prevPrice={game.prevPrice}
-            change={game.change}
-            isUp={game.isUp}
+            change={game.liveChange}
+            isUp={game.liveIsUp}
+            newsChange={game.change}
+            newsIsUp={game.isUp}
             currentHoldings={game.currentHoldings}
             myAvg={myAvg}
             myReturn={myReturn}

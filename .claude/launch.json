@@ -9,6 +9,33 @@
         "cd expo && npx expo start --web --port 8099"
       ],
       "port": 8099
+    },
+    {
+      "name": "expo-web-life",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd expo && npx expo start --web --port 8107"
+      ],
+      "port": 8107
+    },
+    {
+      "name": "expo-web-stock",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd expo && npx expo start --web --port 8113"
+      ],
+      "port": 8113
+    },
+    {
+      "name": "expo-metro",
+      "runtimeExecutable": "sh",
+      "runtimeArgs": [
+        "-c",
+        "cd expo && npx expo start --port 8081"
+      ],
+      "port": 8081
     }
   ]
 }

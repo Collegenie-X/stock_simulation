@@ -1,6 +1,7 @@
 // ============================================================
 // 게임 데이터 타입 정의
 // ============================================================
+import type { ReactNode } from "react"
 
 export interface TurnData {
   turn: number
@@ -209,7 +210,7 @@ export interface ExitConfirmDialogProps {
 }
 
 // ============================================================
-// 미니 게임 리포트 (3일 간격)
+// 주간·월간 리포트 (7일 간격)
 // ============================================================
 
 export interface MiniReportHoldingItem {
@@ -224,6 +225,14 @@ export interface MiniReportHoldingItem {
 
 export interface MiniGameReportProps {
   isVisible: boolean
+  /** week: 매주 / month: 4주마다 (삶 키우기 포함) */
+  kind?: "week" | "month"
+  /** 몇 번째 주(달)인지 */
+  periodNumber?: number
+  /** 이번 주(달) 동안의 수익률. 없으면 전체 수익률을 쓴다 */
+  periodProfitRate?: number
+  /** 월간 리포트의 "삶 키우기" 자리 */
+  lifeSlot?: ReactNode
   reportDay: number
   periodLabel: string
   userProfitRate: number
@@ -339,6 +348,10 @@ export interface DecisionTimelineEntry {
 
 export interface FinalGameReportProps {
   isVisible: boolean
+  /** 캐릭터의 돈으로 한 판이면 등급 아래에 계절 결과(이사)를 끼워 넣는다 */
+  lifeSlot?: ReactNode
+  /** 삶 키우기(이사·꾸미기 상점) 자리 */
+  growSlot?: ReactNode
   totalDays: number
   userProfitRate: number
   userTotalValue: number

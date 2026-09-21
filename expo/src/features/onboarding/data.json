@@ -1,50 +1,95 @@
 {
   "slides": [
     {
-      "id": "chart-training",
+      "id": "my-pattern",
       "accent": "green",
-      "badge": "CHART TRAINING",
-      "title": "타이밍을\n잡아라",
-      "desc": "차트로 매수·매도\n감각 훈련"
+      "badge": "내 버릇 찾기",
+      "title": "왜 나만 팔면\n오를까? 🤔",
+      "desc": "운이 아니에요. 버릇이에요.\n내 선택을 모아 버릇을 찾아드려요"
     },
     {
-      "id": "event-scenario",
-      "accent": "yellow",
-      "badge": "EVENT SCENARIO",
-      "title": "AI 쇼크!\n어떻게 할래?",
-      "desc": "실전 뉴스로\n대응력 훈련"
-    },
-    {
-      "id": "real-data",
-      "accent": "cyan",
-      "badge": "REAL DATA",
-      "title": "AI·로봇주\n실전 연습",
-      "desc": "엔비디아·삼성·테슬라\n실제 데이터"
-    },
-    {
-      "id": "ai-battle",
+      "id": "compare",
       "accent": "indigo",
-      "badge": "AI BATTLE",
-      "title": "AI와 대결\n실력 UP",
-      "desc": "투자 DNA 분석\nAI 코멘트 비교"
+      "badge": "비교하기",
+      "title": "그때 안 팔았다면?\n바로 보여줄게요 👀",
+      "desc": "나 · 나를 닮은 AI · 최고의 선택\n같은 순간을 나란히 달려봐요"
+    },
+    {
+      "id": "know-me",
+      "accent": "rose",
+      "badge": "나 알기",
+      "title": "나는 어떤\n투자자일까? 🪞",
+      "desc": "잘 타는 파도, 약한 파도가 한눈에\n할수록 내가 또렷해져요"
+    },
+    {
+      "id": "strategy-game",
+      "accent": "yellow",
+      "badge": "전략 8턴 게임",
+      "title": "딱 8턴!\n전략을 배워요 🎯",
+      "desc": "살래 · 팔래 · 기다릴게\n짧게 한 판, 바로 점수와 힌트"
+    },
+    {
+      "id": "real-simulation",
+      "accent": "cyan",
+      "badge": "실전 시뮬레이션",
+      "title": "진짜 같은 장에서\n배운 대로 써먹기 🏄",
+      "desc": "실제 주가로 만든 파도 위에서\n할수록 나쁜 버릇이 줄어요"
     }
   ],
+  "habits": {
+    "items": [
+      { "emoji": "😱", "name": "떨어지면 바로 팔기", "count": 23, "impact": "-1.8%" },
+      { "emoji": "🏃", "name": "오르면 따라 사기", "count": 31, "impact": "-2.1%" },
+      { "emoji": "⏳", "name": "너무 일찍 팔기", "count": 12, "impact": "-0.9%" }
+    ],
+    "insight": "운이 아니었네. 23번이나 똑같이 했네!"
+  },
   "comparisonChart": {
     "data": [
-      { "turn": 1, "user": 100, "topPerformer": 100, "similarAI": 100 },
-      { "turn": 2, "user": 103, "topPerformer": 105, "similarAI": 102 },
-      { "turn": 3, "user": 107, "topPerformer": 112, "similarAI": 106 },
-      { "turn": 4, "user": 104, "topPerformer": 115, "similarAI": 108 },
-      { "turn": 5, "user": 109, "topPerformer": 119, "similarAI": 111 },
-      { "turn": 6, "user": 112, "topPerformer": 124, "similarAI": 114 },
-      { "turn": 7, "user": 115, "topPerformer": 129, "similarAI": 117 },
-      { "turn": 8, "user": 113, "topPerformer": 134, "similarAI": 116 }
+      { "turn": 1, "user": 100, "best": 100, "similarAI": 100, "hold": 100 },
+      { "turn": 2, "user": 103, "best": 105, "similarAI": 102, "hold": 103 },
+      { "turn": 3, "user": 107, "best": 112, "similarAI": 106, "hold": 107 },
+      { "turn": 4, "user": 102, "best": 115, "similarAI": 104, "hold": 101 },
+      { "turn": 5, "user": 102, "best": 119, "similarAI": 108, "hold": 106 },
+      { "turn": 6, "user": 105, "best": 124, "similarAI": 112, "hold": 111 },
+      { "turn": 7, "user": 108, "best": 129, "similarAI": 115, "hold": 116 },
+      { "turn": 8, "user": 110, "best": 134, "similarAI": 116, "hold": 118 }
     ],
-    "finalReturns": {
-      "user": "+13.0%",
-      "topPerformer": "+34.0%",
-      "similarAI": "+16.5%"
-    },
-    "insight": "5턴 급등 구간, 홀딩이 정답이었어요"
+    "sellTurn": 4,
+    "insight": "4턴에 겁나서 다 팔았죠? 버텼다면 +8% 더!"
+  },
+  "knowMe": {
+    "waves": [
+      { "label": "오르는 장", "rate": 41, "shape": [20, 28, 26, 38, 44, 42, 56, 62, 60, 74, 82, 90] },
+      { "label": "떨어졌다 오르는 장", "rate": 35, "shape": [70, 62, 40, 22, 18, 26, 34, 48, 56, 66, 74, 84] },
+      { "label": "옆으로 가는 장", "rate": 8, "shape": [50, 58, 46, 56, 44, 58, 48, 56, 44, 54, 48, 52] },
+      { "label": "내리는 장", "rate": -12, "shape": [88, 80, 84, 70, 62, 66, 52, 44, 48, 34, 26, 18] }
+    ],
+    "strategy": { "emoji": "🏄", "name": "오를 때 올라타기", "match": 64 },
+    "insight": "오를 땐 잘 타요. 옆으로 갈 땐 가만히 있는 게 이득!"
+  },
+  "strategyGame": {
+    "emoji": "🏔️",
+    "name": "쌍바닥 전략",
+    "turns": [70, 56, 40, 52, 41, 54, 66, 78, 88],
+    "buyTurn": 4,
+    "sellTurn": 8,
+    "hints": [
+      { "until": 3, "text": "떨어진다고 바로 팔면 손해! 일단 지켜봐요", "emoji": "✋" },
+      { "until": 4, "text": "바닥을 두 번 버텼어요. 지금이 살 때!", "emoji": "💡" },
+      { "until": 7, "text": "오르는 중엔 기다리는 것도 전략이에요", "emoji": "😎" },
+      { "until": 8, "text": "목표만큼 올랐어요. 욕심 말고 이제 팔 때!", "emoji": "💰" }
+    ],
+    "doneHint": { "text": "전략대로 했더니 +38%! 버릇이 바뀌는 중", "emoji": "🎉" }
+  },
+  "simulation": {
+    "startCash": 5000000,
+    "main": { "name": "삼성전자", "logo": "삼", "path": [50, 54, 52, 58, 62, 44, 36, 40, 48, 56, 62, 70, 76, 84] },
+    "dipIndex": 6,
+    "rows": [
+      { "name": "네이버", "base": 25000, "spark": [50, 48, 52, 47, 45, 49, 44, 42, 46, 43, 41, 44, 40, 42] },
+      { "name": "엔씨소프트", "base": 18000, "spark": [40, 44, 42, 48, 46, 52, 50, 56, 54, 60, 58, 64, 66, 70] }
+    ],
+    "habit": { "emoji": "😱", "name": "떨어지면 바로 팔기", "progress": [5, 4, 4, 2, 1] }
   }
 }

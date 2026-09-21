@@ -6,7 +6,10 @@ export const DECISIONS_PER_DAY = 3
 export const DECISION_TIMER_SECONDS = 30
 export const DAYS_PER_WEEK = 7
 export const TURNS_PER_DECISION = 1
-export const AI_REPORT_INTERVAL = 3
+/** 주간 리포트 간격 (일) — 중간 평가는 일주일에 한 번만 보여준다 */
+export const AI_REPORT_INTERVAL = DAYS_PER_WEEK
+/** 이 주차마다 주간 대신 월간 리포트 (삶 키우기 포함) */
+export const WEEKS_PER_MONTH = 4
 
 export const DAY_PHASES = ["☀️ 오전", "🍚 점심", "🌙 저녁"] as const
 export const DAY_NAMES = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"] as const
@@ -163,9 +166,21 @@ export const LABELS = {
   chartPeriods: ["1일", "1주", "3달", "1년"] as const,
   stockDetailTabs: ["차트", "호가", "내 주식", "종목정보", "커뮤니티"] as const,
 
-  // 미니 게임 리포트 (3일 간격)
+  // 주간·월간 리포트 (7일 간격, 4주마다 월간)
   miniReport: {
     periodTitle: "{day}일차 중간 리포트",
+    weekTitle: (week: number) => `${week}주차 결과`,
+    monthTitle: (month: number) => `${month}번째 달 결과`,
+    thisWeek: "이번 주",
+    thisMonth: "이번 달",
+    sinceStart: "처음부터",
+    raceTitle: "🏁 누가 앞서 있나요?",
+    noTradeGrade: "아직 출발 전",
+    noTradeHint: "한 번 사 보면 점수가 매겨져요",
+    foldTrades: "사고판 기록",
+    foldMoney: "내 돈은 어디에",
+    foldStocks: "가진 주식",
+    nextWeek: "다음 주 시작",
     myResult: "내 투자 성적",
     bestAI: "최고 AI",
     gapSimilar: "유사 AI 대비",
@@ -177,12 +192,12 @@ export const LABELS = {
     tabTrades: "거래 내역",
     tabHoldings: "보유 종목",
     // 종합 탭
-    totalTrades: "총 거래",
-    buyLabel: "매수",
-    sellLabel: "매도",
-    winRateLabel: "승률",
-    realizedProfit: "실현 수익",
-    unrealizedProfit: "평가 손익",
+    totalTrades: "모두",
+    buyLabel: "샀어요",
+    sellLabel: "팔았어요",
+    winRateLabel: "이긴 비율",
+    realizedProfit: "팔아서 번 돈",
+    unrealizedProfit: "들고 있는 주식",
     profitTradesLabel: "수익",
     lossTradesLabel: "손실",
     holdingStocksUnit: "종목 보유 중",
@@ -192,8 +207,8 @@ export const LABELS = {
     tradeListTitle: "거래 내역서",
     noTrades: "아직 거래 내역이 없습니다",
     // 보유 종목 탭
-    cashLabel: "보유 현금",
-    stockValueLabel: "주식 평가액",
+    cashLabel: "현금",
+    stockValueLabel: "주식",
     holdingListTitle: "보유 종목 상세",
     noHoldings: "보유 중인 종목이 없습니다",
     totalUnrealizedLabel: "총 평가 손익",
@@ -208,11 +223,13 @@ export const LABELS = {
     finalReturn: "최종 수익률",
     tabOverview: "종합",
     tabStocks: "주식 상세",
+    foldOverview: "자세한 성적표",
+    foldStocks: "주식별 결과",
     tabTrades: "거래",
     tabAI: "AI 대결",
     totalDays: "플레이 일수",
     totalTrades: "총 거래",
-    winRate: "매도 승률",
+    winRate: "이긴 비율",
     holdingStocks: "보유 종목",
     achievementsTitle: "🏆 획득 업적",
     bestTrade: "최고의 거래",

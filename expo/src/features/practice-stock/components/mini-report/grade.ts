@@ -38,3 +38,6 @@ export function pickAchievements(
   if (list.length === 0)                 list.push({ Icon: Star,   iconColor: palette.gray[400],   text: "경험치 획득 중" })
   return list.slice(0, 3)
 }
+
+/** 아직 한 번도 사고팔지 않았을 때 — 등급 대신 보여준다 */
+export const NO_TRADE_GRADE = { color: palette.gray[300], bg: alpha(palette.gray[500], 0.2), border: alpha(palette.gray[500], 0.4), glow: alpha(palette.gray[500], 0.2), emoji: "💤", label: "" }

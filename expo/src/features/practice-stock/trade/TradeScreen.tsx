@@ -8,6 +8,7 @@ import { storage } from "@/lib/storage"
 import { palette } from "@/theme"
 import { useTradeScenario } from "./hooks/useTradeScenario"
 import { executeTrade } from "./utils/executeTrade"
+import { getPreGameClose } from "../utils/stockHistory"
 import ConditionalOrderView from "./components/ConditionalOrderView"
 import MarketOrderView from "./components/MarketOrderView"
 import OrderTypeSheet from "./components/OrderTypeSheet"
@@ -84,7 +85,7 @@ export default function TradeScreen() {
   const currentTurn = Math.min(session.currentTurn ?? 0, stock.turns.length - 1)
   const currentTurnData = stock.turns[currentTurn]
   const currentPrice: number = currentTurnData?.price ?? stock.initialPrice ?? 0
-  const prevPrice: number = currentTurn > 0 ? (stock.turns[currentTurn - 1]?.price ?? stock.initialPrice ?? 0) : (stock.initialPrice ?? 0)
+  const prevPrice: number = currentTurn > 0 ? (stock.turns[currentTurn - 1]?.price ?? stock.initialPrice ?? 0) : getPreGameClose(stock)
   const change = (((currentPrice - prevPrice) / prevPrice) * 100).toFixed(1)
   const isUp = Number.parseFloat(change) >= 0
 

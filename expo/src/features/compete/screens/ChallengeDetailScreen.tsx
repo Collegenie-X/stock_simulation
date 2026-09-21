@@ -8,6 +8,7 @@ import { formatNumber } from "@/lib/format"
 import { alpha, palette } from "@/theme"
 import { RewardRow } from "../components/challenge/RewardRow"
 import { challenges } from "../components/challenge/data"
+import { storage } from "@/lib/storage"
 
 const BG = [palette.purple[50], palette.pink[50], palette.blue[50]]
 
@@ -42,6 +43,8 @@ export default function ChallengeDetailScreen() {
 
   const handleStart = () => {
     setIsStarting(true)
+    // 도전은 캐릭터의 돈으로 하는 판이 아니다 (집에 반영 안 함)
+    storage.setGameSettings({ lifeSeason: false })
     timer.current = setTimeout(() => {
       setIsStarting(false)
       router.push("/practice/stock/scenario-1")

@@ -46,7 +46,7 @@ export default function MyPersonality() {
           <Text style={styles.emptyEmoji}>🧬</Text>
           <View style={styles.flex1}>
             <Text style={styles.emptyTitle}>투자 성향 측정하기</Text>
-            <Text style={styles.emptyDesc}>2분 만에 내 스타일 찾기</Text>
+            <Text style={styles.emptyDesc}>3분 만에 내 스타일 찾기</Text>
           </View>
           <Text style={styles.arrow}>→</Text>
         </PressableScale>

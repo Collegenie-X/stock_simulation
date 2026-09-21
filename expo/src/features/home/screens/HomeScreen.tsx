@@ -11,6 +11,7 @@ import GameModeCards from "../components/GameModeCards"
 import PlayerStats from "../components/PlayerStats"
 import WhySimulation from "../components/WhySimulation"
 import MyPersonality from "../components/MyPersonality"
+import LifeCard from "@/features/life/components/LifeCard"
 
 export default function HomeScreen() {
   const router = useRouter()
@@ -117,6 +118,9 @@ export default function HomeScreen() {
       <View style={styles.sections}>
         {/* Player Stats Bar */}
         <PlayerStats level={character.level} hearts={hearts} maxHearts={maxHearts} streak={streak} winRate={winRate} />
+
+        {/* 나의 삶 — 캐릭터와 집 */}
+        <LifeCard />
 
         {/* My Personality DNA */}
         <MyPersonality />

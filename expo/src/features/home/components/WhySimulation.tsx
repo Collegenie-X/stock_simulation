@@ -1,5 +1,7 @@
 import { StyleSheet, Text, View } from "react-native"
+import { useRouter, type Href } from "expo-router"
 import { FadeUp, PressableScale, Pulse } from "@/components/ui"
+import { storage } from "@/lib/storage"
 import { alpha, palette } from "@/theme"
 import { AiBattleSvg } from "./why/AiBattleSvg"
 import { HotStocksSvg } from "./why/HotStocksSvg"
@@ -8,6 +10,9 @@ import { DailyCardsSvg } from "./why/DailyCardsSvg"
 
 // ─── Card Data ────────────────────────────────────────────────────────────────
 
+// 카드마다 해당 연습으로 바로 연결 (settings: 게임 설정 화면에 미리 채워둘 값)
+const SPRINT = { speedMode: "sprint", timerSeconds: 10, simulationMonths: 1 }
+
 const CARDS = [
   {
     Svg: AiBattleSvg,
@@ -15,6 +20,8 @@ const CARDS = [
     badge: "01",
     title: "닮은꼴 AI와 대결",
     action: "내 패턴 AI가 짚어줘",
+    href: "/practice/setup",
+    settings: { ...SPRINT, dailyOpportunities: 2 },
   },
   {
     Svg: HotStocksSvg,
@@ -22,6 +29,8 @@ const CARDS = [
     badge: "02",
     title: "올해 핫종목 시뮬레이션",
     action: "1년 내 진짜 종목으로",
+    href: "/learn?tab=scenarios",
+    settings: null,
   },
   {
     Svg: BigMoneyMindSvg,
@@ -29,6 +38,8 @@ const CARDS = [
     badge: "03",
     title: "5억에도 평정심",
     action: "돈 크기에 안 흔들리기",
+    href: "/practice/setup?seed=500000000",
+    settings: { speedMode: "standard", timerSeconds: 15, simulationMonths: 3 },
   },
   {
     Svg: DailyCardsSvg,
@@ -36,10 +47,19 @@ const CARDS = [
     badge: "04",
     title: "하루 3번 즉답 카드",
     action: "골라→ 바로 결과 피드백",
+    href: "/learn?tab=patterns",
+    settings: null,
   },
 ]
 
 export default function WhySimulation() {
+  const router = useRouter()
+
+  const handlePress = (card: (typeof CARDS)[number]) => {
+    if (card.settings) storage.setGameSettings(card.settings as any)
+    router.push(card.href as Href)
+  }
+
   return (
     <View style={styles.root}>
       <View style={styles.head}>
@@ -55,7 +75,7 @@ export default function WhySimulation() {
           const Svg = c.Svg
           return (
             <FadeUp key={c.title} delay={i * 80} duration={400} style={styles.cell}>
-              <PressableScale scaleTo={0.97} style={styles.card}>
+              <PressableScale scaleTo={0.97} style={styles.card} onPress={() => handlePress(c)} accessibilityRole="button" accessibilityLabel={c.title}>
                 <View style={styles.cardHead}>
                   <Text style={[styles.stage, { color: c.color }]}>STAGE {c.badge}</Text>
                   <Pulse>

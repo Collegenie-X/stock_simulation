@@ -6,6 +6,7 @@ import { formatNumber } from "@/lib/format"
 import { alpha, palette } from "@/theme"
 import { MiniChart } from "./MiniChart"
 import { buildChartData } from "@/features/practice-stock/utils/stockBreath"
+import { getLiveTrail } from "@/features/practice-stock/hooks/useLivePrices"
 import type { StockListItem } from "@/features/practice-stock/types"
 
 export interface StockRowProps {
@@ -33,7 +34,7 @@ export const StockRow = ({
   onSelect,
   onToggleFavorite,
 }: StockRowProps) => {
-  const chartData = buildChartData(stock, currentTurn)
+  const chartData = buildChartData(stock, currentTurn, getLiveTrail(stock.id))
 
   // 가격 변동 시 플래시 (웹: animate-ticker-pulse — scale 1 → 1.04 → 1, 0.4s)
   const prevPriceRef = useRef(livePrice)
